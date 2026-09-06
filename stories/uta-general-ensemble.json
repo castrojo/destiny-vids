@@ -1,0 +1,217 @@
+{
+  "_what": "The ENSEMBLE cut of General of the Dark Army: the band plays in a window at the centre of a Bluefin stage and all four kids' drawing animations run around it, live, for the body of the film, with the authored weapon callouts interspersed in the pockets above and below the window. It supersedes the static-figure montage in uta-general-dark-army.json, which stays the authority for rights, source measurements and callout copy.",
+  "edit_id": "uta-general-ensemble",
+  "supersedes": "uta-general-dark-army",
+  "authority": {
+    "rights_and_source": "stories/uta-general-dark-army.json",
+    "callout_copy": "stories/uta-general-dark-army.json#composition/callouts",
+    "intro_slide": "stories/uta-general-intro-cards.json"
+  },
+  "owner_direction": [
+    "use the mp4 animations for all the kids and put them in this video, drop everything else except these and the shots of the band, let's find a way to make it all fit in one seamless presentation",
+    "leave the awesome intro we made",
+    "we may want the band in a window and the kids around them",
+    "and then I want the weapons interspersed for variety, mix them up",
+    "1440p is fine don't overdo it",
+    "flip them around for variety in this last one"
+  ],
+  "delivery": {
+    "width": 2560,
+    "height": 1440,
+    "frame_rate": "24000/1001",
+    "slide_frames": 132,
+    "source_frames": 11427,
+    "programme_frames": 11559,
+    "output": "GENERAL_OF_THE_DARK_ARMY.mp4"
+  },
+  "stage": {
+    "_what": "The kids are keyed pencil-and-ink line art. On black they are invisible, which is why every cut in this series lays them over a Bluefin wallpaper that crossfades day to night. This one does the same and calls it the stage.",
+    "day": ".work-rafi01/bg-day.png",
+    "night": ".work-rafi01/bg-night.png",
+    "wallpaper": "Bluefin month 01, 6300x2700 native, cropped to 16:9 and scaled -- no upscale",
+    "crossfade_start_seconds": 120.0,
+    "crossfade_end_seconds": 315.0,
+    "crossfade_note": "The fade completes inside the first stage act, so the protected passage and the second stage act are both fully night and no junction carries a background jump."
+  },
+  "band_window": {
+    "_what": "The band's own film in the stage aperture. The 140px letterbox bars are removed here and ONLY here -- they carry no picture, and leaving them in put a hard black-to-wallpaper seam through both callout pockets. The picture itself is never cropped, panned or graded, and the two full-frame interludes and the credits keep the band's frame exactly as delivered.",
+    "x": 640,
+    "y": 447,
+    "width": 1280,
+    "height": 546,
+    "letterbox_crop": "crop=2048:872:0:140",
+    "source_scale": "2048x872 -> 1280x546"
+  },
+  "kids": [
+    {
+      "id": "LAKSHMI",
+      "station": "left-top",
+      "source": "Lakshmi/CHA_LAKSHMI_01.mp4",
+      "source_frames": 28705,
+      "use_frames": 27684,
+      "use_frames_note": "Frames 27684..28704 are the source's own dim closing treatment (corner luma 254 -> 90, measured in .work-lakshmi01/verify-notes.md). The ensemble uses the drawing only, so it ends on the finished bright artwork.",
+      "x": 54,
+      "y": 20,
+      "width": 532,
+      "flip": false
+    },
+    {
+      "id": "RAFI_01",
+      "station": "left-bottom",
+      "source": "RAFI_01_SP.mp4",
+      "source_frames": 24265,
+      "x": 20,
+      "y": 785,
+      "width": 600,
+      "flip": false
+    },
+    {
+      "id": "LEONARDO",
+      "station": "right-top",
+      "source": "Leonardo/CHA_LEONARDO_01.mp4",
+      "source_frames": 18601,
+      "x": 1940,
+      "y": 60,
+      "width": 600,
+      "flip": true
+    },
+    {
+      "id": "RAFI_02",
+      "station": "right-bottom",
+      "source": "RAFI_02_SP.mp4",
+      "source_frames": 30661,
+      "x": 1940,
+      "y": 820,
+      "width": 600,
+      "flip": true
+    }
+  ],
+  "flip_note": "The right-hand pair is mirrored so all four face in towards the band, owner 2026-09-05 'flip them around for variety in this last one'. Only the two stations that gain by facing inward are flipped; a mirrored drawing is still the kid's own line work, and every title plate is masked out before the key, so no lettering is reversed on screen.",
+  "timeline": {
+    "_what": "Source frame indices at 24000/1001. Every boundary is an exact frame index and the segments tile the source's 11427 frames exactly, because summing rounded segment durations is what put 0.29s of A/V drift into an earlier pass.",
+    "intro_end_frame": 361,
+    "intro_end_note": "15.057s, the first MEASURED scene change. The band's own logo, label card and title play full frame and untouched.",
+    "protect_in_frame": 7672,
+    "protect_in_note": "319.986s -- the stage leaves before the owner-protected 320-350 passage begins.",
+    "protect_out_frame": 8436,
+    "protect_out_note": "351.852s, a measured scene change, so the stage returns on a cut.",
+    "credits_frame": 10532,
+    "credits_note": "439.272s, a measured scene change. The end credits name real people and play full frame and untouched to EOF."
+  },
+  "kid_span": {
+    "start_frame": 361,
+    "end_frame": 10532,
+    "frames": 9407,
+    "_what": "The drawings' clock counts only the frames the stage is actually up: 7311 + 2096 = 9407. Running them against wall clock would hide 764 frames of drawing behind the protected passage and hand the audience a visible jump when the stage came back. They pause with the stage and resume on the next drawing frame, and all four finish together as the credits arrive."
+  },
+  "callout_pockets": {
+    "_what": "The stage's own margins above and below the aperture. A card never crosses a kid station and never touches the band.",
+    "top": {
+      "x": 664,
+      "y": 60,
+      "width": 1232,
+      "height": 300,
+      "bounds": [
+        640,
+        0,
+        1920,
+        431
+      ]
+    },
+    "bottom": {
+      "x": 664,
+      "y": 1030,
+      "width": 1232,
+      "height": 360,
+      "bounds": [
+        640,
+        1009,
+        1920,
+        1424
+      ]
+    },
+    "bounds_note": "The bounds stop short of the frame edge on purpose: a bounding box cannot report pixels that were clipped off the canvas, so a bound ON the edge can never fail. Fit is measured on the type and art, never on the feathered halo behind them."
+  },
+  "callout_schedule": [
+    {
+      "callout": "spear",
+      "art": "xcrop-spear.png",
+      "pocket": "bottom",
+      "start_seconds": 34.0,
+      "hold_seconds": 12.0
+    },
+    {
+      "callout": "composite_bow",
+      "art": "xcrop-bow_top.png",
+      "pocket": "top",
+      "start_seconds": 76.0,
+      "hold_seconds": 9.0
+    },
+    {
+      "callout": "double_kopis",
+      "art": "xcrop-kopis.png",
+      "pocket": "bottom",
+      "start_seconds": 116.0,
+      "hold_seconds": 12.0
+    },
+    {
+      "callout": "bead_catcher",
+      "art": "xcrop-beads.png",
+      "pocket": "top",
+      "start_seconds": 154.0,
+      "hold_seconds": 9.0
+    },
+    {
+      "callout": "hippershell_exox",
+      "art": "xcrop-exox_br.png",
+      "pocket": "bottom",
+      "start_seconds": 196.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "callout": "bomb_10mm",
+      "art": null,
+      "pocket": "top",
+      "start_seconds": 236.0,
+      "hold_seconds": 9.0
+    },
+    {
+      "callout": "magazine_20",
+      "art": null,
+      "pocket": "top",
+      "start_seconds": 268.0,
+      "hold_seconds": 9.0
+    },
+    {
+      "callout": "ai_control_module",
+      "art": null,
+      "pocket": "bottom",
+      "start_seconds": 300.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "callout": "bead_catcher",
+      "art": "xcrop-beads.png",
+      "pocket": "bottom",
+      "start_seconds": 372.0,
+      "hold_seconds": 9.0
+    },
+    {
+      "callout": "composite_bow",
+      "art": "xcrop-bow_top.png",
+      "pocket": "bottom",
+      "start_seconds": 404.0,
+      "hold_seconds": 9.0
+    }
+  ],
+  "callout_note": "Mixed up rather than run in sheet order, and the two reprises in the second stage act come back in the opposite pocket to the one they first appeared in. The two callouts carrying a full description sit in the deep bottom pocket, because copy that cannot be read in the time it is up is a gap one step later. Copy is verbatim from uta-general-dark-army.json.",
+  "dropped": {
+    "chonkers": "Owner: drop everything else except the kid animations and the band.",
+    "static_kid_stills": "Replaced by the animations they were standing in for.",
+    "negative_space_placements": "The band is in a window now, so art no longer has to find a clear rectangle inside somebody else's frame."
+  },
+  "transport": {
+    "fetch_base": "http://192.168.1.227:8877",
+    "receiver_url": "http://192.168.1.227:8882"
+  }
+}
