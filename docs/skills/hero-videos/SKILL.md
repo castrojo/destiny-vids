@@ -143,6 +143,14 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   screen must be a reviewed transparent component extracted from a
   source-backed RGBA asset. Quarter-turn tall equipment only after extraction,
   then re-measure its fit.
+- **An ensemble catalog is a set-equality contract.** The scheduled item IDs
+  must equal the merged source catalog exactly, with every item appearing once.
+  Display extraction is explicit: `components`, `context_crop`, or `text_only`;
+  the last mode renders copy only with its recorded degradation reason.
+- **Placeholder equipment copy is visibly provisional.** A
+  `description_source: placeholder` row uses deterministic lorem from
+  `tools/placeholder.py` and carries a visible `[PLACEHOLDER]` marker.
+  Authored descriptions remain verbatim.
 - **Wordmark validation is source-specific.** A pinned website mark and the
   legacy no-argument fallback may have different geometry and color contracts;
   pass each source's invariants explicitly, preserve the fallback's URL/output/
@@ -155,6 +163,9 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   dimensions, alpha, lettering/fin colors, or digest do not match is stale and
   must fail the builder. The Argo fetch step repeats the digest check after
   staging rather than trusting the transport.
+- **Ensemble wordmarks keep their authored top-center seat.** A source record's
+  explicit placement wins over the generic corner-furniture convention when
+  the record reserves the top rail for the mark.
 - **Pillow preflight is still-image review only.** Load actual day/night stage
   faces and RGBA cards, use `Image.alpha_composite` for one-card-at-a-time
   composites, and write two contact sheets so every card can be reviewed in
@@ -200,6 +211,11 @@ available after success.
 Make every expected output value a workflow parameter or a value derived from
 `target_frames`: derive duration as `target_frames / 24`, derive review indices
 in the workflow shell, and use the same values in both probes and extraction.
+For a programme with a head slide, convert a source-film review time to the
+programme frame with `slide_frames + round(source_seconds * FPS_NUM / FPS_DEN)`
+and select the delivered frame by its exact output PTS. The review set should
+cover wordmark day/transition/night, every callout midpoint, protected
+full-frame passages, credits, and CTA/end.
 Decode with `ffmpeg -xerror -v error -i <output> -f null -`, capture stderr
 into an uploaded record, and write a decode PASS only after its zero exit.
 Probe all streams: include `format=nb_streams,duration`, require one stream,

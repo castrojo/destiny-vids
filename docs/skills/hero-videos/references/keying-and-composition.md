@@ -161,6 +161,19 @@ then fit and re-measure the card. Never rotate an opaque sheet crop. Tall
 weapons may be turned sideways to use a shallow bottom pocket without shrinking
 them into illegibility.
 
+Ensemble records make the extraction mode explicit:
+
+- `components` selects one or more reviewed connected alpha components.
+- `context_crop` retains only a recorded polygon and the minimum attached
+  pixels justified by its `context_note`.
+- `text_only` deliberately writes no art and carries a `degraded_reason`.
+
+The merged schedule is a set-equality invariant: every catalog item appears
+exactly once, and no scheduled item exists outside the catalog. Missing
+descriptions are deterministic lorem from `tools/placeholder.py`, marked
+`[PLACEHOLDER]` on the rendered card; they are never silently presented as
+authored copy.
+
 ## Equipment rails and readable copy
 
 Reserve named regions before placing cards. If the top is promised to a
@@ -173,6 +186,13 @@ clipped copy valid. Fail generation when the calculated copy extent exceeds the
 card bounds, then widen the layout or use available space beneath short
 horizontal art. When body copy flows beneath the art, suppress the old
 side-by-side leader instead of leaving a disconnected dot or crossing the text.
+
+When the finished programme has a head slide, source-film review times are not
+programme times. Compute
+`slide_frames + round(source_seconds * FPS_NUM / FPS_DEN)` and derive the
+delivered PTS from that programme frame. Review the returned frame set, not a
+mock: wordmark day/transition/night, every equipment midpoint, protected
+full-frame passages, credits, and CTA/end.
 
 ## Farm plumbing
 
