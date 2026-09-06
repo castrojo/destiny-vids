@@ -30,11 +30,11 @@ FRAME_W = 2560
 FRAME_H = 1440
 MARGIN = 48
 
-# Band video window geometry
-BAND_VID_X = 80
-BAND_VID_Y = 190
-BAND_VID_W = 896
-BAND_VID_H = 504
+# Band video window geometry (bottom right)
+BAND_VID_X = 1660
+BAND_VID_Y = 880
+BAND_VID_W = 854
+BAND_VID_H = 480
 
 # Bluefin Brand Colors
 COLOR_BLUE = (66, 133, 244, 255)       # #4285f4
@@ -131,14 +131,13 @@ def build_overlay() -> Image.Image:
 
     # 2. Bottom-left wordmark
     wordmark = draw_wordmark(height=44)
-    wm_x = MARGIN
-    card_h = int(round(280 * (1 + qr.STRIP_FRAC)))
-    wm_y = FRAME_H - MARGIN - card_h + card_h - wordmark.height
+    wm_x = 36
+    wm_y = FRAME_H - 36 - wordmark.height
     canvas.alpha_composite(wordmark, (wm_x, wm_y))
 
-    # 3. Bottom-right QR card
+    # 3. Top-left QR card (positioned at x=36, y=36, width=240 to clear spear tip and leave sky clear for comet)
     qr_card = qr.card(
-        width=280,
+        width=240,
         url="https://www.unleashthearchers.com/",
         style="slate",
         eyebrow="SUPPORT",
@@ -148,8 +147,8 @@ def build_overlay() -> Image.Image:
             qr.decodes(qr_card, "https://www.unleashthearchers.com/", qr.NIGHT_PLATE)):
         raise RuntimeError("QR card failed decode gate")
 
-    qr_x = FRAME_W - MARGIN - 280
-    qr_y = FRAME_H - MARGIN - card_h
+    qr_x = 36
+    qr_y = 36
     canvas.alpha_composite(qr_card, (qr_x, qr_y))
 
     return canvas

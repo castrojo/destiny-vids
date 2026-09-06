@@ -42,7 +42,7 @@ def test_render_callout_card(tmp_path):
     assert img.size == (2560, 1440)
     assert img.mode == "RGBA"
 
-    # Verify callout container area has content
-    crop = img.crop((80, 740, 80 + 896, 740 + 520))
+    # Verify callout container area has content (x=1660, y=530, w=854, h=320)
+    crop = img.crop((1660, 530, 1660 + 854, 530 + 320))
     alpha = crop.split()[-1]
     assert alpha.getbbox() is not None

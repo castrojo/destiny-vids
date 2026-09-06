@@ -110,10 +110,11 @@ def render_callout_card(spec: dict, weapons_dir: Path) -> Image.Image:
     card = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
     d = ImageDraw.Draw(card)
 
-    bx0 = 80
-    by0 = 740
-    bw = 896
-    bh = 520
+    # Positioned above terminal in bottom-right (x=1660, y=530), leaving upper sky clear for comet
+    bx0 = 1660
+    by0 = 530
+    bw = 854
+    bh = 320
     bx1 = bx0 + bw
     by1 = by0 + bh
     chamfer = 14
@@ -138,46 +139,46 @@ def render_callout_card(spec: dict, weapons_dir: Path) -> Image.Image:
            fill=COLOR_BLUE, width=2)
 
     # Header plate / eyebrow
-    font_eyebrow = plate_mod._font("bold", 13)
-    d.text((bx0 + 24, by0 + 18), "// BLUEFIN TACTICAL ARSENAL", font=font_eyebrow, fill=COLOR_BLUE)
+    font_eyebrow = plate_mod._font("bold", 12)
+    d.text((bx0 + 20, by0 + 14), "// BLUEFIN TACTICAL ARSENAL", font=font_eyebrow, fill=COLOR_BLUE)
 
     # Title
-    font_title = plate_mod._font("bold", 24)
-    d.text((bx0 + 24, by0 + 44), spec["title"], font=font_title, fill=COLOR_WHITE)
+    font_title = plate_mod._font("bold", 20)
+    d.text((bx0 + 20, by0 + 36), spec["title"], font=font_title, fill=COLOR_WHITE)
 
     # Subtitle
-    font_sub = plate_mod._font("regular", 15)
-    d.text((bx0 + 24, by0 + 82), spec["subtitle"], font=font_sub, fill=COLOR_BLUE)
+    font_sub = plate_mod._font("regular", 14)
+    d.text((bx0 + 20, by0 + 68), spec["subtitle"], font=font_sub, fill=COLOR_BLUE)
 
     # Accent rule
-    d.line([(bx0 + 24, by0 + 110), (bx0 + 480, by0 + 110)], fill=COLOR_RULE, width=2)
+    d.line([(bx0 + 20, by0 + 92), (bx0 + 440, by0 + 92)], fill=COLOR_RULE, width=2)
 
     # Description text
-    font_body = plate_mod._font("regular", 18)
+    font_body = plate_mod._font("regular", 16)
     text_width = 460
     desc_lines = wrap_text(d, spec["description"], font_body, text_width)
-    dy = by0 + 130
+    dy = by0 + 108
     for line in desc_lines:
-        d.text((bx0 + 24, dy), line, font=font_body, fill=COLOR_TEXT_DIM)
-        dy += 30
+        d.text((bx0 + 20, dy), line, font=font_body, fill=COLOR_TEXT_DIM)
+        dy += 26
 
     # Weapon Image on right side
     weap_path = weapons_dir / f"{spec['weapon_key']}.png"
     if weap_path.exists():
         weap_img = Image.open(weap_path).convert("RGBA")
-        max_art_w = 340
-        max_art_h = 420
+        max_art_w = 300
+        max_art_h = 240
         scale = min(max_art_w / weap_img.width, max_art_h / weap_img.height)
         new_w = max(1, int(round(weap_img.width * scale)))
         new_h = max(1, int(round(weap_img.height * scale)))
         scaled_weap = weap_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
 
-        ax = bx1 - 24 - new_w
-        ay = by0 + 50 + (bh - 60 - new_h) // 2
+        ax = bx1 - 20 - new_w
+        ay = by0 + 30 + (bh - 40 - new_h) // 2
         card.alpha_composite(scaled_weap, (ax, ay))
 
         # Vertical separator rule between text and weapon
-        d.line([(bx0 + 500, by0 + 40), (bx0 + 500, by1 - 30)], fill=COLOR_RULE, width=1)
+        d.line([(bx0 + 510, by0 + 30), (bx0 + 510, by1 - 20)], fill=COLOR_RULE, width=1)
 
     return card
 

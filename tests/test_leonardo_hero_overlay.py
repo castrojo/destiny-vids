@@ -30,11 +30,11 @@ def test_overlay_dimensions_and_mode(built_overlay):
 
 
 def test_qr_card_decodes_in_overlay(built_overlay):
-    # QR card box at bottom right
-    card_w = 280
+    # QR card box at top left (x=36, y=36)
+    card_w = 240
     card_h = int(round(card_w * (1 + qr.STRIP_FRAC)))
-    x0 = 2560 - 48 - card_w
-    y0 = 1440 - 48 - card_h
+    x0 = 36
+    y0 = 36
     qr_crop = built_overlay.crop((x0, y0, x0 + card_w, y0 + card_h))
 
     assert qr.decodes(qr_crop, "https://www.unleashthearchers.com/", qr.DAY_PLATE)
@@ -42,8 +42,8 @@ def test_qr_card_decodes_in_overlay(built_overlay):
 
 
 def test_band_video_window_is_transparent(built_overlay):
-    # Window interior (x=80..976, y=190..694) must be transparent so video shows through
-    center_pixel = built_overlay.getpixel((80 + 448, 190 + 252))
+    # Window interior (x=1660..2514, y=880..1360) must be transparent so video shows through
+    center_pixel = built_overlay.getpixel((1660 + 427, 880 + 240))
     assert center_pixel[3] == 0, f"Expected transparent center pixel in video window, got {center_pixel}"
 
 
