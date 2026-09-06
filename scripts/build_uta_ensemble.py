@@ -426,6 +426,9 @@ def review_frame_plan(record):
                 "programme_frame": (
                     record["delivery"]["slide_frames"] + source_frame
                 ),
+                "programme_pts": (
+                    record["delivery"]["slide_frames"] + source_frame
+                ) * FPS_DEN,
             }
         )
 
@@ -457,7 +460,7 @@ def review_frame_plan(record):
 
 def review_plan_tsv(plan):
     lines = [
-        "label\tkind\titem\tsource_seconds\tsource_frame\tprogramme_frame\tprogramme_seconds"
+        "label\tkind\titem\tsource_seconds\tsource_frame\tprogramme_frame\tprogramme_pts\tprogramme_seconds"
     ]
     for row in plan:
         programme_seconds = row["programme_frame"] * FPS_DEN / FPS_NUM
@@ -470,6 +473,7 @@ def review_plan_tsv(plan):
                     f"{row['source_seconds']:.6f}",
                     str(row["source_frame"]),
                     str(row["programme_frame"]),
+                    str(row["programme_pts"]),
                     f"{programme_seconds:.6f}",
                 ]
             )
@@ -1529,7 +1533,7 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
     if not wordmark_sha256:
         raise ValueError("wordmark raster sha256 is required for workflow generation")
     frame_expr = "+".join(
-        f"eq(n\\,{row['programme_frame']})" for row in plan
+        f"eq(pts\\,{row['programme_pts']})" for row in plan
     )
     review_paths = " ".join(f"/work/{row['label']}.jpg" for row in plan)
 

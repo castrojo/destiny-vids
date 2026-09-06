@@ -123,6 +123,7 @@ def test_review_plan_uses_exact_programme_frame_offset_math():
         / B.FPS_DEN
     )
     assert row["programme_frame"] == expected
+    assert row["programme_pts"] == expected * B.FPS_DEN
     assert len(
         [row for row in plan if row["kind"] == "callout"]
     ) == len(RECORD["callout_schedule"])
@@ -138,7 +139,7 @@ def test_workflow_contains_remote_preview_and_full_review_artifacts():
     assert "/work/frame-plan.tsv" in text
     assert "/work/ens-gates.txt" in text
     assert "/work/review-sha256.txt" in text
-    assert "select='eq(n\\," in text
+    assert "select='eq(pts\\," in text
     assert 'ffmpeg -xerror -v error -i "$out" -f null - 2>' in text
     assert "audio_bitrate_actual" in text
 
