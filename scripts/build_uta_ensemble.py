@@ -147,6 +147,20 @@ PREFLIGHT_CELL_WIDTH = 640
 PREFLIGHT_CELL_HEIGHT = 420
 PREFLIGHT_PREVIEW_HEIGHT = 360
 WORDMARK_ASSET_PATH = Path(".work-uta-general/assets/bluefin-wordmark.png")
+PREVIEW_SLICES = (
+    {
+        "name": "preview-day",
+        "start_seconds": 46.0,
+        "duration_seconds": 12.0,
+        "purpose": "day stage, real band, top-rail child edge, placeholder-description callout",
+    },
+    {
+        "name": "preview-night",
+        "start_seconds": 398.0,
+        "duration_seconds": 20.0,
+        "purpose": "night stage, real band, top-rail child edge, longest authored night description",
+    },
+)
 
 
 def t_of(frame: int) -> float:
@@ -285,6 +299,11 @@ def normalize_callout(item_id: str, item: dict) -> dict:
 
     source_copy = placeholder.fill_equipment_description(item_id, item["copy"])
     presentation = item["presentation"]
+    description = source_copy.get(
+        "description_render", source_copy.get("description")
+    )
+    if source_copy.get("description_source") == placeholder.MARKER and description:
+        description = f"[PLACEHOLDER] {description}"
     return {
         "copy": {
             "label_render": source_copy.get(
@@ -293,9 +312,7 @@ def normalize_callout(item_id: str, item: dict) -> dict:
             "subtitle_render": source_copy.get(
                 "subtitle_render", source_copy.get("subtitle")
             ),
-            "description_render": source_copy.get(
-                "description_render", source_copy.get("description")
-            ),
+            "description_render": description,
         },
         "font_size": presentation["font_size"],
         "description_font_size": presentation.get(
@@ -365,6 +382,99 @@ def stage_windows(record):
         for kind, start, frames in segments(record)
         if kind == "stage"
     ]
+
+
+def visible_offset_for_source_frame(record, source_frame: int) -> int:
+    """Return the drawing-clock frame at a source frame in a stage segment."""
+    offset = 0
+    for kind, start, frames in segments(record):
+        if kind == "stage":
+            if start <= source_frame < start + frames:
+                return offset + source_frame - start
+            offset += frames
+    raise ValueError(
+        f"source frame {source_frame} is not inside a stage segment"
+    )
+
+
+def scheduled_cards(record, card_names, start_seconds, duration_seconds):
+    """Return cards wholly contained in a stage slice."""
+    end_seconds = start_seconds + duration_seconds
+    return [
+        (name, entry["start_seconds"], entry["hold_seconds"])
+        for entry, name in zip(record["callout_schedule"], card_names)
+        if (
+            start_seconds <= entry["start_seconds"]
+            and entry["start_seconds"] + entry["hold_seconds"] <= end_seconds
+        )
+    ]
+
+
+def review_frame_plan(record):
+    """Build the exact programme-frame review plan used by Argo extraction."""
+    rows = []
+
+    def add(label, source_seconds, kind, item=None):
+        source_frame = round(source_seconds * FPS_NUM / FPS_DEN)
+        rows.append(
+            {
+                "label": label,
+                "kind": kind,
+                "item": item or "",
+                "source_seconds": source_seconds,
+                "source_frame": source_frame,
+                "programme_frame": (
+                    record["delivery"]["slide_frames"] + source_frame
+                ),
+            }
+        )
+
+    add("intro-logo", 3.0, "intro")
+    add("intro-title", 14.0, "intro")
+    add("wordmark-day", 42.0, "wordmark")
+    add("wordmark-transition-mid", 217.5, "wordmark")
+    add("wordmark-night", 402.0, "wordmark")
+    for index, entry in enumerate(record["callout_schedule"]):
+        add(
+            f"callout-{index:02d}-{entry['item']}",
+            entry["start_seconds"] + entry["hold_seconds"] / 2,
+            "callout",
+            entry["item"],
+        )
+    add("protected-start", 320.2, "protected")
+    add("protected-mid", 335.0, "protected")
+    add("protected-end", 349.8, "protected")
+    add("credits-start", 440.0, "credits")
+    add("cta", 445.0, "cta")
+    add("ending", 474.0, "ending")
+
+    rows.sort(key=lambda row: row["programme_frame"])
+    frames = [row["programme_frame"] for row in rows]
+    if len(frames) != len(set(frames)):
+        raise ValueError("review frame plan contains duplicate programme frames")
+    return rows
+
+
+def review_plan_tsv(plan):
+    lines = [
+        "label\tkind\titem\tsource_seconds\tsource_frame\tprogramme_frame\tprogramme_seconds"
+    ]
+    for row in plan:
+        programme_seconds = row["programme_frame"] * FPS_DEN / FPS_NUM
+        lines.append(
+            "\t".join(
+                [
+                    row["label"],
+                    row["kind"],
+                    row["item"],
+                    f"{row['source_seconds']:.6f}",
+                    str(row["source_frame"]),
+                    str(row["programme_frame"]),
+                    f"{programme_seconds:.6f}",
+                ]
+            )
+        )
+    return "\n".join(lines) + "\n"
 
 
 def validate_equipment_schedule(record, catalog, montage=None):
@@ -1214,7 +1324,15 @@ def stage_bg_chain(record, seg_start_t, dur):
     ), ["day", "night"]
 
 
-def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
+def stage_segment(
+    record,
+    idx,
+    start_frame,
+    frames,
+    cards,
+    kid_offset,
+    output_name=None,
+):
     kids = stations(record)
     win = record["band_window"]
     wordmark = record["wordmark"]
@@ -1300,11 +1418,12 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
         n += 1
 
     chain.append(f"[{prev}]format=yuv420p[v]")
+    output_name = output_name or f"s{idx:02d}"
     return (
         f"ffmpeg -hide_banner -v error -y {' '.join(inputs)} \\\n"
         f'  -filter_complex "{";".join(chain)}" \\\n'
-        f'  -map "[v]" -an -frames:v {frames} $V /work/s{idx:02d}.mp4\n'
-        f'echo "s{idx:02d} stage {start_frame} {frames}f"'
+        f'  -map "[v]" -an -frames:v {frames} $V /work/{output_name}.mp4\n'
+        f'echo "{output_name} stage {start_frame} {frames}f"'
     )
 
 
@@ -1400,6 +1519,7 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
     segs = segments(record)
     src = montage["source"]
     output = record["delivery"]["output"]
+    plan = review_frame_plan(record)
     wordmark = validate_wordmark_record(record)
     wordmark_sha256 = wordmark_sha256 or wordmark.get("raster_sha256")
     wordmark_name = Path(
@@ -1408,6 +1528,10 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
     wordmark_source = wordmark.get("asset_path", str(WORDMARK_ASSET_PATH))
     if not wordmark_sha256:
         raise ValueError("wordmark raster sha256 is required for workflow generation")
+    frame_expr = "+".join(
+        f"eq(n\\,{row['programme_frame']})" for row in plan
+    )
+    review_paths = " ".join(f"/work/{row['label']}.jpg" for row in plan)
 
     fetch = ["base=" + FETCH_BASE]
     fetch.append(
@@ -1446,38 +1570,84 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
             f"$base/.work-uta-general/cards/{name}"
         )
 
-    body = []
-    body.append(f'V="-r {FPS_NUM}/{FPS_DEN} -c:v libx264 -preset medium '
-                f'-crf 18 -pix_fmt yuv420p"')
-    body.append("")
-    body.append("# 0. the intro we already made: 132 frames on black, so the")
-    body.append("#    programme is the slide plus the source's own 11427 and")
-    body.append("#    nothing is invented at a junction.")
-    body.append(
-        "ffmpeg -hide_banner -v error -y \\\n"
-        f"  -f lavfi -i \"color=c=black:s={CANVAS_W}x{CANVAS_H}"
-        f":r={FPS_NUM}/{FPS_DEN}\" \\\n"
-        f"  -loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/INTRO_BLUEFIN.png \\\n"
-        f'  -filter_complex "[1:v]scale={CANVAS_W}:{CANVAS_H}:flags=lanczos,'
-        "format=rgba,setsar=1,fade=in:st=0.3:d=1.0:alpha=1,"
-        'fade=out:st=4.7:d=0.8:alpha=1[c];[0:v][c]overlay=x=0:y=0[v]" \\\n'
-        f"  -map \"[v]\" -frames:v {record['delivery']['slide_frames']} "
-        "-an $V /work/s00.mp4"
+    body = [
+        f'V="-r {FPS_NUM}/{FPS_DEN} -c:v libx264 -preset medium '
+        f'-crf 18 -pix_fmt yuv420p"',
+        'MODE="{{workflow.parameters.render_mode}}"',
+        "",
+        "# Preview mode uses the same stage graph as the full render but only",
+        "# two representative source slices. It never substitutes a mock.",
+        'if [ "$MODE" = "preview" ]; then',
+    ]
+    for preview in PREVIEW_SLICES:
+        start_frame = round(
+            preview["start_seconds"] * FPS_NUM / FPS_DEN
+        )
+        frames = round(preview["duration_seconds"] * FPS_NUM / FPS_DEN)
+        kid_offset = visible_offset_for_source_frame(record, start_frame)
+        cards = scheduled_cards(
+            record,
+            card_names,
+            preview["start_seconds"],
+            preview["duration_seconds"],
+        )
+        command = stage_segment(
+            record,
+            90 if preview["name"] == "preview-day" else 91,
+            start_frame,
+            frames,
+            cards,
+            kid_offset,
+            output_name=preview["name"],
+        )
+        body.extend(f"  {line}" for line in command.splitlines())
+        sample_indices = [0, frames // 2, frames - 1]
+        preview_expr = "+".join(
+            f"eq(n\\,{index})" for index in sample_indices
+        )
+        body.append(
+            f'  ffmpeg -xerror -hide_banner -v error -y -i '
+            f'/work/{preview["name"]}.mp4 -vf '
+            f'"select=\'{preview_expr}\',scale=1280:720" '
+            f"-fps_mode vfr -frames:v 3 -q:v 2 "
+            f'/work/{preview["name"]}-frame-%02d.jpg'
+        )
+        body.append(
+            f'  ffmpeg -xerror -v error -i /work/{preview["name"]}.mp4 '
+            f'-f null - 2> /work/{preview["name"]}-decode.txt'
+        )
+    body.extend(
+        [
+            "  exit 0",
+            "fi",
+            "",
+            "# 0. the intro we already made: 132 frames on black, so the",
+            "#    programme is the slide plus the source's own 11427 and",
+            "#    nothing is invented at a junction.",
+            "ffmpeg -hide_banner -v error -y \\\n"
+            f"  -f lavfi -i \"color=c=black:s={CANVAS_W}x{CANVAS_H}"
+            f":r={FPS_NUM}/{FPS_DEN}\" \\\n"
+            f"  -loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/INTRO_BLUEFIN.png \\\n"
+            f'  -filter_complex "[1:v]scale={CANVAS_W}:{CANVAS_H}:flags=lanczos,'
+            "format=rgba,setsar=1,fade=in:st=0.3:d=1.0:alpha=1,"
+            'fade=out:st=4.7:d=0.8:alpha=1[c];[0:v][c]overlay=x=0:y=0[v]" \\\n'
+            f"  -map \"[v]\" -frames:v {record['delivery']['slide_frames']} "
+            "-an $V /work/s00.mp4",
+            'echo "s00 head slide"',
+        ]
     )
-    body.append('echo "s00 head slide"')
 
-    schedule = list(zip(record["callout_schedule"], card_names))
     kid_offset = 0
     for i, (kind, start, frames) in enumerate(segs, start=1):
         if kind == "clean":
             body.append(clean_segment(i, start, frames))
             continue
-        a, b = t_of(start), t_of(start + frames)
-        cards = [
-            (name, e["start_seconds"], e["hold_seconds"])
-            for e, name in schedule
-            if a <= e["start_seconds"] and e["start_seconds"] + e["hold_seconds"] <= b
-        ]
+        cards = scheduled_cards(
+            record,
+            card_names,
+            t_of(start),
+            t_of(frames),
+        )
         body.append(stage_segment(record, i, start, frames, cards, kid_offset))
         kid_offset += frames
 
@@ -1510,24 +1680,99 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         f"out=/work/{output}\n"
         'ffprobe -v error -count_frames -show_format -show_streams -of json "$out" '
         "> /work/ens-probe.json\n"
-        'ffmpeg -v error -i "$out" -f null - 2> /work/ens-decode.txt\n'
+        'ffmpeg -xerror -v error -i "$out" -f null 2> /work/ens-decode.txt\n'
         "printf 'decode stderr bytes: %s\\n' \"$(wc -c < /work/ens-decode.txt)\"\n"
         'sha256sum "$out" > /work/ens-sha256.txt\n'
         'ffmpeg -hide_banner -nostats -y -i "$out" -af ebur128=peak=true '
-        "-f null - 2> /work/ens-ebur128.txt || true\n"
+        "-f null - 2> /work/ens-ebur128.txt\n"
         "tail -12 /work/ens-ebur128.txt\n"
-        "for t in 3 20 40 80 122 160 200 240 276 305 330 360 376 408 445; do\n"
-        '  ffmpeg -hide_banner -v error -y -ss $t -i "$out" -frames:v 1 '
-        '-vf "scale=1280:720" -q:v 2 /work/ens-t$t.jpg\n'
-        "done"
+        "cat > /work/frame-plan.tsv <<'EOF'\n"
+        f"{review_plan_tsv(plan)}"
+        "EOF\n"
+        "sed -i 's/^[[:space:]]*//' /work/frame-plan.tsv\n"
+        f'ffmpeg -hide_banner -v error -y -i "$out" -vf '
+        f'"select=\'{frame_expr}\',scale=1280:720" -fps_mode vfr '
+        f"-frames:v {len(plan)} -q:v 2 /work/review-%03d.jpg\n"
+        "i=1\n"
+        "tail -n +2 /work/frame-plan.tsv | cut -f1 | while IFS= "
+        "read -r label; do\n"
+        '  mv "/work/review-$(printf \'%03d\' "$i").jpg" "/work/$label.jpg"\n'
+        "  i=$((i + 1))\n"
+        "done\n"
+        f"sha256sum {review_paths} > /work/review-sha256.txt\n"
+        ": > /work/ens-gates.txt\n"
+        "printf 'render_mode=full\\n' >> /work/ens-gates.txt\n"
+        "printf 'expected_frames="
+        f"{record['delivery']['programme_frames']}\\n' >> /work/ens-gates.txt\n"
+        "v_frames=$(ffprobe -v error -select_streams v:0 -count_frames "
+        "-show_entries stream=nb_read_frames -of default=nw=1:nk=1 \"$out\")\n"
+        "printf 'video_frames=%s\\n' \"$v_frames\" >> /work/ens-gates.txt\n"
+        f'[ "$v_frames" = "{record["delivery"]["programme_frames"]}" ]\n'
+        "stream_types=$(ffprobe -v error -show_entries stream=codec_type "
+        "-of csv=p=0 \"$out\" | tr '\\n' ' ')\n"
+        "printf 'stream_types=%s\\n' \"$stream_types\" >> /work/ens-gates.txt\n"
+        '[ "$(printf "%s" "$stream_types" | wc -w | tr -d " ")" = "2" ]\n'
+        '[ "$(printf "%s" "$stream_types" | grep -c "video")" = "1" ]\n'
+        '[ "$(printf "%s" "$stream_types" | grep -c "audio")" = "1" ]\n'
+        "v_meta=$(ffprobe -v error -select_streams v:0 "
+        "-show_entries stream=codec_name,width,height,r_frame_rate "
+        "-of default=nw=1 \"$out\")\n"
+        "printf '%s\\n' \"$v_meta\" >> /work/ens-gates.txt\n"
+        'printf "%s\\n" "$v_meta" | grep -q "codec_name=h264"\n'
+        f'printf "%s\\n" "$v_meta" | grep -q "width={CANVAS_W}"\n'
+        f'printf "%s\\n" "$v_meta" | grep -q "height={CANVAS_H}"\n'
+        f'printf "%s\\n" "$v_meta" | grep -q "r_frame_rate={FPS_NUM}/{FPS_DEN}"\n'
+        "a_meta=$(ffprobe -v error -select_streams a:0 "
+        "-show_entries stream=codec_name,sample_rate,channels,bit_rate "
+        "-of default=nw=1 \"$out\")\n"
+        "printf '%s\\n' \"$a_meta\" >> /work/ens-gates.txt\n"
+        'printf "%s\\n" "$a_meta" | grep -q "codec_name=aac"\n'
+        'printf "%s\\n" "$a_meta" | grep -q "sample_rate=48000"\n'
+        'printf "%s\\n" "$a_meta" | grep -q "channels=2"\n'
+        f'printf "%s\\n" "$a_meta" | grep -q "bit_rate={bitrate}000"\n'
+        "duration=$(ffprobe -v error -show_entries format=duration "
+        "-of default=nw=1:nk=1 \"$out\")\n"
+        f'expected_duration=$(awk "BEGIN {{printf \\"%.9f\\", '
+        f'{record["delivery"]["programme_frames"]}*{FPS_DEN}/{FPS_NUM}}}")\n'
+        "printf 'duration=%s\\nexpected_duration=%s\\n' \"$duration\" "
+        "\"$expected_duration\" >> /work/ens-gates.txt\n"
+        "awk -v actual=\"$duration\" -v expected=\"$expected_duration\" "
+        "'BEGIN { if (actual < expected - 0.05 || actual > expected + 0.05) exit 1 }'\n"
+        f"printf 'audio_policy=static_gain={gain:g}dB; no_normalization; no_eq\\n' "
+        ">> /work/ens-gates.txt\n"
+        "printf 'all_gates=PASS\\n' >> /work/ens-gates.txt"
     )
 
+    preview_upload_paths = " ".join(
+        [
+            f"/work/{preview['name']}.mp4"
+            for preview in PREVIEW_SLICES
+        ]
+        + [
+            f"/work/{preview['name']}-decode.txt"
+            for preview in PREVIEW_SLICES
+        ]
+        + [
+            f"/work/{preview['name']}-frame-{index:02d}.jpg"
+            for preview in PREVIEW_SLICES
+            for index in range(1, 4)
+        ]
+    )
     upload = [
-        f"for f in /work/{output} /work/ens-probe.json /work/ens-decode.txt \\",
-        "         /work/ens-sha256.txt /work/ens-ebur128.txt "
-        "/work/ens-t*.jpg /work/*-proof.png; do",
-        f'  curl -fsS -T "$f" {RECEIVER}/$(basename $f)',
-        "done",
+        'MODE="{{workflow.parameters.render_mode}}"',
+        'if [ "$MODE" = "preview" ]; then',
+        f"  for f in {preview_upload_paths}; do",
+        f'    curl -fsS -T "$f" {RECEIVER}/$(basename $f)',
+        "  done",
+        "else",
+        f"  for f in /work/{output} /work/ens-probe.json /work/ens-decode.txt \\",
+        "           /work/ens-sha256.txt /work/ens-ebur128.txt "
+        "/work/ens-gates.txt /work/frame-plan.tsv "
+        f"/work/review-sha256.txt {review_paths} /work/ens-t*.jpg "
+        "/work/*-proof.png; do",
+        f'    curl -fsS -T "$f" {RECEIVER}/$(basename $f)',
+        "  done",
+        "fi",
     ]
 
     key_tasks = "\n".join(
@@ -1549,6 +1794,10 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         "spec:",
         "  entrypoint: main",
         "  podGC: {strategy: OnWorkflowSuccess}",
+        "  arguments:",
+        "    parameters:",
+        "      - name: render_mode",
+        "        value: full",
         "  volumes:",
         f"    - name: work",
         f"      persistentVolumeClaim: {{claimName: {PVC}}}",

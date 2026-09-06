@@ -107,6 +107,40 @@ def test_builder_uses_the_declared_delivery_name():
     assert f"/work/{RECORD['delivery']['output']}" in text
 
 
+def test_review_plan_uses_exact_programme_frame_offset_math():
+    plan = B.review_frame_plan(RECORD)
+    row = next(
+        row for row in plan if row["item"] == "leonardo_chili_smoke_grenade"
+    )
+    entry = next(
+        entry
+        for entry in RECORD["callout_schedule"]
+        if entry["item"] == row["item"]
+    )
+    expected = RECORD["delivery"]["slide_frames"] + round(
+        (entry["start_seconds"] + entry["hold_seconds"] / 2)
+        * B.FPS_NUM
+        / B.FPS_DEN
+    )
+    assert row["programme_frame"] == expected
+    assert len(
+        [row for row in plan if row["kind"] == "callout"]
+    ) == len(RECORD["callout_schedule"])
+
+
+def test_workflow_contains_remote_preview_and_full_review_artifacts():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+    assert 'MODE="{{workflow.parameters.render_mode}}"' in text
+    for preview in B.PREVIEW_SLICES:
+        assert f"/work/{preview['name']}.mp4" in text
+        assert f"/work/{preview['name']}-decode.txt" in text
+    assert "/work/frame-plan.tsv" in text
+    assert "/work/ens-gates.txt" in text
+    assert "/work/review-sha256.txt" in text
+    assert "select='eq(n\\," in text
+
+
 def test_ensemble_catalog_contains_all_rafi_and_leonardo_items():
     assert set(CATALOG) == (
         set(MONTAGE["composition"]["callouts"])
@@ -164,6 +198,7 @@ def test_normalized_callouts_fill_only_placeholder_descriptions():
     )
     assert placeholder["copy"]["description_render"].strip()
     assert placeholder["copy"]["description_render"] != "REGULAR HUNTING ARROW"
+    assert placeholder["copy"]["description_render"].startswith("[PLACEHOLDER] ")
     assert authored["copy"]["description_render"] == (
         "FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM"
     )
@@ -576,6 +611,9 @@ def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():
     text = B.workflow(RECORD, MONTAGE, names)
     doc = yaml.safe_load(text)
     assert doc["kind"] == "Workflow"
+    assert doc["spec"]["arguments"]["parameters"] == [
+        {"name": "render_mode", "value": "full"}
+    ]
     for _, start, frames in B.segments(RECORD):
         assert f"-frames:v {frames}" in text
     assert f"-frames:v {RECORD['delivery']['slide_frames']}" in text
@@ -631,7 +669,7 @@ def test_only_the_aperture_is_rounded():
     # the kids' own keying chains alphamerge too, so count the aperture's
     assert text.count("[bandpix][amask]alphamerge") == sum(
         1 for kind, _, _ in B.segments(RECORD) if kind == "stage"
-    )
+    ) + len(B.PREVIEW_SLICES)
     # the clean segments carry no mask and no alpha work at all
     for kind, start, frames in B.segments(RECORD):
         if kind == "clean":
@@ -684,7 +722,7 @@ def test_workflow_fetches_the_wordmark_only_for_stage_graphs():
     assert "$base/.work-uta-general/assets/bluefin-wordmark.png" in text
     assert text.count("-i /work/bluefin-wordmark.png") == sum(
         kind == "stage" for kind, _, _ in B.segments(RECORD)
-    )
+    ) + len(B.PREVIEW_SLICES)
     assert (
         f'echo "{RECORD["wordmark"]["raster_sha256"]}  '
         '/work/bluefin-wordmark.png" | sha256sum -c -'
