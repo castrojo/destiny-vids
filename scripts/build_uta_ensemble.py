@@ -43,7 +43,9 @@ CANVAS_W, CANVAS_H = 2560, 1440
 # the key is colorkey=0x0000FF. The fill runs on the FULL frame before the
 # tight crop, and the matte goes back onto the ORIGINAL pixels.
 FILL = "s0=255:s1=255:s2=255:d0=0:d1=255:d2=0"
-LEONARDO_NAME_MASK = "drawbox=x=1020:y=0:w=1026:h=128:color=white@1:t=fill"
+LEONARDO_NAME_MASK = (
+    "drawbox=x=1020:y=0:w=1026:h=128:color=0x0000FF@1:t=fill"
+)
 
 KEY_CHAINS = {
     "RAFI_01": (
@@ -98,9 +100,8 @@ KEY_CHAINS = {
     ),
     "LEONARDO": (
         "crop=2046:1746:0:0,"
-        f"{LEONARDO_NAME_MASK},"
         "format=rgba,split[c][m];"
-        "[m]format=rgb24,"
+        f"[m]format=rgb24,{LEONARDO_NAME_MASK},"
         "lutrgb=r='if(gt(val,247),255,val)':g='if(gt(val,247),255,val)'"
         ":b='if(gt(val,247),255,val)',"
         f"floodfill=x=2:y=2:{FILL},"
@@ -652,12 +653,15 @@ def workflow(record, montage, card_names):
         "-c copy /work/picture.mp4"
     )
     delay = record["delivery"]["slide_frames"] * FPS_DEN / FPS_NUM * 1000
+    gain = record["delivery"]["audio_gain_db"]
+    bitrate = record["delivery"]["audio_bitrate_kbps"]
     body.append(
         "# ONE gapless audio pass: the music is continuous, so per-segment\n"
         "# encoding would put an AAC encoder-delay junction inside it at every\n"
         "# cut. adelay seats the film's audio behind the head slide.\n"
         "ffmpeg -hide_banner -v error -y -i /work/source.webm \\\n"
-        f'  -af "adelay={delay:.1f}|{delay:.1f}" -c:a aac -b:a 192k '
+        f'  -af "adelay={delay:.1f}|{delay:.1f},volume={gain:g}dB" '
+        f"-c:a aac -b:a {bitrate}k "
         "-ar 48000 -ac 2 /work/programme-audio.m4a"
     )
     body.append(
