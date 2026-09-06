@@ -296,6 +296,18 @@
     }
   ],
   "callout_note": "Mixed up rather than run in sheet order, and the two reprises in the second stage act come back in the opposite pocket to the one they first appeared in. The two callouts carrying a full description sit in the deep bottom pocket, because copy that cannot be read in the time it is up is a gap one step later. Copy is verbatim from uta-general-dark-army.json.",
+  "wordmark": {
+    "_what": "Canonical website Bluefin wordmark, centered in the top rail during stage segments only.",
+    "source_repo": "projectbluefin/website",
+    "source_commit": "c03567d972bb9cf52ab0676de5068a54f62f8a48",
+    "source_path": "public/brands/bluefin-wordmark-light.svg",
+    "source_url": "https://raw.githubusercontent.com/projectbluefin/website/c03567d972bb9cf52ab0676de5068a54f62f8a48/public/brands/bluefin-wordmark-light.svg",
+    "sha256": "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74",
+    "raster_width": 1200,
+    "display_width": 600,
+    "x": 980,
+    "y": 48
+  },
   "dropped": {
     "chonkers": "Owner: drop everything else except the kid animations and the band.",
     "static_kid_stills": "Replaced by the animations they were standing in for.",
