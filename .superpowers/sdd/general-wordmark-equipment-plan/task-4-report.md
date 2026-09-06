@@ -103,3 +103,14 @@ solid-alpha threshold and must remain within the bottom bounds.
 Task 5 still owns wordmark compositing. This change intentionally leaves the
 top rail available and does not add the wordmark to the ensemble card or
 workflow layers.
+
+## Fix round 1
+
+- Propagated `main()` through `raise SystemExit(main())`, so `--audit-assets`
+  returns nonzero when any source or final-card validation fails.
+- Extended the offline bottom-rail bounds regression to render every
+  non-text-only catalog item with transparent synthetic RGBA art and its
+  recorded `art_width_share`; text-only items remain copy-only.
+- Reused the delivery card-fit loop during `--audit-assets`, rendering each
+  Leonardo item with its extracted asset so source-specific aspect and scale
+  overflow is reported before delivery.

@@ -7,6 +7,7 @@ what it landed on.
 """
 
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -222,23 +223,51 @@ def test_no_two_cards_are_up_at_once():
         assert start >= end + 1.0
 
 
-def test_solid_card_alpha_stays_inside_bottom_bounds():
+def test_solid_card_alpha_stays_inside_bottom_bounds(tmp_path):
+    from PIL import Image, ImageDraw
+
+    art_path = tmp_path / "synthetic-art.png"
+    art = Image.new("RGBA", (240, 160), (0, 0, 0, 0))
+    ImageDraw.Draw(art).rounded_rectangle(
+        (24, 20, 215, 139), radius=18, fill=(255, 255, 255, 220)
+    )
+    art.save(art_path)
+
     pocket = dict(RECORD["callout_pockets"]["bottom"])
     bounds = pocket.pop("bounds")
     for item_id, item in CATALOG.items():
         callout = B.normalize_callout(item_id, item)
-        callout["label_box"] = pocket
-        callout["plate_luma"] = {"mean": 64}
-        callout["font_size"] = round(callout["font_size"] * B.CANVAS_W / 3840)
-        callout["description_font_size"] = round(
-            callout["description_font_size"] * B.CANVAS_W / 3840
+        art = (
+            str(art_path)
+            if item["art"].get("mode", "components") != "text_only"
+            else None
         )
-        image = C.render_callout(
+        image, _, _ = B.render_card(
             callout,
-            canvas=(B.CANVAS_W, B.CANVAS_H),
-            frame_map=1920 / B.CANVAS_W,
+            item,
+            pocket,
+            bounds,
+            art_path=art,
+            plate_mean=64,
         )
         assert B.fits(B.ink_bbox(image), bounds), item_id
+
+
+def test_audit_assets_propagates_failure_to_cli_exit_code(tmp_path):
+    script = REPO / "scripts" / "build_uta_ensemble.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--audit-assets",
+            "--hero-root",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0
+    assert "ERROR" in result.stderr
 
 
 def test_every_callout_uses_clean_equipment_not_review_crops():

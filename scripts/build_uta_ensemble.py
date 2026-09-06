@@ -598,12 +598,15 @@ def extract_equipment(spec, hero_root, out_path):
     return _finish_equipment_art(art, spec, out_path)
 
 
-def audit_assets(leonardo, hero_root):
-    """Audit Leonardo display sources without touching video or ffmpeg."""
+def audit_assets(record, montage, leonardo, hero_root):
+    """Audit Leonardo sources and render their final cards without video I/O."""
     from PIL import Image
 
     errors = []
     root = Path(hero_root)
+    catalog = equipment_catalog(record, montage, leonardo)
+    pocket = dict(record["callout_pockets"]["bottom"])
+    bounds = pocket.pop("bounds")
     with tempfile.TemporaryDirectory(prefix="uta-equipment-audit-") as temp:
         out_dir = Path(temp)
         for item_id, item in sorted(leonardo["items"].items()):
@@ -629,9 +632,11 @@ def audit_assets(leonardo, hero_root):
                         f"with supplied {source_size}"
                     )
                 output = None
+                output_path = None
                 if mode != "text_only":
+                    output_path = out_dir / f"{item_id}.png"
                     output = extract_equipment(
-                        spec, root, out_dir / f"{item_id}.png"
+                        spec, root, output_path
                     )
                     if output is None:
                         raise ValueError("extraction returned no art")
@@ -641,12 +646,23 @@ def audit_assets(leonardo, hero_root):
                 else:
                     _open_equipment_source(spec, root)
                     final_bounds = None
+                callout = normalize_callout(item_id, catalog[item_id])
+                image, rendered, attempts = render_card(
+                    callout,
+                    item,
+                    pocket,
+                    bounds,
+                    output_path,
+                    plate_mean=64,
+                )
                 print(
                     f"{item_id} source={spec['file']} mode={mode} "
                     f"source_dimensions={source_size[0]}x{source_size[1]} "
                     f"final_alpha_bounds={final_bounds or 'none'} "
                     f"rotation={spec.get('rotation_degrees', 'n/a')} "
-                    f"note={note}"
+                    f"card_alpha_bounds={ink_bbox(image) or 'none'} "
+                    f"card_label_size={rendered['font_size']} "
+                    f"card_shrinks={attempts} note={note}"
                 )
             except (OSError, ValueError) as exc:
                 errors.append(f"{item_id}: {exc}")
@@ -661,15 +677,10 @@ def render_cards(record, montage, leonardo, out_dir):
     fits the pocket. Copy that runs out of its pocket lands on the band, and
     a card that covers the band is the one thing this layout may never do.
     """
-    import sys
-
-    sys.path.insert(0, str(REPO / "scripts"))
-    from render_uta_callout import render_callout
     catalog = equipment_catalog(record, montage, leonardo)
     validate_equipment_schedule(record, catalog, montage)
     faces = stage_background(record)
     out_dir.mkdir(parents=True, exist_ok=True)
-    scale = CANVAS_W / 3840
     hero_root = Path.home() / "Videos" / "Wolves" / "Hero"
     equipment_paths = {}
     for item_id, item in catalog.items():
@@ -694,48 +705,85 @@ def render_cards(record, montage, leonardo, out_dir):
             if equipment_paths[item_id] is not None
             else None
         )
-        art_width_share = item["art"].get(
-            "art_width_share", ART_WIDTH_SHARE
+        img, rendered, attempt = render_card(
+            callout,
+            item,
+            pocket,
+            bounds,
+            art_path,
+            plate_mean=mean,
+            plate_weight=weight,
         )
-        callout["plate_luma"] = {
-            "mean": mean,
-            "measured_by": "stage background under the pocket at the card's own second",
-            "day_weight": weight,
-        }
-        title0 = callout["font_size"] * scale
-        body0 = callout.get("description_font_size", 0) * scale
-        bbox = None
-        last_overflow = None
-        for attempt in range(12):
-            shrink = 0.94 ** attempt
-            callout["label_box"] = pocket
-            callout["font_size"] = even(title0 * shrink)
-            if body0:
-                callout["description_font_size"] = even(body0 * shrink)
-            try:
-                img = render_callout(
-                    callout, art_path=art_path, canvas=(CANVAS_W, CANVAS_H),
-                    frame_map=1920 / CANVAS_W,
-                    art_width_share=art_width_share,
-                )
-            except ValueError as exc:
-                if "exceeds its label_box" in str(exc):
-                    last_overflow = str(exc)
-                    continue
-                raise
-            bbox = ink_bbox(img)
-            if fits(bbox, bounds):
-                break
-        else:
-            raise SystemExit(
-                f"{item_id} will not fit its {entry['pocket']} pocket "
-                f"at a readable size: "
-                f"{bbox if bbox is not None else last_overflow} outside {bounds}"
-            )
         name = card_name(i, entry)
         img.save(out_dir / name)
-        written.append((name, round(mean, 1), weight, callout["font_size"], attempt))
+        written.append(
+            (name, round(mean, 1), weight, rendered["font_size"], attempt)
+        )
     return written
+
+
+def render_card(
+    callout,
+    item,
+    pocket,
+    bounds,
+    art_path,
+    plate_mean,
+    plate_weight=None,
+):
+    """Render one card with the same fit loop used by delivery rendering."""
+    scale = CANVAS_W / 3840
+    art_width_share = item["art"].get("art_width_share", ART_WIDTH_SHARE)
+    rendered = dict(callout)
+    rendered["plate_luma"] = {
+        "mean": plate_mean,
+        "measured_by": "stage background under the card's own second",
+    }
+    if plate_weight is not None:
+        rendered["plate_luma"]["day_weight"] = plate_weight
+
+    title0 = rendered["font_size"] * scale
+    body0 = rendered.get("description_font_size", 0) * scale
+    bbox = None
+    last_overflow = None
+    for attempt in range(12):
+        shrink = 0.94 ** attempt
+        rendered["label_box"] = pocket
+        rendered["font_size"] = even(title0 * shrink)
+        if body0:
+            rendered["description_font_size"] = even(body0 * shrink)
+        try:
+            image = _render_callout(
+                rendered,
+                art_path=art_path,
+                canvas=(CANVAS_W, CANVAS_H),
+                frame_map=1920 / CANVAS_W,
+                art_width_share=art_width_share,
+            )
+        except ValueError as exc:
+            if "exceeds its label_box" in str(exc):
+                last_overflow = str(exc)
+                continue
+            raise
+        bbox = ink_bbox(image)
+        if fits(bbox, bounds):
+            return image, rendered, attempt
+    raise ValueError(
+        f"card will not fit its pocket at a readable size: "
+        f"{bbox if bbox is not None else last_overflow} outside {bounds}"
+    )
+
+
+def _render_callout(*args, **kwargs):
+    """Import the renderer lazily so catalog and audit tests stay lightweight."""
+    import sys
+
+    scripts = str(REPO / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    from render_uta_callout import render_callout
+
+    return render_callout(*args, **kwargs)
 
 
 def fits(bbox, bounds):
@@ -1146,7 +1194,7 @@ def main():
 
     record, montage, leonardo = load()
     if args.audit_assets:
-        errors = audit_assets(leonardo, args.hero_root)
+        errors = audit_assets(record, montage, leonardo, args.hero_root)
         if errors:
             return 1
         if not args.cards and not args.workflow:
@@ -1179,7 +1227,8 @@ def main():
             f"{record['delivery']['slide_frames']} slide = "
             f"{total + record['delivery']['slide_frames']}"
         )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
