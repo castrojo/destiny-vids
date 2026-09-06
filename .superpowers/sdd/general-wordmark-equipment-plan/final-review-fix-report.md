@@ -5,6 +5,7 @@ Branch: `feat/general-wordmark-equipment`
 Fix commit: `3874e36` (rebased onto the merged hero base)
 Pull request: [#455](https://github.com/castrojo/destiny-vids/pull/455)
 Pull request base: `feat/hero-videos`
+Merge commit: `2b1da42b659ff62ce3a447d1659dac382d3d1ebb`
 
 ## Scope
 
@@ -74,15 +75,14 @@ be rerun after the report commit and before handoff.
 
 ## Delivery status
 
-The fix commits are ready to push to `origin/feat/general-wordmark-equipment`,
-and PR #455 is open against `feat/hero-videos`. The branch was rebased so the
-PR contains only this final fix wave rather than the already-merged Task 6
-history. Auto-merge is the remaining GitHub operation after the rebased branch
-is pushed; the final handoff records the resulting green-check and merge
-status.
+The fix commits were pushed to `origin/feat/general-wordmark-equipment`, and
+PR #455 was rebased against the merged hero base so it contained only this
+final fix wave rather than the already-merged Task 6 history. Auto-merge was
+enabled and the PR merged at `2026-09-06T21:34:42Z`. GitHub Actions `test`
+completed successfully at `2026-09-06T21:38:10Z`.
 
 ## Concerns
 
-There are no pixel, audio, rights, or delivery-master concerns. The only
-remaining operational concern is to complete the GitHub auto-merge/green-check
-step and rerun `python3 tools/worktrees.py --check` on the clean checkout.
+There are no pixel, audio, rights, or delivery-master concerns. The selected
+worktree is safe and clean; the checker still reports three unrelated unsafe
+worktrees elsewhere on the workstation, which were not modified.
