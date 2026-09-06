@@ -25,6 +25,7 @@ bounding box from another drawing is a wrong number.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -116,6 +117,8 @@ KEY_BBOX = {
 FETCH_BASE = "http://192.168.1.227:8877"
 RECEIVER = "http://192.168.1.227:8882"
 OUTPUT = "GENERAL_OF_THE_DARK_ARMY-ensemble.mp4"
+# Retained across runs: keying does not depend on the layout.
+PVC = "uta-ensemble-work"
 
 # A wide art crop scaled to the box height eats the text column.
 ART_WIDTH_SHARE = 0.32
@@ -222,6 +225,31 @@ def plate_luma(record, faces, box, seconds):
     ).convert("L")
     px = list(crop.getdata())
     return sum(px) / len(px), w
+
+
+APERTURE_MASK = "aperture-mask.png"
+
+
+def render_aperture_mask(record, out_dir):
+    """A rounded-corner alpha for the band aperture.
+
+    alphamerge takes its matte from the second input's LUMA, so this is a
+    white rounded rectangle on black, drawn at 4x and resampled down for an
+    edge that does not stair-step at 1440p.
+    """
+    from PIL import Image, ImageDraw
+
+    win = record["band_window"]
+    w, h, r = win["width"], win["height"], win["corner_radius"]
+    ss = 4
+    big = Image.new("L", (w * ss, h * ss), 0)
+    ImageDraw.Draw(big).rounded_rectangle(
+        (0, 0, w * ss - 1, h * ss - 1), radius=r * ss, fill=255
+    )
+    mask = big.resize((w, h), Image.LANCZOS)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    mask.save(out_dir / APERTURE_MASK)
+    return mask.size
 
 
 def render_cards(record, montage, out_dir):
@@ -348,10 +376,18 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
     n = 1 + len(faces)
 
     chain = [bg_chain]
+    inputs.append(
+        f"-loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/cards/{APERTURE_MASK}"
+    )
+    mask_idx = n
+    n += 1
     chain.append(
         f"[0:v]{win['letterbox_crop']},"
-        f"scale={win['width']}:{win['height']}:flags=lanczos,setsar=1[band]"
+        f"scale={win['width']}:{win['height']}:flags=lanczos,setsar=1,"
+        f"format=rgba[bandpix]"
     )
+    chain.append(f"[{mask_idx}:v]format=gray[amask]")
+    chain.append("[bandpix][amask]alphamerge[band]")
     chain.append(f"[bg][band]overlay=x={win['x']}:y={win['y']}[stage0]")
 
     prev = "stage0"
@@ -409,6 +445,13 @@ def clean_segment(idx, start_frame, frames):
 
 
 def key_step(record, kid):
+    """Key a kid, unless the PVC already holds one from this exact command.
+
+    Keying is 25 of this cut's 35 minutes and it does not depend on the
+    layout, so a change to the stage should not pay for it again. The stamp
+    is the command itself: any change to a seed, a threshold, a station size,
+    a trim or the retime misses the cache by construction.
+    """
     factor, use = retime(record, kid)
     span = visible_frames(record)
     pre = []
@@ -435,7 +478,7 @@ def key_step(record, kid):
     if kid["flip"]:
         post += ",hflip"
     graph += f",{post},setsar=1,format=yuva420p[k]"
-    return (
+    cmd = (
         f"ffmpeg -hide_banner -v error -y -i /work/{kid['id']}-src.mp4 \\\n"
         f'  -filter_complex "{graph}" -map "[k]" -frames:v {span} \\\n'
         f"  -c:v prores_ks -profile:v 4444 -pix_fmt yuva444p10le "
@@ -445,6 +488,17 @@ def key_step(record, kid):
         f"-i /work/{kid['id']}-keyed.mov -frames:v 1 -pix_fmt rgba "
         f"/work/{kid['id']}-proof.png\n"
         f'echo "{kid["id"]} keyed {span}f"'
+    )
+    stamp = hashlib.sha256(cmd.encode()).hexdigest()[:16]
+    mov = f"/work/{kid['id']}-keyed.mov"
+    return (
+        f"stamp={stamp}\n"
+        f'if [ -f {mov} ] && [ "$(cat {mov}.stamp 2>/dev/null)" = "$stamp" ]; then\n'
+        f'  echo "{kid["id"]} cached"\n'
+        f"else\n"
+        + "\n".join("  " + line for line in cmd.splitlines())
+        + f"\n  echo $stamp > {mov}.stamp\n"
+        f"fi"
     )
 
 
@@ -473,7 +527,10 @@ def workflow(record, montage, card_names):
     src = montage["source"]
 
     fetch = ["base=" + FETCH_BASE]
-    fetch.append(f"curl -fsSL -o /work/source.webm $base/.work-uta-general/source.webm")
+    fetch.append(
+        "[ -f /work/source.webm ] || curl -fsSL -o /work/source.webm "
+        "$base/.work-uta-general/source.webm"
+    )
     fetch.append(
         f'echo "{src["sha256"]}  /work/source.webm" | sha256sum -c -'
     )
@@ -488,11 +545,12 @@ def workflow(record, montage, card_names):
         )
     for kid in kids:
         fetch.append(
+            f"[ -f /work/{kid['id']}-src.mp4 ] || "
             f"curl -fsSL -o /work/{kid['id']}-src.mp4 "
             f"$base/{kid['source'].replace(' ', '%20')}"
         )
     fetch.append("mkdir -p /work/cards")
-    for name in card_names:
+    for name in card_names + [APERTURE_MASK]:
         fetch.append(
             f"curl -fsSL -o /work/cards/{name} "
             f"$base/.work-uta-general/cards/{name}"
@@ -597,12 +655,9 @@ def workflow(record, montage, card_names):
         "spec:",
         "  entrypoint: main",
         "  podGC: {strategy: OnWorkflowSuccess}",
-        "  volumeClaimTemplates:",
-        "    - metadata: {name: work}",
-        "      spec:",
-        '        accessModes: ["ReadWriteOnce"]',
-        "        storageClassName: local-path",
-        "        resources: {requests: {storage: 60Gi}}",
+        "  volumes:",
+        f"    - name: work",
+        f"      persistentVolumeClaim: {{claimName: {PVC}}}",
         "  templates:",
         "    - name: main",
         "      dag:",
@@ -657,6 +712,7 @@ def main():
     ]
 
     if args.cards:
+        print(f"{APERTURE_MASK}  {render_aperture_mask(record, out / 'cards')}")
         for name, mean, weight, size, tries in render_cards(
             record, montage, out / "cards"
         ):
