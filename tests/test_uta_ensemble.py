@@ -256,6 +256,7 @@ def test_leonardo_preserves_enclosed_white_paper():
 def test_leonardos_name_is_masked_before_keying():
     chain = B.KEY_CHAINS["LEONARDO"]
     assert B.LEONARDO_NAME_MASK in chain
+    assert chain.index("split[c][m]") < chain.index(B.LEONARDO_NAME_MASK)
     assert chain.index(B.LEONARDO_NAME_MASK) < chain.index("floodfill")
 
 
@@ -272,6 +273,8 @@ def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():
     assert f"-frames:v {RECORD['delivery']['slide_frames']}" in text
     # the audio is decoded once and encoded once
     assert text.count("-c:a aac") == 1
+    assert f"volume={RECORD['delivery']['audio_gain_db']:g}dB" in text
+    assert f"-b:a {RECORD['delivery']['audio_bitrate_kbps']}k" in text
     assert ": > /work/list.txt" in text
     assert "-v error -y -i \"$out\" -af ebur128" not in text
 

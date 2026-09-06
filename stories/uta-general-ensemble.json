@@ -29,6 +29,8 @@
     "slide_frames": 132,
     "source_frames": 11427,
     "programme_frames": 11559,
+    "audio_gain_db": -3.0,
+    "audio_bitrate_kbps": 320,
     "output": "GENERAL_OF_THE_DARK_ARMY.mp4"
   },
   "stage": {
