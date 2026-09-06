@@ -279,6 +279,7 @@ def test_text_only_art_has_no_display_geometry(catalog):
     ]
     assert text_only
     for item in text_only:
+        assert item["presentation"]["usage"] == "text-only"
         assert item["art"]["degraded_reason"].strip()
         assert "component_seeds" not in item["art"]
         assert "mask_polygon" not in item["art"]
