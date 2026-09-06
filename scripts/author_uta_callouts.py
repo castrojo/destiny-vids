@@ -85,6 +85,7 @@ CALLOUTS = {
         "font_size": 88,
         "description_font_size": 52,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_03",
     },
     "double_kopis": {
         "copy": {
@@ -113,6 +114,7 @@ CALLOUTS = {
         "description_font_size": 52,
         "usage": "dedicated-hold",
         "min_hold_seconds": 4.0,
+        "art_asset": "RAFI_WEAPONS_05",
     },
     "composite_bow": {
         "copy": {
@@ -131,6 +133,7 @@ CALLOUTS = {
         "leader_anchor": {"x": 1580, "y": 480},
         "font_size": 88,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_01",
     },
     "ai_control_module": {
         "copy": {
@@ -149,6 +152,7 @@ CALLOUTS = {
         "leader_anchor": {"x": 1580, "y": 480},
         "font_size": 88,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_03",
     },
     "bead_catcher": {
         "copy": {
@@ -174,6 +178,7 @@ CALLOUTS = {
         "leader_anchor": {"x": 1560, "y": 430},
         "font_size": 84,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02",
     },
     "bomb_10mm": {
         "copy": {
@@ -196,6 +201,7 @@ CALLOUTS = {
         "leader_anchor": {"x": 1260, "y": 410},
         "font_size": 84,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02",
     },
     "magazine_20": {
         "copy": {
@@ -221,6 +227,7 @@ CALLOUTS = {
         "leader_anchor": {"x": 1360, "y": 410},
         "font_size": 84,
         "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02",
     },
 }
 

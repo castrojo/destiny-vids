@@ -71,6 +71,13 @@ editorial change: never trim the tail, loop material, or hold the last frame to
 fit the bed. Keep the measured values and effective speed factor in that
 video's `verify-notes.md`.
 
+For a composition containing several drawing animations, compute that factor
+separately for every source from its own usable frame count. They may share an
+authored completion frame, but never a speed value: each drawing must reach its
+own finished frame by that endpoint. If a protected full-frame passage hides
+the stage, pause every drawing clock and resume on the next frame rather than
+discarding unseen animation.
+
 ## Composition
 
 - Character to **85%** of frame height. Centre by default; apply only the
@@ -111,6 +118,24 @@ cv2.QRCodeDetector().detectAndDecode(np.array(crop)[:, :, ::-1].copy())
 ```
 
 Do it at both ends of the crossfade — the daylight wallpaper and the night one.
+
+## Extracting equipment from design sheets
+
+A design-sheet crop is evidence for transcription, not display art. Never pass
+an RGB crop through `convert("RGBA")`: that only makes the entire rectangle
+opaque, including its paper, labels, leader lines, and neighbouring objects.
+
+Use an existing source-backed RGBA equipment PNG and select only the reviewed
+connected alpha component or components for the named object. Preserve its
+original colour and antialiasing, crop to the selected alpha bounds, and reject
+inputs with no real transparency. Record the source file and component seed
+points so the extraction is reproducible.
+
+Quarter-turning a reviewed transparent object is allowed as a per-use display
+transform. Apply rotation after extraction, crop to the rotated alpha bounds,
+then fit and re-measure the card. Never rotate an opaque sheet crop. Tall
+weapons may be turned sideways to use a shallow bottom pocket without shrinking
+them into illegibility.
 
 ## Farm plumbing
 

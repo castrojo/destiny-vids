@@ -43,6 +43,7 @@ CANVAS_W, CANVAS_H = 2560, 1440
 # the key is colorkey=0x0000FF. The fill runs on the FULL frame before the
 # tight crop, and the matte goes back onto the ORIGINAL pixels.
 FILL = "s0=255:s1=255:s2=255:d0=0:d1=255:d2=0"
+LEONARDO_NAME_MASK = "drawbox=x=1020:y=0:w=1026:h=128:color=white@1:t=fill"
 
 KEY_CHAINS = {
     "RAFI_01": (
@@ -95,13 +96,19 @@ KEY_CHAINS = {
         "format=rgba,alphaextract[al];"
         "[orig][al]alphamerge,crop=1414:1861:212:106"
     ),
-    # Leonardo's paper was measured to key smoothly, pockets and all, with a
-    # single anti-aliased colorkey -- no fill, no seeds.
     "LEONARDO": (
         "crop=2046:1746:0:0,"
-        "drawbox=x=1020:y=0:w=1026:h=128:color=white@1:t=fill,"
-        "colorkey=color=0xFDFFFD:similarity=0.04:blend=0.08,"
-        "crop=1888:1676:41:21"
+        f"{LEONARDO_NAME_MASK},"
+        "format=rgba,split[c][m];"
+        "[m]format=rgb24,"
+        "lutrgb=r='if(gt(val,247),255,val)':g='if(gt(val,247),255,val)'"
+        ":b='if(gt(val,247),255,val)',"
+        f"floodfill=x=2:y=2:{FILL},"
+        f"floodfill=x=2043:y=2:{FILL},"
+        f"floodfill=x=2:y=1743:{FILL},"
+        f"floodfill=x=2043:y=1743:{FILL},"
+        "format=rgba,colorkey=0x0000FF:0.01:0.0,alphaextract[al];"
+        "[c][al]alphamerge,crop=1888:1676:41:21"
     ),
 }
 
@@ -116,7 +123,6 @@ KEY_BBOX = {
 
 FETCH_BASE = "http://192.168.1.227:8877"
 RECEIVER = "http://192.168.1.227:8882"
-OUTPUT = "GENERAL_OF_THE_DARK_ARMY-ensemble.mp4"
 # Retained across runs: keying does not depend on the layout.
 PVC = "uta-ensemble-work"
 
@@ -252,6 +258,48 @@ def render_aperture_mask(record, out_dir):
     return mask.size
 
 
+def extract_equipment(spec, hero_root, out_path):
+    """Select reviewed alpha components and apply the per-use orientation."""
+    from PIL import Image, ImageChops, ImageDraw
+
+    source = Image.open(Path(hero_root) / spec["file"])
+    if source.mode != "RGBA":
+        raise ValueError(f"equipment source must be RGBA: {spec['file']}")
+    alpha = source.getchannel("A")
+    if alpha.getextrema()[0] == 255:
+        raise ValueError(f"equipment source has no transparency: {spec['file']}")
+
+    binary = alpha.point(lambda a: 255 if a > 16 else 0)
+    selected = Image.new("L", source.size, 0)
+    for seed in spec["component_seeds"]:
+        point = tuple(seed)
+        if binary.getpixel(point) == 0:
+            raise ValueError(
+                f"equipment seed {point} is transparent in {spec['file']}"
+            )
+        marked = binary.copy()
+        ImageDraw.floodfill(marked, point, 128, thresh=0)
+        component = marked.point(lambda a: 255 if a == 128 else 0)
+        selected = ImageChops.lighter(selected, component)
+
+    source.putalpha(ImageChops.multiply(alpha, selected))
+    bbox = source.getchannel("A").getbbox()
+    if not bbox:
+        raise ValueError(f"equipment extraction is empty: {spec['file']}")
+    art = source.crop(bbox)
+    rotation = spec.get("rotation_degrees", 0)
+    if rotation not in (0, 90, 180, 270):
+        raise ValueError(f"equipment rotation must be a quarter turn: {rotation}")
+    if rotation:
+        art = art.rotate(rotation, expand=True)
+        art = art.crop(art.getchannel("A").getbbox())
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    art.save(out_path)
+    return art
+
+
 def render_cards(record, montage, out_dir):
     """One full-canvas RGBA card per scheduled appearance.
 
@@ -263,11 +311,18 @@ def render_cards(record, montage, out_dir):
 
     sys.path.insert(0, str(REPO / "scripts"))
     from render_uta_callout import render_callout
-    from PIL import Image
-
     faces = stage_background(record)
     out_dir.mkdir(parents=True, exist_ok=True)
     scale = CANVAS_W / 3840
+    hero_root = Path.home() / "Videos" / "Wolves" / "Hero"
+    equipment_paths = {}
+    for equipment_id, spec in record["equipment_assets"].items():
+        if equipment_id == "_what":
+            continue
+        path = out_dir / f"equipment-{equipment_id}.png"
+        extract_equipment(spec, hero_root, path)
+        equipment_paths[equipment_id] = path
+
     written = []
     for i, entry in enumerate(record["callout_schedule"]):
         callout = json.loads(
@@ -276,15 +331,11 @@ def render_cards(record, montage, out_dir):
         pocket = dict(record["callout_pockets"][entry["pocket"]])
         bounds = pocket.pop("bounds")
         mean, weight = plate_luma(record, faces, pocket, entry["start_seconds"])
-        art = entry.get("art")
-        art_path = str(WORK / "review" / art) if art else None
-        if art_path:
-            # Art is scaled to the box height, so a wide crop eats the text
-            # column. Cap its width instead and let the box height follow.
-            aw, ah = Image.open(art_path).size
-            cap = ART_WIDTH_SHARE * pocket["width"]
-            if aw * pocket["height"] / ah > cap:
-                pocket["height"] = int(cap * ah / aw)
+        equipment = entry["equipment"]
+        art_path = str(equipment_paths[equipment])
+        art_width_share = record["equipment_assets"][equipment].get(
+            "art_width_share", ART_WIDTH_SHARE
+        )
         callout["plate_luma"] = {
             "mean": mean,
             "measured_by": "stage background under the pocket at the card's own second",
@@ -301,6 +352,7 @@ def render_cards(record, montage, out_dir):
             img = render_callout(
                 callout, art_path=art_path, canvas=(CANVAS_W, CANVAS_H),
                 frame_map=1920 / CANVAS_W,
+                art_width_share=art_width_share,
             )
             bbox = ink_bbox(img)
             if fits(bbox, bounds):
@@ -525,6 +577,7 @@ def workflow(record, montage, card_names):
     kids = stations(record)
     segs = segments(record)
     src = montage["source"]
+    output = record["delivery"]["output"]
 
     fetch = ["base=" + FETCH_BASE]
     fetch.append(
@@ -593,6 +646,7 @@ def workflow(record, montage, card_names):
 
     names = " ".join(f"{i:02d}" for i in range(len(segs) + 1))
     body.append(
+        f": > /work/list.txt\n"
         f"for i in {names}; do echo \"file '/work/s$i.mp4'\" >> /work/list.txt; done\n"
         "ffmpeg -hide_banner -v error -y -f concat -safe 0 -i /work/list.txt "
         "-c copy /work/picture.mp4"
@@ -610,16 +664,16 @@ def workflow(record, montage, card_names):
         "ffmpeg -hide_banner -v error -y -i /work/picture.mp4 "
         "-i /work/programme-audio.m4a \\\n"
         "  -map 0:v -map 1:a -c copy -movflags +faststart "
-        f"/work/{OUTPUT}"
+        f"/work/{output}"
     )
     body.append(
-        f"out=/work/{OUTPUT}\n"
+        f"out=/work/{output}\n"
         'ffprobe -v error -count_frames -show_format -show_streams -of json "$out" '
         "> /work/ens-probe.json\n"
         'ffmpeg -v error -i "$out" -f null - 2> /work/ens-decode.txt\n'
         "printf 'decode stderr bytes: %s\\n' \"$(wc -c < /work/ens-decode.txt)\"\n"
         'sha256sum "$out" > /work/ens-sha256.txt\n'
-        'ffmpeg -hide_banner -v error -y -i "$out" -af ebur128=peak=true '
+        'ffmpeg -hide_banner -nostats -y -i "$out" -af ebur128=peak=true '
         "-f null - 2> /work/ens-ebur128.txt || true\n"
         "tail -12 /work/ens-ebur128.txt\n"
         "for t in 3 20 40 80 122 160 200 240 276 305 330 360 376 408 445; do\n"
@@ -629,7 +683,7 @@ def workflow(record, montage, card_names):
     )
 
     upload = [
-        f"for f in /work/{OUTPUT} /work/ens-probe.json /work/ens-decode.txt \\",
+        f"for f in /work/{output} /work/ens-probe.json /work/ens-decode.txt \\",
         "         /work/ens-sha256.txt /work/ens-ebur128.txt "
         "/work/ens-t*.jpg /work/*-proof.png; do",
         f'  curl -fsS -T "$f" {RECEIVER}/$(basename $f)',

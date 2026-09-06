@@ -235,7 +235,8 @@
         },
         "font_size": 88,
         "description_font_size": 52,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_03"
       },
       "double_kopis": {
         "copy": {
@@ -270,7 +271,8 @@
         "font_size": 88,
         "description_font_size": 52,
         "usage": "dedicated-hold",
-        "min_hold_seconds": 4.0
+        "min_hold_seconds": 4.0,
+        "art_asset": "RAFI_WEAPONS_05"
       },
       "composite_bow": {
         "copy": {
@@ -301,7 +303,8 @@
           "y": 480
         },
         "font_size": 88,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_01"
       },
       "ai_control_module": {
         "copy": {
@@ -332,7 +335,8 @@
           "y": 480
         },
         "font_size": 88,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_03"
       },
       "bead_catcher": {
         "copy": {
@@ -367,7 +371,8 @@
           "y": 430
         },
         "font_size": 84,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02"
       },
       "bomb_10mm": {
         "copy": {
@@ -402,7 +407,8 @@
           "y": 410
         },
         "font_size": 84,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02"
       },
       "magazine_20": {
         "copy": {
@@ -437,7 +443,8 @@
           "y": 410
         },
         "font_size": 84,
-        "usage": "accompany-art"
+        "usage": "accompany-art",
+        "art_asset": "RAFI_WEAPONS_02"
       }
     }
   },

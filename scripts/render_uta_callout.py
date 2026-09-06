@@ -86,7 +86,13 @@ def _wrap(draw, text, font, max_width, tracking=0):
     return lines
 
 
-def render_callout(callout, art_path=None, canvas=(3840, 2160), frame_map=None):
+def render_callout(
+    callout,
+    art_path=None,
+    canvas=(3840, 2160),
+    frame_map=None,
+    art_width_share=0.32,
+):
     copy = callout["copy"]
     box = callout["label_box"]
     card = Image.new("RGBA", canvas, (0, 0, 0, 0))
@@ -137,9 +143,21 @@ def render_callout(callout, art_path=None, canvas=(3840, 2160), frame_map=None):
     # setting a label beside the thing it names.
     art = None
     if art_path:
-        art = Image.open(art_path).convert("RGBA")
-        art_h = box["height"]
-        art_w = max(1, int(art.width * art_h / art.height))
+        art = Image.open(art_path)
+        if art.mode != "RGBA" or art.getchannel("A").getextrema()[0] == 255:
+            raise ValueError(
+                "callout art must be an extracted RGBA object with transparency"
+            )
+        bbox = art.getchannel("A").getbbox()
+        if not bbox:
+            raise ValueError("callout art has no visible pixels")
+        art = art.crop(bbox)
+        art_scale = min(
+            box["height"] / art.height,
+            box["width"] * art_width_share / art.width,
+        )
+        art_w = max(1, int(art.width * art_scale))
+        art_h = max(1, int(art.height * art_scale))
         art = art.resize((art_w, art_h), Image.LANCZOS)
         text_w = box["width"] - art_w - int(title_size * 0.9)
 
