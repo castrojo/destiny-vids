@@ -55,6 +55,13 @@ Sample every candidate seed across the timeline before accepting it. A seed that
 works on frame zero may land on artwork later, so the selected full-frame seed
 set is a per-video measurement, not a shared recipe.
 
+Edge-connected fill intentionally preserves enclosed white. That is correct for
+white clothing, faces, and finished paper treatment, but wrong for a paper
+pocket trapped between a body and a prop. Add a measured interior flood-fill
+seed for that pocket on the matte branch only. Verify it across the source
+timeline: if artwork ever crosses the seed, move the seed rather than returning
+to a global colorkey that erases every enclosed white region.
+
 If the source finishes with a dimmed or otherwise intentionally translucent
 treatment, the aligned finished-still alpha may replace the flood-fill alpha
 only after a dense check proves the artwork is complete. Preserve the original
@@ -77,6 +84,23 @@ authored completion frame, but never a speed value: each drawing must reach its
 own finished frame by that endpoint. If a protected full-frame passage hides
 the stage, pause every drawing clock and resume on the next frame rather than
 discarding unseen animation.
+
+## Balancing a multi-character stage
+
+Equal station widths do not produce equal visual weight. A wide spear, cape, or
+empty crop can make one drawing's box large while its visible character remains
+small.
+
+1. Render one keyed proof per character at the authored station size.
+2. Count pixels above a recorded alpha threshold (for example `A > 16`).
+3. Choose the constrained character first -- usually the one already at a
+   column's maximum clean width.
+4. Scale the other stations toward that visible-alpha target, preserving aspect
+   ratio and keeping every station clear of the band and overlay zones.
+5. Re-render and count again. Any matte change invalidates the old measurement.
+
+Record the actual returned counts, not only the estimated square-law scaling.
+The final proof images are the evidence.
 
 ## Composition
 
@@ -137,6 +161,19 @@ then fit and re-measure the card. Never rotate an opaque sheet crop. Tall
 weapons may be turned sideways to use a shallow bottom pocket without shrinking
 them into illegibility.
 
+## Equipment rails and readable copy
+
+Reserve named regions before placing cards. If the top is promised to a
+wordmark, every equipment card belongs in the authored bottom rail; do not let
+individual cards opportunistically drift back into the reserved area.
+
+Fit copy from calculated line positions, not only the raster alpha bbox. A
+canvas cannot report a line drawn below its edge, so a post-render bbox can call
+clipped copy valid. Fail generation when the calculated copy extent exceeds the
+card bounds, then widen the layout or use available space beneath short
+horizontal art. When body copy flows beneath the art, suppress the old
+side-by-side leader instead of leaving a disconnected dot or crossing the text.
+
 ## Farm plumbing
 
 One source server and one PUT receiver per active video run on the workstation
@@ -151,6 +188,11 @@ Check the Argo `ffmpeg` log within the first minute of a submission. A
 filter-graph error fails immediately; finding it 25 minutes later is a wasted
 render. Argo also runs all source probes, audio checks, decode checks, and
 `ffprobe` validation; record the results in `verify-notes.md`.
+
+A retained PVC keeps generated scratch state across workflows. Before writing
+an append-only file such as a concat list, truncate it explicitly (`: >
+/work/list.txt`). `-y` overwrites media outputs; it does not clear helper files,
+and a stale list can duplicate an otherwise correct programme.
 
 ## Placing art over somebody else's film: clear the box, not the shot
 

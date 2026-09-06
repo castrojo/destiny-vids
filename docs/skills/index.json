@@ -149,7 +149,7 @@
         "argo"
       ],
       "description": "Key a paper-background character animation to transparency, compose the frame, and render on the farm. Use when working in ~/Videos/Wolves/Hero, when a hero video needs a pass, or when adding a QR card or URL wordmark to a hero cut.",
-      "version": "1.6",
+      "version": "1.7",
       "last_updated": "2026-09-06",
       "doc_type": "procedure"
     },

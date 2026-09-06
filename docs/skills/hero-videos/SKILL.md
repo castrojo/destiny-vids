@@ -1,6 +1,6 @@
 ---
 name: hero-videos
-version: "1.6"
+version: "1.7"
 last_updated: "2026-09-06"
 id: hero-videos
 one_line_purpose: Build a hero character music video from a paper-background animation.
@@ -131,6 +131,10 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   and frame counts belong to one source and never transfer.
 - **Test each proposed fill seed across the source timeline.** A corner that is
   paper in the opening can become art later.
+- **Outer paper and enclosed paper pockets are different masks.** Edge seeds
+  deliberately preserve enclosed white. If a pocket between limbs or equipment
+  is paper, add a measured per-video interior seed and re-check the whole
+  timeline; never restore the global colorkey that erases white artwork too.
 - **Use final-still alpha only for a verified completed closing interval.** It
   restores intentional transparent finishing treatment; using it earlier
   injects future art into unfinished frames.
@@ -138,6 +142,14 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   screen must be a reviewed transparent component extracted from a
   source-backed RGBA asset. Quarter-turn tall equipment only after extraction,
   then re-measure its fit.
+- **Equal boxes do not mean equal characters.** In an ensemble, measure each
+  returned proof's visible alpha area, balance visual weight within the
+  available stations, and measure again after every matte change.
+- **A raster bbox cannot report clipped copy.** Calculate card extents before
+  drawing, fail on overflow, and omit a side leader when long copy widens
+  beneath horizontal art.
+- **Retained PVCs retain scratch mistakes too.** Truncate generated concat
+  lists and similar append-only files before rebuilding them.
 - **Furniture goes in the corners**, never centred. Owner: *"why are you blocking
   art?"*
 - **A QR is decoded off a rendered frame**, at both ends of the day/night
@@ -173,6 +185,10 @@ and explicitly fail if any `codec_type=audio` appears in the recorded probe.
   speed are recorded from the measured bed.
 - [ ] Argo verified decode, geometry, frame count, duration, decoded audio, and
   day/night QR frames.
+- [ ] Ensemble proofs were re-measured after the final matte and their visible
+  alpha areas match the authored visual-weight target.
+- [ ] Every rendered card contains all authored copy inside its layout bounds;
+  no fit decision depends on pixels already clipped by the canvas.
 - [ ] The thumbnail uses the finished still, is 1920x1080 and under 2 MB, and
   was reviewed at 336x189.
 
@@ -184,6 +200,8 @@ and explicitly fail if any `codec_type=audio` appears in the recorded probe.
 | "The crop from video 1 will be close enough." | It is measured from a different drawing. Re-derive it. |
 | "The QR decodes in the mock, ship it." | The mock is not `yuv420p` at CRF 17 and 280px wide. |
 | "The card doesn't touch him, so it's fine." | Competing with the art is the problem, not overlap. |
+| "All four stations use the same width, so they are balanced." | Wide props and sparse line art change visual weight. Count visible alpha pixels. |
+| "The output bbox fits, so no copy is clipped." | A canvas cannot report pixels that were never drawn. Validate the calculated layout first. |
 
 ## Red Flags
 
@@ -196,6 +214,12 @@ and explicitly fail if any `codec_type=audio` appears in the recorded probe.
   instead of one bed-driven retime.
 - A fill seed accepted from a single frame, or final-still alpha switched in
   before complete artwork.
+- Equal-width ensemble characters accepted without measuring their returned
+  alpha footprints after the final key.
+- A generated concat list appended on a retained PVC without first being
+  truncated.
+- A card whose only fit check is the raster alpha bbox, especially when copy
+  approaches a canvas edge.
 - A per-video card, x offset, crop, or thumbnail measurement copied into a
   different hero's record.
 - Calling a provisional visual preview a picture, mux, or final delivery.
