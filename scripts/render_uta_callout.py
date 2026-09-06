@@ -86,7 +86,7 @@ def _wrap(draw, text, font, max_width, tracking=0):
     return lines
 
 
-def render_callout(callout, art_path=None, canvas=(3840, 2160)):
+def render_callout(callout, art_path=None, canvas=(3840, 2160), frame_map=None):
     copy = callout["copy"]
     box = callout["label_box"]
     card = Image.new("RGBA", canvas, (0, 0, 0, 0))
@@ -96,9 +96,15 @@ def render_callout(callout, art_path=None, canvas=(3840, 2160)):
     body_size = callout.get("description_font_size", int(title_size * 0.55))
     sub_size = int(title_size * 0.5)
 
-    # The band is a property of the delivered frame, not the canvas.
-    read_px = body_size * CANVAS_TO_FRAME
-    if not BODY_MIN_FRAME_PX <= read_px <= BODY_MAX_FRAME_PX:
+    # The band is a property of the delivered frame, not the canvas. A cut
+    # delivered at another size passes its own map rather than inheriting the
+    # 3840-canvas-to-2048-frame one this montage was authored at. The band
+    # guards copy somebody has to READ: a card with no description has no body
+    # copy on it, and its derived size is only used to space the label.
+    read_px = body_size * (frame_map or CANVAS_TO_FRAME)
+    if copy.get("description_render") and not (
+        BODY_MIN_FRAME_PX <= read_px <= BODY_MAX_FRAME_PX
+    ):
         raise ValueError(
             f"description_font_size {body_size} maps to {read_px:.1f}px in "
             f"the delivered frame, outside the documented "
