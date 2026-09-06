@@ -142,6 +142,11 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   screen must be a reviewed transparent component extracted from a
   source-backed RGBA asset. Quarter-turn tall equipment only after extraction,
   then re-measure its fit.
+- **Wordmark validation is source-specific.** A pinned website mark and the
+  legacy no-argument fallback may have different geometry and color contracts;
+  pass each source's invariants explicitly, preserve the fallback's URL/output/
+  width behavior, and cover both paths with offline fixtures. Never commit a
+  fetched website asset.
 - **Equal boxes do not mean equal characters.** In an ensemble, measure each
   returned proof's visible alpha area, balance visual weight within the
   available stations, and measure again after every matte change.
