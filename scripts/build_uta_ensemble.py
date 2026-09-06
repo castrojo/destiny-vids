@@ -447,7 +447,8 @@ def review_frame_plan(record):
     add("protected-start", 320.2, "protected")
     add("protected-mid", 335.0, "protected")
     add("protected-end", 349.8, "protected")
-    add("credits-start", 440.0, "credits")
+    add("credits-start", 458.0, "credits")
+    add("credits-mid", 466.0, "credits")
     add("cta", 445.0, "cta")
     add("ending", 474.0, "ending")
 
