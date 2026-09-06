@@ -11,12 +11,11 @@ wallpapers only, no wordmark in any branch or release. The mark lives at
 `ublue-os/universal-blue-org`, `content/ocis/bluefin.svg`: the "project
 Bluefin" lockup with the blue fin ligature, as outlined paths.
 
-**The reversed variant.** The published mark is black with a `#4285f4` fin,
-drawn for light backgrounds; the credits are near-black. So the BLACK paths are
-recoloured to white and **the fin's blue is left exactly as published**. That is
-the standard reversed lockup every brand ships for dark backgrounds, not a
-recolour of the brand: the one coloured element keeps its value, and no
-geometry is touched.
+**The reversed variant.** The legacy published mark is black with a
+`#4285f4` fin, drawn for light backgrounds; the credits are near-black. So the
+BLACK paths are recoloured to white and **the fin's blue is left exactly as
+published**. The pinned website asset is already the light variant and uses
+`--preserve-colors`.
 
 Rasterised with playwright, the same browser this repo already uses for
 `cards/render-cards.mjs` -- an atomic host has no rsvg/inkscape/cairosvg, and
@@ -61,7 +60,11 @@ REVERSED_FILL = "#ffffff"
 WHITE_FILLS = {"#fff", "#ffffff"}
 BLACK_FILLS = {"#000", "#000000"}
 FIN_FILL = "#4285f4"
-EXPECTED_VIEWBOX = "0 0 105.658 43.183"
+WEBSITE_VIEWBOX = "0 0 105.658 43.183"
+LEGACY_VIEWBOX = "0 0 105.65843 43.183342"
+# Kept as an alias for callers that imported the website invariant by its
+# earlier name.
+EXPECTED_VIEWBOX = WEBSITE_VIEWBOX
 
 DEFAULT_OUT = DEST / "bluefin-wordmark.png"
 DEFAULT_WIDTH = 1600
@@ -98,7 +101,12 @@ def _rect_covers_viewbox(elem, width, height):
     return abs(float(h) - height) <= 1e-3
 
 
-def validate_svg(svg_text, expected_sha256=None, preserve_colors=False):
+def validate_svg(
+    svg_text,
+    expected_sha256=None,
+    preserve_colors=False,
+    expected_viewbox=WEBSITE_VIEWBOX,
+):
     """Validate the pinned source SVG before rasterising it.
 
     The synthetic tests exercise this offline with a tiny inline SVG that keeps
@@ -119,9 +127,9 @@ def validate_svg(svg_text, expected_sha256=None, preserve_colors=False):
         raise ValueError("root element is not <svg>")
 
     view_box = root.get("viewBox")
-    if view_box != EXPECTED_VIEWBOX:
+    if expected_viewbox is not None and view_box != expected_viewbox:
         raise ValueError(
-            f"unexpected viewBox {view_box!r}; expected {EXPECTED_VIEWBOX!r}"
+            f"unexpected viewBox {view_box!r}; expected {expected_viewbox!r}"
         )
     _, _, width, height = [float(v) for v in re.split(r"[\s,]+", view_box.strip())]
 
@@ -227,6 +235,9 @@ def main(argv=None):
             svg,
             expected_sha256=args.expected_sha256,
             preserve_colors=args.preserve_colors,
+            expected_viewbox=(
+                WEBSITE_VIEWBOX if args.preserve_colors else LEGACY_VIEWBOX
+            ),
         )
     except ValueError as exc:
         print(f"could not fetch the wordmark: {exc}", file=sys.stderr)

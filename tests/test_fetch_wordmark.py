@@ -10,10 +10,18 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import fetch_wordmark  # noqa: E402
 
+MANIFEST = REPO_ROOT / "stories" / "uta-general-ensemble.json"
+WEBSITE_SHA256 = "4ae1d486e6e73743fad1e1ef625615c4a28e72bbcc0a966ba3c5294303e4e380"
 
-def _svg(fill="#000000", fin="#4285f4", rect=""):
+
+def _svg(
+    fill="#000000",
+    fin="#4285f4",
+    rect="",
+    viewbox=fetch_wordmark.WEBSITE_VIEWBOX,
+):
     return (
-        '<svg viewBox="0 0 105.658 43.183">'
+        f'<svg viewBox="{viewbox}">'
         f"{rect}"
         f'<path fill="{fill}" d="M0 0h10v10z"/>'
         f'<path fill="{fin}" d="M12 0h10v10z"/>'
@@ -27,7 +35,28 @@ def test_validate_svg_accepts_the_pinned_website_mark():
         svg,
         expected_sha256=hashlib.sha256(svg.encode()).hexdigest(),
         preserve_colors=True,
+        expected_viewbox=fetch_wordmark.WEBSITE_VIEWBOX,
     )
+    assert "#4285f4" in svg
+    assert fetch_wordmark.WEBSITE_VIEWBOX in svg
+
+
+def test_manifest_uses_the_verified_website_asset_hash():
+    import json
+
+    wordmark = json.loads(MANIFEST.read_text())["wordmark"]
+    assert wordmark["source_path"] == "public/brands/bluefin-wordmark-light.svg"
+    assert wordmark["sha256"] == WEBSITE_SHA256
+
+
+def test_validate_svg_accepts_the_legacy_default_shape():
+    svg = _svg(viewbox=fetch_wordmark.LEGACY_VIEWBOX)
+    fetch_wordmark.validate_svg(
+        svg,
+        preserve_colors=False,
+        expected_viewbox=fetch_wordmark.LEGACY_VIEWBOX,
+    )
+    assert fetch_wordmark.LEGACY_VIEWBOX in svg
 
 
 def test_validate_svg_rejects_background_rect_or_wrong_hash():
@@ -53,7 +82,7 @@ def test_parser_defaults_preserve_existing_credits_behavior():
 def test_main_recolors_the_default_wordmark_and_keeps_the_default_width(
     monkeypatch, tmp_path
 ):
-    svg = _svg()
+    svg = _svg(viewbox=fetch_wordmark.LEGACY_VIEWBOX)
     out_path = tmp_path / "bluefin-wordmark.png"
     seen = {}
 
@@ -90,6 +119,7 @@ def test_main_recolors_the_default_wordmark_and_keeps_the_default_width(
     assert seen["timeout"] == 30
     assert seen["out"] == out_path
     assert seen["width"] == 1600
+    assert fetch_wordmark.LEGACY_VIEWBOX in seen["rasterised_svg"]
     assert 'fill="#ffffff"' in seen["rasterised_svg"]
     assert '#000000' not in seen["rasterised_svg"]
 
@@ -97,7 +127,7 @@ def test_main_recolors_the_default_wordmark_and_keeps_the_default_width(
 def test_main_preserves_colors_when_requested_and_honors_custom_width(
     monkeypatch, tmp_path
 ):
-    svg = _svg(fill="#fff")
+    svg = _svg(fill="#fff", viewbox=fetch_wordmark.WEBSITE_VIEWBOX)
     out_path = tmp_path / "assets" / "bluefin-wordmark.png"
     seen = {}
 
@@ -146,4 +176,3 @@ def test_main_preserves_colors_when_requested_and_honors_custom_width(
     assert seen["out"] == out_path
     assert seen["width"] == 1200
     assert seen["rasterised_svg"] == svg
-
