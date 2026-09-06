@@ -1,0 +1,477 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "_what",
+    "character",
+    "sources",
+    "items"
+  ],
+  "properties": {
+    "_what": {
+      "type": "string",
+      "minLength": 1
+    },
+    "character": {
+      "const": "LEONARDO"
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "design_sheet",
+        "rgba_assets"
+      ],
+      "properties": {
+        "design_sheet": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file",
+            "size",
+            "role"
+          ],
+          "properties": {
+            "file": {
+              "const": "Leonardo/Cha Design_LEONARDO.jpg"
+            },
+            "size": {
+              "const": [
+                7342,
+                9075
+              ]
+            },
+            "role": {
+              "const": "copy and label evidence only"
+            }
+          }
+        },
+        "rgba_assets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "weapons",
+            "pose_03",
+            "pose_04"
+          ],
+          "properties": {
+            "weapons": {
+              "$ref": "#/$defs/rgba_source",
+              "properties": {
+                "file": {
+                  "const": "Leonardo/CHA_LEONARDO_WEAPONS.png"
+                },
+                "size": {
+                  "const": [
+                    6891,
+                    5354
+                  ]
+                }
+              }
+            },
+            "pose_03": {
+              "$ref": "#/$defs/rgba_source",
+              "properties": {
+                "file": {
+                  "const": "Leonardo/CHA_LEONARDO_03.png"
+                },
+                "size": {
+                  "const": [
+                    3871,
+                    5051
+                  ]
+                }
+              }
+            },
+            "pose_04": {
+              "$ref": "#/$defs/rgba_source",
+              "properties": {
+                "file": {
+                  "const": "Leonardo/CHA_LEONARDO_04.png"
+                },
+                "size": {
+                  "const": [
+                    2561,
+                    2817
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "items": {
+      "type": "object",
+      "minProperties": 18,
+      "additionalProperties": {
+        "$ref": "#/$defs/item"
+      }
+    }
+  },
+  "$defs": {
+    "rgba_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "size",
+        "role"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ],
+          "items": false
+        },
+        "role": {
+          "const": "reviewed RGBA display-art source"
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "copy",
+        "evidence",
+        "art",
+        "presentation"
+      ],
+      "properties": {
+        "copy": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/authored_copy"
+            },
+            {
+              "$ref": "#/$defs/placeholder_copy"
+            }
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "art": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/components_art"
+            },
+            {
+              "$ref": "#/$defs/context_crop_art"
+            },
+            {
+              "$ref": "#/$defs/text_only_art"
+            }
+          ]
+        },
+        "presentation": {
+          "$ref": "#/$defs/presentation"
+        }
+      }
+    },
+    "authored_copy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "description",
+        "description_source"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subtitle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description_source": {
+          "const": "authored"
+        }
+      }
+    },
+    "placeholder_copy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "description_source",
+        "placeholder_chars"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subtitle": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description_source": {
+          "const": "placeholder"
+        },
+        "placeholder_chars": {
+          "const": 84
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sheet",
+        "label_crop"
+      ],
+      "properties": {
+        "sheet": {
+          "const": "Leonardo/Cha Design_LEONARDO.jpg"
+        },
+        "label_crop": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "integer",
+              "minimum": 1
+            }
+          ],
+          "items": false
+        }
+      }
+    },
+    "source_size": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "items": false
+    },
+    "rotation": {
+      "type": "integer",
+      "multipleOf": 90
+    },
+    "art_width_share": {
+      "type": "number",
+      "minimum": 0.15,
+      "maximum": 0.55
+    },
+    "components_art": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "mode",
+        "source_size",
+        "component_seeds",
+        "rotation_degrees",
+        "art_width_share"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^Leonardo/.+\\.png$"
+        },
+        "mode": {
+          "const": "components"
+        },
+        "source_size": {
+          "$ref": "#/$defs/source_size"
+        },
+        "component_seeds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "items": false
+          }
+        },
+        "rotation_degrees": {
+          "$ref": "#/$defs/rotation"
+        },
+        "art_width_share": {
+          "$ref": "#/$defs/art_width_share"
+        }
+      }
+    },
+    "context_crop_art": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "mode",
+        "source_size",
+        "crop",
+        "mask_polygon",
+        "context_note",
+        "rotation_degrees",
+        "art_width_share"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^Leonardo/.+\\.png$"
+        },
+        "mode": {
+          "const": "context_crop"
+        },
+        "source_size": {
+          "$ref": "#/$defs/source_size"
+        },
+        "crop": {
+          "$ref": "#/$defs/evidence_crop"
+        },
+        "mask_polygon": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "items": false
+          }
+        },
+        "context_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rotation_degrees": {
+          "$ref": "#/$defs/rotation"
+        },
+        "art_width_share": {
+          "$ref": "#/$defs/art_width_share"
+        }
+      }
+    },
+    "text_only_art": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "mode",
+        "degraded_reason"
+      ],
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^Leonardo/.+\\.png$"
+        },
+        "mode": {
+          "const": "text_only"
+        },
+        "degraded_reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence_crop": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ],
+      "items": false
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "font_size",
+        "description_font_size",
+        "usage",
+        "min_hold_seconds"
+      ],
+      "properties": {
+        "font_size": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "description_font_size": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "usage": {
+          "enum": [
+            "accompany-art",
+            "dedicated-hold",
+            "text-only"
+          ]
+        },
+        "min_hold_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}
