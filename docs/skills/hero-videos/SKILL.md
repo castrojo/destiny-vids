@@ -1,6 +1,6 @@
 ---
 name: hero-videos
-version: "1.7"
+version: "1.8"
 last_updated: "2026-09-06"
 id: hero-videos
 one_line_purpose: Build a hero character music video from a paper-background animation.
@@ -28,6 +28,7 @@ metadata:
     - /websites/ffmpeg_documentation
     - /websites/opencv_4_13_0
     - /argoproj/argo-workflows
+    - /python-pillow/pillow
 ---
 
 # Hero videos
@@ -147,6 +148,19 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
   pass each source's invariants explicitly, preserve the fallback's URL/output/
   width behavior, and cover both paths with offline fixtures. Never commit a
   fetched website asset.
+- **A staged wordmark is a content-addressed input.** The record must carry
+  the pinned source URL and source digest, its preserve-colors policy and
+  raster width, plus the derived PNG dimensions and digest. Fetch it through
+  the shared wordmark helper only when absent; an existing PNG whose
+  dimensions, alpha, lettering/fin colors, or digest do not match is stale and
+  must fail the builder. The Argo fetch step repeats the digest check after
+  staging rather than trusting the transport.
+- **Pillow preflight is still-image review only.** Load actual day/night stage
+  faces and RGBA cards, use `Image.alpha_composite` for one-card-at-a-time
+  composites, and write two contact sheets so every card can be reviewed in
+  the real bottom rail. These sheets catch alpha, clipping, and contrast
+  regressions; they are not evidence for the live band or keyed children and
+  must never decode a video locally.
 - **Equal boxes do not mean equal characters.** In an ensemble, measure each
   returned proof's visible alpha area, balance visual weight within the
   available stations, and measure again after every matte change.
