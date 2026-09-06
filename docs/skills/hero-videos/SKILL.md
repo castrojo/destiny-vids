@@ -218,8 +218,11 @@ cover wordmark day/transition/night, every callout midpoint, protected
 full-frame passages, credits, and CTA/end.
 Decode with `ffmpeg -xerror -v error -i <output> -f null -`, capture stderr
 into an uploaded record, and write a decode PASS only after its zero exit.
-Probe all streams: include `format=nb_streams,duration`, require one stream,
-and explicitly fail if any `codec_type=audio` appears in the recorded probe.
+Probe all streams: include `format=nb_streams,duration`, then apply the
+workflow's stream contract. Video-only picture workflows require exactly one
+video stream and no audio stream; ensemble and final mux workflows require
+exactly one video stream and one audio stream. Record the stream types and
+fail when the applicable contract is not met.
 
 - [ ] Per-video measurements and source/asset provenance are in `verify-notes.md`.
 - [ ] `target_frames`, uniform `setpts` factor, 24 fps output, and effective

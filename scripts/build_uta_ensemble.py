@@ -1537,6 +1537,9 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         f"eq(pts\\,{row['programme_pts']})" for row in plan
     )
     review_paths = " ".join(f"/work/{row['label']}.jpg" for row in plan)
+    proof_paths = " ".join(
+        f"/work/{kid['id']}-proof.png" for kid in kids
+    )
 
     fetch = ["base=" + FETCH_BASE]
     fetch.append(
@@ -1706,6 +1709,15 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         "done\n"
         f"sha256sum {review_paths} > /work/review-sha256.txt\n"
         ": > /work/ens-gates.txt\n"
+        "true_peak_dbtp=$(awk '\n"
+        "  /^ *True peak:/ { in_true_peak=1; next }\n"
+        "  in_true_peak && /^ *Peak:/ { print $2; exit }\n"
+        "' /work/ens-ebur128.txt)\n"
+        "printf 'true_peak_dbtp=%s\\n' \"$true_peak_dbtp\" "
+        ">> /work/ens-gates.txt\n"
+        "awk -v peak=\"$true_peak_dbtp\" "
+        "'BEGIN { if (peak == \"\" || peak !~ /^[-+]?[0-9]+([.][0-9]+)?$/ "
+        "|| peak + 0 >= 0) exit 1 }'\n"
         "printf 'render_mode=full\\n' >> /work/ens-gates.txt\n"
         "printf 'expected_frames="
         f"{record['delivery']['programme_frames']}\\n' >> /work/ens-gates.txt\n"
@@ -1778,8 +1790,7 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         f"  for f in /work/{output} /work/ens-probe.json /work/ens-decode.txt \\",
         "           /work/ens-sha256.txt /work/ens-ebur128.txt "
         "/work/ens-gates.txt /work/frame-plan.tsv "
-        f"/work/review-sha256.txt {review_paths} /work/ens-t*.jpg "
-        "/work/*-proof.png; do",
+        f"/work/review-sha256.txt {review_paths} {proof_paths}; do",
         f'    curl -fsS -T "$f" {RECEIVER}/$(basename $f)',
         "  done",
         "fi",
