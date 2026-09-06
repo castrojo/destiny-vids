@@ -170,3 +170,16 @@ def test_no_hero_step_shells_out_to_a_local_ffmpeg():
     """Every frame this repo touches for a hero video is touched on the farm."""
     src = (REPO / "scripts" / "build_uta_ensemble.py").read_text()
     assert "subprocess" not in src
+
+
+def test_every_kid_stream_is_padded_past_its_retime():
+    """An overlay past the end of its input does not show the last frame.
+
+    RAFI_01 came back as a white ghost for the final second of the first
+    pass, because resampling 24/1 onto 24000/1001 landed its stream a frame
+    short of the span the composite asked for.
+    """
+    for kid in B.stations(RECORD):
+        step = B.key_step(RECORD, kid)
+        assert f"tpad=stop_mode=clone:stop={B.TAIL_PAD}" in step
+        assert f"-frames:v {B.visible_frames(RECORD)}" in step

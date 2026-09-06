@@ -120,6 +120,9 @@ OUTPUT = "GENERAL_OF_THE_DARK_ARMY-ensemble.mp4"
 # A wide art crop scaled to the box height eats the text column.
 ART_WIDTH_SHARE = 0.32
 
+# Frames of finished drawing cloned past the retime, to cover rounding.
+TAIL_PAD = 72
+
 
 def t_of(frame: int) -> float:
     return frame * FPS_DEN / FPS_NUM
@@ -420,7 +423,15 @@ def key_step(record, kid):
     graph = f"[0:v]{','.join(pre)},{head}"
     if tail:
         graph = f"{graph};{tail}"
-    post = f"scale={kid['scaled_width']}:{kid['scaled_height']}:flags=lanczos"
+    # Resampling 24/1 onto 24000/1001 can land a frame or two short, and the
+    # frame an overlay shows past the end of its input is not the finished
+    # drawing -- RAFI_01 rendered as a white ghost for the last second of the
+    # first pass. Clone the finished frame to cover any shortfall; -frames:v
+    # still cuts it to the exact span.
+    post = (
+        f"tpad=stop_mode=clone:stop={TAIL_PAD},"
+        f"scale={kid['scaled_width']}:{kid['scaled_height']}:flags=lanczos"
+    )
     if kid["flip"]:
         post += ",hflip"
     graph += f",{post},setsar=1,format=yuva420p[k]"
