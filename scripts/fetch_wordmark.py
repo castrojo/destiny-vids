@@ -11,11 +11,11 @@ wallpapers only, no wordmark in any branch or release. The mark lives at
 `ublue-os/universal-blue-org`, `content/ocis/bluefin.svg`: the "project
 Bluefin" lockup with the blue fin ligature, as outlined paths.
 
-**The reversed variant.** The legacy published mark is black with a
-`#4285f4` fin, drawn for light backgrounds; the credits are near-black. So the
-BLACK paths are recoloured to white and **the fin's blue is left exactly as
-published**. The pinned website asset is already the light variant and uses
-`--preserve-colors`.
+**The reversed variant.** The published mark is black with a `#4285f4` fin,
+drawn for light backgrounds. The stage uses the reversed lockup: black paths
+are recoloured to white and **the fin's blue is left exactly as published**.
+The source digest is checked before that transformation. `--preserve-colors`
+is for an already-light SVG fixture, not for the pinned website file.
 
 Rasterised with playwright, the same browser this repo already uses for
 `cards/render-cards.mjs` -- an atomic host has no rsvg/inkscape/cairosvg, and
@@ -26,7 +26,8 @@ above exists to prevent.
     python3 scripts/fetch_wordmark.py --force   # redo it
     python3 scripts/fetch_wordmark.py \
       --source-url ... --expected-sha256 ... --out ... --width 1200 \
-      --preserve-colors  # for the already-correct light lockup
+      # the pinned website source is verified, then black lettering is
+      # reversed to white while the blue fin is preserved
 """
 
 from __future__ import annotations
@@ -59,6 +60,7 @@ TYPE_FILL = "#000000"
 REVERSED_FILL = "#ffffff"
 WHITE_FILLS = {"#fff", "#ffffff"}
 BLACK_FILLS = {"#000", "#000000"}
+BLACK_SOURCE_FILLS = ("#000000", "#000")
 FIN_FILL = "#4285f4"
 WEBSITE_VIEWBOX = "0 0 105.658 43.183"
 LEGACY_VIEWBOX = "0 0 105.65843 43.183342"
@@ -99,6 +101,14 @@ def _rect_covers_viewbox(elem, width, height):
     if h is None:
         return True
     return abs(float(h) - height) <= 1e-3
+
+
+def _is_website_source(source_url):
+    return source_url.endswith("/public/brands/bluefin-wordmark-light.svg")
+
+
+def _recolour_black(svg_text):
+    return svg_text.replace(TYPE_FILL, REVERSED_FILL).replace("#000", "#fff")
 
 
 def validate_svg(
@@ -224,27 +234,32 @@ def main(argv=None):
               file=sys.stderr)
         return 1
 
-    if not args.preserve_colors and TYPE_FILL not in svg:
-        print(f"warning: {TYPE_FILL} not found in the published SVG -- the mark "
-              f"may have been redrawn upstream. Not recolouring blind.",
+    if not args.preserve_colors and not any(
+        fill in svg for fill in BLACK_SOURCE_FILLS
+    ):
+        print("warning: black lettering was not found in the published SVG -- "
+              "the mark may have been redrawn upstream. Not recolouring blind.",
               file=sys.stderr)
         return 1
 
+    expected_viewbox = (
+        WEBSITE_VIEWBOX
+        if _is_website_source(args.source_url) or args.preserve_colors
+        else LEGACY_VIEWBOX
+    )
     try:
         validate_svg(
             svg,
             expected_sha256=args.expected_sha256,
             preserve_colors=args.preserve_colors,
-            expected_viewbox=(
-                WEBSITE_VIEWBOX if args.preserve_colors else LEGACY_VIEWBOX
-            ),
+            expected_viewbox=expected_viewbox,
         )
     except ValueError as exc:
         print(f"could not fetch the wordmark: {exc}", file=sys.stderr)
         return 1
 
     if not args.preserve_colors:
-        svg = svg.replace(TYPE_FILL, REVERSED_FILL)
+        svg = _recolour_black(svg)
 
     rasterise(svg, out, width=args.width)
     size = trim(out)

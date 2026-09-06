@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from PIL import Image, ImageDraw
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
@@ -21,6 +22,17 @@ import render_uta_callout as C  # noqa: E402
 
 RECORD, MONTAGE, LEONARDO = B.load()
 CATALOG = B.equipment_catalog(RECORD, MONTAGE, LEONARDO)
+
+
+def _wordmark_image():
+    image = Image.new("RGBA", (1200, 300), (0, 0, 0, 0))
+    ImageDraw.Draw(image).rounded_rectangle(
+        (0, 0, 1199, 299), radius=24, fill=(255, 255, 255, 255)
+    )
+    return image
+
+
+WORDMARK_IMAGE = _wordmark_image()
 
 
 def rects_overlap(a, b):
@@ -196,6 +208,21 @@ def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
 def test_band_is_raised_to_give_bottom_equipment_room():
     assert RECORD["band_window"]["y"] == 407
     assert RECORD["callout_pockets"]["bottom"]["height"] == 425
+
+
+def test_wordmark_is_centered_and_above_the_band():
+    mark = RECORD["wordmark"]
+    assert mark["x"] == (B.CANVAS_W - mark["display_width"]) // 2
+    assert mark["y"] >= 0
+    assert mark["y"] < RECORD["band_window"]["y"]
+
+
+def test_wordmark_does_not_overlap_kids_band_or_equipment():
+    box = B.wordmark_box(RECORD, WORDMARK_IMAGE)
+    assert not rects_overlap(box, B.band_box(RECORD))
+    for kid in B.stations(RECORD):
+        assert not rects_overlap(box, B.station_box(kid))
+    assert not rects_overlap(box, B.pocket_box(RECORD, "bottom"))
 
 
 def test_all_equipment_uses_the_bottom_rail():
@@ -528,8 +555,6 @@ def test_only_the_aperture_is_rounded():
 
 
 def test_the_aperture_mask_matches_the_aperture():
-    from PIL import Image
-
     win = RECORD["band_window"]
     path = B.WORK / "cards" / B.APERTURE_MASK
     if not path.exists():
@@ -541,3 +566,144 @@ def test_the_aperture_mask_matches_the_aperture():
     assert mask.getpixel((win["width"] // 2, win["height"] // 2)) == 255
     assert mask.getpixel((0, 0)) == 0
     assert 0 < mask.getpixel((win["corner_radius"], 0)) <= 255
+
+
+def test_stage_segments_add_the_wordmark_but_clean_segments_do_not():
+    stage = B.stage_segment(
+        RECORD,
+        1,
+        RECORD["timeline"]["intro_end_frame"],
+        10,
+        [],
+        0,
+    )
+    assert "-i /work/bluefin-wordmark.png" in stage
+    assert (
+        f"scale={RECORD['wordmark']['display_width']}:-2:flags=lanczos"
+        in stage
+    )
+    assert (
+        f"overlay=x={RECORD['wordmark']['x']}:y={RECORD['wordmark']['y']}"
+        in stage
+    )
+
+    clean = B.clean_segment(0, 0, 10)
+    assert "bluefin-wordmark.png" not in clean
+    assert "overlay=x=980:y=48" not in clean
+
+
+def test_workflow_fetches_the_wordmark_only_for_stage_graphs():
+    names = [
+        B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])
+    ]
+    text = B.workflow(RECORD, MONTAGE, names)
+    assert "$base/.work-uta-general/assets/bluefin-wordmark.png" in text
+    assert text.count("-i /work/bluefin-wordmark.png") == sum(
+        kind == "stage" for kind, _, _ in B.segments(RECORD)
+    )
+
+
+def test_layout_review_frame_composites_transparent_stills_only():
+    background = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (23, 31, 42))
+    card = Image.new("RGBA", (B.CANVAS_W, B.CANVAS_H), (0, 0, 0, 0))
+    ImageDraw.Draw(card).rectangle(
+        (700, 1100, 1850, 1280), fill=(255, 255, 255, 220)
+    )
+
+    frame = B.layout_review_frame(
+        RECORD,
+        background,
+        WORDMARK_IMAGE,
+        cards=(card,),
+    )
+
+    assert frame.mode == "RGBA"
+    assert frame.size == (B.CANVAS_W, B.CANVAS_H)
+    assert frame.getpixel((0, 0))[:3] == background.getpixel((0, 0))
+    assert frame.getchannel("A").getbbox()
+    assert card.getchannel("A").getextrema()[0] == 0
+
+
+def test_image_level_layout_gate_renders_all_26_cards_and_previews(
+    monkeypatch, tmp_path
+):
+    def fake_extract(spec, hero_root, out_path):
+        if B._art_mode(spec) == "text_only":
+            return None
+        art = Image.new("RGBA", (96, 64), (0, 0, 0, 0))
+        ImageDraw.Draw(art).rounded_rectangle(
+            (8, 8, 87, 55), radius=8, fill=(230, 240, 255, 235)
+        )
+        art.save(out_path)
+        return art
+
+    monkeypatch.setattr(B, "extract_equipment", fake_extract)
+    day = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (232, 240, 246))
+    night = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (18, 24, 34))
+    cards_dir = tmp_path / "cards"
+    rows = B.render_cards(
+        RECORD,
+        MONTAGE,
+        LEONARDO,
+        cards_dir,
+        hero_root=tmp_path,
+        faces=(day, night),
+    )
+
+    assert len(rows) == 26
+    assert {row["item_id"] for row in rows} == set(CATALOG)
+    pocket = B.pocket_box(RECORD, "bottom")
+    bounds = (
+        pocket[0],
+        pocket[1],
+        pocket[0] + pocket[2],
+        pocket[1] + pocket[3],
+    )
+    for row in rows:
+        with Image.open(row["path"]) as card:
+            assert card.mode == "RGBA"
+            assert card.getchannel("A").getbbox()
+            assert B.fits(B.ink_bbox(card), bounds), row["item_id"]
+        assert row["art_bounds"] is None or len(row["art_bounds"]) == 4
+
+    mark = B.fit_wordmark(RECORD, WORDMARK_IMAGE)
+    box = B.wordmark_box(RECORD, WORDMARK_IMAGE)
+    assert mark.mode == "RGBA"
+    assert mark.getchannel("A").getbbox()
+    assert box[0] == (B.CANVAS_W - box[2]) // 2
+
+    preview_paths = B.render_layout_previews(
+        RECORD,
+        (day, night),
+        WORDMARK_IMAGE,
+        tmp_path / "review",
+    )
+    assert [path.name for path in preview_paths] == [
+        "stage-day-wordmark.png",
+        "stage-night-wordmark.png",
+    ]
+    for path, face in zip(preview_paths, (day, night)):
+        with Image.open(path) as preview:
+            assert preview.mode == "RGBA"
+            assert preview.getpixel((0, 0))[:3] == face.getpixel((0, 0))
+
+    contact = B.render_contact_sheet(
+        RECORD,
+        MONTAGE,
+        LEONARDO,
+        rows,
+        tmp_path / "review" / "equipment-contact-sheet.png",
+    )
+    assert contact.exists()
+    with Image.open(contact) as sheet:
+        assert sheet.mode == "RGBA"
+        assert sheet.size[0] == 4 * B.CONTACT_CELL_WIDTH
+
+
+def test_context_crop_items_keep_transparency_notes_and_no_sheet_art():
+    for item_id, item in LEONARDO["items"].items():
+        spec = item["art"]
+        assert "Cha Design_LEONARDO.jpg" not in spec["file"], item_id
+        if spec["mode"] == "context_crop":
+            assert spec["context_note"].strip(), item_id
+        assert not spec["file"].endswith(".jpg"), item_id

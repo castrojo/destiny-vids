@@ -11,7 +11,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 import fetch_wordmark  # noqa: E402
 
 MANIFEST = REPO_ROOT / "stories" / "uta-general-ensemble.json"
-WEBSITE_SHA256 = "4ae1d486e6e73743fad1e1ef625615c4a28e72bbcc0a966ba3c5294303e4e380"
+WEBSITE_SHA256 = "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74"
 
 
 def _svg(
@@ -176,3 +176,57 @@ def test_main_preserves_colors_when_requested_and_honors_custom_width(
     assert seen["out"] == out_path
     assert seen["width"] == 1200
     assert seen["rasterised_svg"] == svg
+
+
+def test_main_recolors_the_pinned_website_source_before_rasterizing(
+    monkeypatch, tmp_path
+):
+    svg = (
+        f'<svg viewBox="{fetch_wordmark.WEBSITE_VIEWBOX}">'
+        '<path style="fill:#000" d="M0 0h10v10z"/>'
+        '<path fill="#4285f4" d="M12 0h10v10z"/>'
+        "</svg>"
+    )
+    seen = {}
+
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            return svg.encode()
+
+    monkeypatch.setattr(
+        fetch_wordmark.urllib.request,
+        "urlopen",
+        lambda url, timeout=30: FakeResponse(),
+    )
+    monkeypatch.setattr(
+        fetch_wordmark,
+        "rasterise",
+        lambda svg_text, out, width=1600: seen.update(
+            svg_text=svg_text, out=Path(out), width=width
+        ),
+    )
+    monkeypatch.setattr(fetch_wordmark, "trim", lambda path: (12, 34))
+
+    assert fetch_wordmark.main(
+        [
+            "--source-url",
+            "https://raw.githubusercontent.com/projectbluefin/website/"
+            "c03567d972bb9cf52ab0676de5068a54f62f8a48/public/brands/"
+            "bluefin-wordmark-light.svg",
+            "--expected-sha256",
+            hashlib.sha256(svg.encode()).hexdigest(),
+            "--out",
+            str(tmp_path / "wordmark.png"),
+            "--width",
+            "1200",
+        ]
+    ) == 0
+    assert "fill:#fff" in seen["svg_text"]
+    assert "#000" not in seen["svg_text"]
+    assert fetch_wordmark.WEBSITE_VIEWBOX in seen["svg_text"]

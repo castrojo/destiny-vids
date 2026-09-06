@@ -138,6 +138,11 @@ ART_WIDTH_SHARE = 0.32
 # Frames of finished drawing cloned past the retime, to cover rounding.
 TAIL_PAD = 72
 
+CONTACT_COLUMNS = 4
+CONTACT_CELL_WIDTH = 640
+CONTACT_CELL_HEIGHT = 440
+CONTACT_PREVIEW_WIDTH = 600
+
 
 def t_of(frame: int) -> float:
     return frame * FPS_DEN / FPS_NUM
@@ -173,6 +178,7 @@ def equipment_catalog(
             "copy": callout["copy"],
             "evidence": callout["source"],
             "art": record["equipment_assets"][item_id],
+            "source_character": "RAFI",
             "presentation": {
                 "font_size": callout["font_size"],
                 "description_font_size": callout.get(
@@ -185,7 +191,7 @@ def equipment_catalog(
     for item_id, item in leonardo["items"].items():
         if item_id in merged:
             raise ValueError(f"duplicate equipment id: {item_id}")
-        merged[item_id] = item
+        merged[item_id] = {**item, "source_character": "LEONARDO"}
     return merged
 
 
@@ -400,15 +406,69 @@ def retime(record, kid):
 # cards
 
 
+def band_box(record):
+    win = record["band_window"]
+    return win["x"], win["y"], win["width"], win["height"]
+
+
+def station_box(kid):
+    return kid["x"], kid["y"], kid["scaled_width"], kid["scaled_height"]
+
+
+def pocket_box(record, pocket):
+    bounds = record["callout_pockets"][pocket]["bounds"]
+    x0, y0, x1, y1 = bounds
+    return x0, y0, x1 - x0, y1 - y0
+
+
+def fit_wordmark(record, wordmark):
+    """Return the pinned mark scaled to its recorded display width."""
+    from PIL import Image
+
+    mark = wordmark.convert("RGBA")
+    bbox = mark.getchannel("A").getbbox()
+    if not bbox:
+        raise ValueError("wordmark has no visible alpha")
+    mark = mark.crop(bbox)
+    width = int(record["wordmark"]["display_width"])
+    if width <= 0:
+        raise ValueError("wordmark display_width must be positive")
+    height = max(1, round(mark.height * width / mark.width))
+    return mark.resize((width, height), Image.Resampling.LANCZOS)
+
+
+def wordmark_box(record, wordmark):
+    mark = fit_wordmark(record, wordmark)
+    spec = record["wordmark"]
+    return spec["x"], spec["y"], mark.width, mark.height
+
+
+def layout_review_frame(record, background, wordmark, cards=()):
+    """Composite only supplied RGBA stills onto a still background."""
+    frame = background.convert("RGBA")
+    mark = fit_wordmark(record, wordmark)
+    spec = record["wordmark"]
+    frame.alpha_composite(mark, (spec["x"], spec["y"]))
+    for card in cards:
+        if card.mode != "RGBA":
+            raise ValueError("layout review cards must be RGBA")
+        if card.size != frame.size:
+            raise ValueError("layout review cards must match the canvas")
+        frame.alpha_composite(card)
+    return frame
+
+
 def card_name(i, entry):
     return f"card{i:02d}-{entry['item']}-{entry['pocket']}.png"
 
 
-def stage_background(record):
+def stage_background(record, hero_root=None):
     """The day and night faces as the stage actually composites them."""
     from PIL import Image
 
-    hero = Path.home() / "Videos" / "Wolves" / "Hero"
+    hero = Path(hero_root) if hero_root is not None else (
+        Path.home() / "Videos" / "Wolves" / "Hero"
+    )
     faces = []
     for key in ("day", "night"):
         im = Image.open(hero / record["stage"][key]).convert("RGB")
@@ -670,7 +730,15 @@ def audit_assets(record, montage, leonardo, hero_root):
     return errors
 
 
-def render_cards(record, montage, leonardo, out_dir):
+def render_cards(
+    record,
+    montage,
+    leonardo,
+    out_dir,
+    *,
+    hero_root=None,
+    faces=None,
+):
     """One full-canvas RGBA card per scheduled appearance.
 
     Every card is measured after it is drawn and shrunk until its own alpha
@@ -679,18 +747,25 @@ def render_cards(record, montage, leonardo, out_dir):
     """
     catalog = equipment_catalog(record, montage, leonardo)
     validate_equipment_schedule(record, catalog, montage)
-    faces = stage_background(record)
+    hero_root = Path(hero_root) if hero_root is not None else (
+        Path.home() / "Videos" / "Wolves" / "Hero"
+    )
+    faces = stage_background(record, hero_root) if faces is None else faces
     out_dir.mkdir(parents=True, exist_ok=True)
-    hero_root = Path.home() / "Videos" / "Wolves" / "Hero"
     equipment_paths = {}
+    equipment_bounds = {}
     for item_id, item in catalog.items():
         spec = item["art"]
         if _art_mode(spec) == "text_only":
             equipment_paths[item_id] = None
+            equipment_bounds[item_id] = None
             continue
         path = out_dir / f"equipment-{item_id}.png"
-        extract_equipment(spec, hero_root, path)
+        art = extract_equipment(spec, hero_root, path)
+        if art is None:
+            raise ValueError(f"{item_id}: art extraction returned no image")
         equipment_paths[item_id] = path
+        equipment_bounds[item_id] = art.getchannel("A").getbbox()
 
     written = []
     for i, entry in enumerate(record["callout_schedule"]):
@@ -715,11 +790,118 @@ def render_cards(record, montage, leonardo, out_dir):
             plate_weight=weight,
         )
         name = card_name(i, entry)
-        img.save(out_dir / name)
+        path = out_dir / name
+        img.save(path)
         written.append(
-            (name, round(mean, 1), weight, rendered["font_size"], attempt)
+            {
+                "name": name,
+                "item_id": item_id,
+                "source_character": item["source_character"],
+                "description_source": item["copy"].get(
+                    "description_source",
+                    "authored" if item["copy"].get("description") else "placeholder",
+                ),
+                "hold_seconds": entry["hold_seconds"],
+                "art_bounds": equipment_bounds[item_id],
+                "path": path,
+                "plate_mean": round(mean, 1),
+                "day_weight": weight,
+                "font_size": rendered["font_size"],
+                "shrinks": attempt,
+            }
         )
     return written
+
+
+def render_layout_previews(record, faces, wordmark, out_dir, cards=()):
+    """Write day/night stills for the local layout preflight."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    paths = []
+    for theme, face in zip(("day", "night"), faces):
+        path = out_dir / f"stage-{theme}-wordmark.png"
+        layout_review_frame(record, face, wordmark, cards=cards).save(path)
+        paths.append(path)
+    return paths
+
+
+def render_contact_sheet(record, montage, leonardo, rows, out_path):
+    """Lay out every catalog item and its final card in catalog order."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    catalog = equipment_catalog(record, montage, leonardo)
+    if len(rows) != len(catalog) or {row["item_id"] for row in rows} != set(catalog):
+        raise ValueError("contact sheet requires exactly one card per catalog item")
+    by_item = {row["item_id"]: row for row in rows}
+    ordered = [by_item[item_id] for item_id in catalog]
+
+    title_height = 48
+    preview_height = round(
+        CONTACT_PREVIEW_WIDTH * CANVAS_H / CANVAS_W
+    )
+    sheet_height = title_height + (
+        (len(ordered) + CONTACT_COLUMNS - 1) // CONTACT_COLUMNS
+    ) * CONTACT_CELL_HEIGHT
+    sheet = Image.new(
+        "RGBA",
+        (CONTACT_COLUMNS * CONTACT_CELL_WIDTH, sheet_height),
+        (18, 23, 31, 255),
+    )
+    draw = ImageDraw.Draw(sheet)
+    title_font = ImageFont.truetype(
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf", 24
+    )
+    meta_font = ImageFont.truetype(
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf", 15
+    )
+    draw.text(
+        (18, 12),
+        "GENERAL OF THE DARK ARMY - COMPLETE EQUIPMENT CONTACT SHEET (26)",
+        font=title_font,
+        fill=(240, 244, 248, 255),
+    )
+
+    for index, row in enumerate(ordered):
+        col = index % CONTACT_COLUMNS
+        grid_row = index // CONTACT_COLUMNS
+        x = col * CONTACT_CELL_WIDTH + 20
+        y = title_height + grid_row * CONTACT_CELL_HEIGHT + 12
+        panel = Image.new(
+            "RGBA",
+            (CONTACT_PREVIEW_WIDTH, preview_height),
+            (42, 50, 62, 255),
+        )
+        with Image.open(row["path"]) as card:
+            thumb = card.convert("RGBA").resize(
+                (CONTACT_PREVIEW_WIDTH, preview_height),
+                Image.Resampling.LANCZOS,
+            )
+        panel.alpha_composite(thumb)
+        sheet.alpha_composite(panel, (x, y))
+
+        art_bounds = row["art_bounds"] or "none"
+        metadata = (
+            f'{row["item_id"]} | {row["source_character"]} | '
+            f'desc={row["description_source"]} | '
+            f'hold={row["hold_seconds"]:g}s'
+        )
+        draw.text(
+            (x, y + preview_height + 8),
+            metadata,
+            font=meta_font,
+            fill=(226, 232, 240, 255),
+        )
+        draw.text(
+            (x, y + preview_height + 25),
+            f"art_alpha={art_bounds}",
+            font=meta_font,
+            fill=(190, 200, 214, 255),
+        )
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(out_path)
+    return out_path
 
 
 def render_card(
@@ -833,6 +1015,7 @@ def stage_bg_chain(record, seg_start_t, dur):
 def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
     kids = stations(record)
     win = record["band_window"]
+    wordmark = record["wordmark"]
     t0 = t_of(start_frame)
     # the drawings' clock counts stage frames only, so a segment resumes at
     # the frame the previous stage act stopped on, not at wall clock
@@ -862,6 +1045,16 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
     chain.append("[bandpix][amask]alphamerge[band]")
     chain.append(f"[bg][band]overlay=x={win['x']}:y={win['y']}[stage0]")
 
+    inputs.append(
+        f"-loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/bluefin-wordmark.png"
+    )
+    wordmark_idx = n
+    n += 1
+    chain.append(
+        f"[{wordmark_idx}:v]format=rgba,"
+        f"scale={wordmark['display_width']}:-2:flags=lanczos,setsar=1[mark]"
+    )
+
     prev = "stage0"
     for kid in kids:
         inputs.append(f"-ss {kid_t:.6f} -i /work/{kid['id']}-keyed.mov")
@@ -877,6 +1070,12 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
         )
         prev = f"s{n}"
         n += 1
+
+    chain.append(
+        f"[{prev}][mark]overlay=x={wordmark['x']}:y={wordmark['y']}:"
+        f"eof_action=repeat[wordmarked]"
+    )
+    prev = "wordmarked"
 
     for name, start, hold in cards:
         a = start - t0
@@ -1010,6 +1209,10 @@ def workflow(record, montage, card_names):
     fetch.append(
         "curl -fsSL -o /work/INTRO_BLUEFIN.png "
         "$base/.work-uta-general/assets/INTRO_BLUEFIN.png"
+    )
+    fetch.append(
+        "curl -fsSL -o /work/bluefin-wordmark.png "
+        "$base/.work-uta-general/assets/bluefin-wordmark.png"
     )
     for face in ("day", "night"):
         fetch.append(
@@ -1185,9 +1388,14 @@ def main():
         help="audit supplied Leonardo RGBA display assets without video decoding",
     )
     ap.add_argument(
+        "--contact-sheet",
+        action="store_true",
+        help="render the complete equipment contact sheet and still previews",
+    )
+    ap.add_argument(
         "--hero-root",
         default=str(Path.home() / "Videos" / "Wolves" / "Hero"),
-        help="Hero asset root used by --audit-assets",
+        help="Hero asset root used by asset audits and still generation",
     )
     ap.add_argument("--out-dir", default=str(WORK))
     args = ap.parse_args()
@@ -1197,7 +1405,7 @@ def main():
         errors = audit_assets(record, montage, leonardo, args.hero_root)
         if errors:
             return 1
-        if not args.cards and not args.workflow:
+        if not args.cards and not args.contact_sheet and not args.workflow:
             return 0
     catalog = equipment_catalog(record, montage, leonardo)
     validate_equipment_schedule(record, catalog, montage)
@@ -1207,15 +1415,47 @@ def main():
         card_name(i, e) for i, e in enumerate(record["callout_schedule"])
     ]
 
-    if args.cards:
+    rows = None
+    if args.cards or args.contact_sheet:
         print(f"{APERTURE_MASK}  {render_aperture_mask(record, out / 'cards')}")
-        for name, mean, weight, size, tries in render_cards(
-            record, montage, leonardo, out / "cards"
-        ):
+        rows = render_cards(
+            record,
+            montage,
+            leonardo,
+            out / "cards",
+            hero_root=args.hero_root,
+        )
+        for row in rows:
             print(
-                f"{name}  plate luma {mean}  day {weight:.2f}  "
-                f"label {size}px  shrinks {tries}"
+                f"{row['name']}  plate luma {row['plate_mean']}  "
+                f"day {row['day_weight']:.2f}  label {row['font_size']}px  "
+                f"shrinks {row['shrinks']}"
             )
+        from PIL import Image
+
+        hero_root = Path(args.hero_root)
+        wordmark_path = (
+            hero_root / ".work-uta-general" / "assets" / "bluefin-wordmark.png"
+        )
+        with Image.open(wordmark_path) as wordmark:
+            faces = stage_background(record, hero_root)
+            previews = render_layout_previews(
+                record,
+                faces,
+                wordmark,
+                out / "review",
+            )
+        for path in previews:
+            print(f"wrote {path}")
+        if args.contact_sheet:
+            path = render_contact_sheet(
+                record,
+                montage,
+                leonardo,
+                rows,
+                out / "review" / "equipment-contact-sheet.png",
+            )
+            print(f"wrote {path}")
 
     if args.workflow:
         path = out / "uta-ensemble.yaml"
