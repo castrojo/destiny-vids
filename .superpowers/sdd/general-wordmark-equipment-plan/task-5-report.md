@@ -139,3 +139,30 @@ No video was rendered by request. The per-card Pillow sheets verify the actual
 bottom rail against day/night stage faces and the pinned wordmark, but Argo
 returned frames remain the authoritative visual gate for the live band and
 keyed children.
+
+## Fix round 2
+
+**Status:** complete.
+
+The synthetic 26-card fit test remains offline and unchanged. A separate
+local-only regression now skips when `~/Videos/Wolves/Hero` is unavailable and,
+when present, runs the merged 26-item catalog through `extract_equipment` and
+`render_card` using the actual Hero PNG sources. It asserts that every card
+fits the bottom rail, context crops retain transparent pixels, quarter-turn
+rotations change the extracted orientation, text-only entries write no art,
+and no design-sheet file is used. Extraction and card-render failures are not
+swallowed, so any real catalog failure fails the test.
+
+### Validation
+
+- `python3 -m pytest -q tests/test_uta_ensemble.py::test_solid_card_alpha_stays_inside_bottom_bounds tests/test_uta_ensemble.py::test_real_hero_assets_render_every_merged_equipment_card` — 2 passed.
+- `python3 -m pytest -q tests/test_uta_ensemble.py` — 54 passed.
+- `python3 -m pytest -q tests/test_fetch_wordmark.py tests/test_hero_equipment.py tests/test_uta_ensemble.py` — 82 passed.
+- `HOME=/tmp PYTHONPATH=/var/home/jorge/.local/lib/python3.13/site-packages python3 -m pytest -q tests/test_uta_ensemble.py::test_real_hero_assets_render_every_merged_equipment_card` — 1 skipped.
+- `python3 scripts/build_uta_ensemble.py --audit-assets --hero-root "$HOME/Videos/Wolves/Hero"` — passed for the local asset audit.
+
+### Concerns
+
+The real-asset regression is intentionally skipped on CI hosts without the
+owner's local Hero asset tree; the existing synthetic regression remains the
+offline CI coverage.

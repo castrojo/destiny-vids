@@ -24,6 +24,7 @@ import render_uta_callout as C  # noqa: E402
 
 RECORD, MONTAGE, LEONARDO = B.load()
 CATALOG = B.equipment_catalog(RECORD, MONTAGE, LEONARDO)
+HERO_ROOT = Path.home() / "Videos" / "Wolves" / "Hero"
 
 
 def _wordmark_image():
@@ -287,6 +288,69 @@ def test_solid_card_alpha_stays_inside_bottom_bounds(tmp_path):
             pocket,
             bounds,
             art_path=art,
+            plate_mean=64,
+        )
+        assert B.fits(B.ink_bbox(image), bounds), item_id
+
+
+@pytest.mark.skipif(
+    not HERO_ROOT.is_dir(),
+    reason="local Hero RGBA assets are unavailable",
+)
+def test_real_hero_assets_render_every_merged_equipment_card(tmp_path):
+    """Run the complete merged catalog against the supplied Hero sources."""
+    pocket = dict(RECORD["callout_pockets"]["bottom"])
+    bounds = pocket.pop("bounds")
+    assert len(CATALOG) == 26
+
+    for item_id, item in CATALOG.items():
+        spec = item["art"]
+        source_path = HERO_ROOT / spec["file"]
+        assert source_path.is_file(), item_id
+        assert source_path.suffix.lower() == ".png", item_id
+        assert "design" not in source_path.name.lower(), item_id
+
+        output_path = tmp_path / f"{item_id}.png"
+        extracted = B.extract_equipment(spec, HERO_ROOT, output_path)
+        if spec.get("mode", "components") == "text_only":
+            assert extracted is None, item_id
+            assert not output_path.exists(), item_id
+            art_path = None
+        else:
+            assert extracted is not None, item_id
+            assert extracted.mode == "RGBA", item_id
+            assert extracted.getchannel("A").getbbox(), item_id
+            assert output_path.is_file(), item_id
+            art_path = output_path
+
+            if spec.get("mode") == "context_crop":
+                assert extracted.getchannel("A").getextrema()[0] == 0, item_id
+
+            rotation = spec.get("rotation_degrees", 0)
+            if rotation:
+                unrotated_spec = {**spec, "rotation_degrees": 0}
+                unrotated = B.extract_equipment(
+                    unrotated_spec,
+                    HERO_ROOT,
+                    tmp_path / f"{item_id}-unrotated.png",
+                )
+                assert unrotated is not None, item_id
+                if rotation in (90, 270):
+                    assert extracted.size == (
+                        unrotated.height,
+                        unrotated.width,
+                    ), item_id
+                else:
+                    assert extracted.size == unrotated.size, item_id
+                    assert extracted.tobytes() != unrotated.tobytes(), item_id
+
+        callout = B.normalize_callout(item_id, item)
+        image, _, _ = B.render_card(
+            callout,
+            item,
+            pocket,
+            bounds,
+            art_path,
             plate_mean=64,
         )
         assert B.fits(B.ink_bbox(image), bounds), item_id
