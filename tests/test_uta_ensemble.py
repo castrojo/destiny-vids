@@ -113,6 +113,13 @@ def test_leonardos_spear_faces_inward():
     assert leonardo["flip"] is False
 
 
+def test_character_visual_weight_is_measured_and_balanced():
+    measured = RECORD["character_balance"]["measured_final_opaque_pixels"]
+    assert max(measured.values()) / min(measured.values()) < 1.01
+    leonardo = next(k for k in B.stations(RECORD) if k["id"] == "LEONARDO")
+    assert leonardo["scaled_width"] == 640
+
+
 def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
     kids = [
         (k["x"], k["y"], k["scaled_width"], k["scaled_height"])
@@ -132,7 +139,11 @@ def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
 
 def test_band_is_raised_to_give_bottom_equipment_room():
     assert RECORD["band_window"]["y"] == 407
-    assert RECORD["callout_pockets"]["bottom"]["height"] == 400
+    assert RECORD["callout_pockets"]["bottom"]["height"] == 425
+
+
+def test_all_equipment_uses_the_bottom_rail():
+    assert {entry["pocket"] for entry in RECORD["callout_schedule"]} == {"bottom"}
 
 
 def test_every_card_is_up_while_the_stage_is_up():
@@ -222,6 +233,17 @@ def test_callout_renderer_rejects_an_opaque_sheet_crop(tmp_path):
         C.render_callout(callout, art_path=crop, canvas=(1280, 720))
 
 
+def test_callout_renderer_rejects_clipped_copy():
+    callout = json.loads(json.dumps(
+        MONTAGE["composition"]["callouts"]["spear"]
+    ))
+    callout["label_box"] = {"x": 0, "y": 0, "width": 300, "height": 120}
+    callout["plate_luma"] = {"mean": 64}
+
+    with pytest.raises(ValueError, match="exceeds its label_box"):
+        C.render_callout(callout, canvas=(1280, 720))
+
+
 def test_the_owner_protected_passage_carries_nothing():
     for entry in RECORD["callout_schedule"]:
         a = entry["start_seconds"]
@@ -258,6 +280,14 @@ def test_leonardos_name_is_masked_before_keying():
     assert B.LEONARDO_NAME_MASK in chain
     assert chain.index("split[c][m]") < chain.index(B.LEONARDO_NAME_MASK)
     assert chain.index(B.LEONARDO_NAME_MASK) < chain.index("floodfill")
+
+
+def test_leonardos_enclosed_spear_gap_is_removed():
+    chain = B.KEY_CHAINS["LEONARDO"]
+    assert B.LEONARDO_PAPER_POCKET in chain
+    assert chain.index(B.LEONARDO_PAPER_POCKET) > chain.index(
+        B.LEONARDO_NAME_MASK
+    )
 
 
 def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():

@@ -46,6 +46,7 @@ FILL = "s0=255:s1=255:s2=255:d0=0:d1=255:d2=0"
 LEONARDO_NAME_MASK = (
     "drawbox=x=1020:y=0:w=1026:h=128:color=0x0000FF@1:t=fill"
 )
+LEONARDO_PAPER_POCKET = f"floodfill=x=640:y=870:{FILL}"
 
 KEY_CHAINS = {
     "RAFI_01": (
@@ -108,6 +109,7 @@ KEY_CHAINS = {
         f"floodfill=x=2043:y=2:{FILL},"
         f"floodfill=x=2:y=1743:{FILL},"
         f"floodfill=x=2043:y=1743:{FILL},"
+        f"{LEONARDO_PAPER_POCKET},"
         "format=rgba,colorkey=0x0000FF:0.01:0.0,alphaextract[al];"
         "[c][al]alphamerge,crop=1888:1676:41:21"
     ),
@@ -344,24 +346,33 @@ def render_cards(record, montage, out_dir):
         }
         title0 = callout["font_size"] * scale
         body0 = callout.get("description_font_size", 0) * scale
+        bbox = None
+        last_overflow = None
         for attempt in range(12):
             shrink = 0.94 ** attempt
             callout["label_box"] = pocket
             callout["font_size"] = even(title0 * shrink)
             if body0:
                 callout["description_font_size"] = even(body0 * shrink)
-            img = render_callout(
-                callout, art_path=art_path, canvas=(CANVAS_W, CANVAS_H),
-                frame_map=1920 / CANVAS_W,
-                art_width_share=art_width_share,
-            )
+            try:
+                img = render_callout(
+                    callout, art_path=art_path, canvas=(CANVAS_W, CANVAS_H),
+                    frame_map=1920 / CANVAS_W,
+                    art_width_share=art_width_share,
+                )
+            except ValueError as exc:
+                if "exceeds its label_box" in str(exc):
+                    last_overflow = str(exc)
+                    continue
+                raise
             bbox = ink_bbox(img)
             if fits(bbox, bounds):
                 break
         else:
             raise SystemExit(
                 f"{entry['callout']} will not fit its {entry['pocket']} pocket "
-                f"at a readable size: {bbox} outside {bounds}"
+                f"at a readable size: "
+                f"{bbox if bbox is not None else last_overflow} outside {bounds}"
             )
         name = card_name(i, entry)
         img.save(out_dir / name)
