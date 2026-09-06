@@ -183,3 +183,16 @@ def test_every_kid_stream_is_padded_past_its_retime():
         step = B.key_step(RECORD, kid)
         assert f"tpad=stop_mode=clone:stop={B.TAIL_PAD}" in step
         assert f"-frames:v {B.visible_frames(RECORD)}" in step
+
+
+def test_no_kid_carries_its_sources_closing_white_flash():
+    """Every one of these animations ends by flashing to white.
+
+    All four sources append the same ~49 frame flourish: a jump to pure
+    white that decays back. Carried into the cut it puts a white ghost of
+    the child on screen in the last second of the stage.
+    """
+    for kid in RECORD["kids"]:
+        assert "use_frames" in kid, kid["id"]
+        assert kid["use_frames"] < kid["source_frames"] - 40, kid["id"]
+        assert "flash" in kid["use_frames_note"] or "dim" in kid["use_frames_note"]

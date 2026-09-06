@@ -63,7 +63,9 @@
       "x": 20,
       "y": 785,
       "width": 600,
-      "flip": false
+      "flip": false,
+      "use_frames": 24216,
+      "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     },
     {
       "id": "LEONARDO",
@@ -73,7 +75,9 @@
       "x": 1940,
       "y": 60,
       "width": 600,
-      "flip": true
+      "flip": true,
+      "use_frames": 18552,
+      "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     },
     {
       "id": "RAFI_02",
@@ -83,7 +87,9 @@
       "x": 1940,
       "y": 820,
       "width": 600,
-      "flip": true
+      "flip": true,
+      "use_frames": 30612,
+      "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     }
   ],
   "flip_note": "The right-hand pair is mirrored so all four face in towards the band, owner 2026-09-05 'flip them around for variety in this last one'. Only the two stations that gain by facing inward are flipped; a mirrored drawing is still the kid's own line work, and every title plate is masked out before the key, so no lettering is reversed on screen.",
