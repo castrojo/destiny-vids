@@ -1,8 +1,10 @@
 import hashlib
+import json
 import sys
 from pathlib import Path
 
 import pytest
+from PIL import Image, ImageDraw
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -42,11 +44,14 @@ def test_validate_svg_accepts_the_pinned_website_mark():
 
 
 def test_manifest_uses_the_verified_website_asset_hash():
-    import json
-
     wordmark = json.loads(MANIFEST.read_text())["wordmark"]
     assert wordmark["source_path"] == "public/brands/bluefin-wordmark-light.svg"
+    assert wordmark["source_url"] == fetch_wordmark.PINNED_WEBSITE_SOURCE_URL
     assert wordmark["sha256"] == WEBSITE_SHA256
+    assert wordmark["preserve_colors"] is False
+    assert wordmark["raster_width"] == 1200
+    assert wordmark["raster_size"] == [1992, 765]
+    assert wordmark["raster_sha256"] == fetch_wordmark.PINNED_WEBSITE_RASTER_SHA256
 
 
 def test_validate_svg_accepts_the_legacy_default_shape():
@@ -230,3 +235,53 @@ def test_main_recolors_the_pinned_website_source_before_rasterizing(
     assert "fill:#fff" in seen["svg_text"]
     assert "#000" not in seen["svg_text"]
     assert fetch_wordmark.WEBSITE_VIEWBOX in seen["svg_text"]
+
+
+def _raster_fixture(path):
+    image = Image.new("RGBA", fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((80, 120, 1250, 620), fill=(255, 255, 255, 255))
+    draw.polygon(
+        [(1320, 100), (1880, 380), (1660, 700), (1370, 500)],
+        fill=(66, 133, 244, 255),
+    )
+    image.save(path)
+    return path
+
+
+def test_validate_png_accepts_an_offline_faithful_raster_fixture(tmp_path):
+    path = _raster_fixture(tmp_path / "wordmark.png")
+    expected = fetch_wordmark.sha256_file(path)
+
+    result = fetch_wordmark.validate_png(
+        path,
+        expected_size=fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE,
+        expected_sha256=expected,
+    )
+
+    assert result["size"] == fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE
+    assert result["sha256"] == expected
+
+
+def test_validate_png_rejects_stale_or_wrong_raster(tmp_path):
+    path = _raster_fixture(tmp_path / "wordmark.png")
+    expected = fetch_wordmark.sha256_file(path)
+
+    with Image.open(path) as image:
+        image.load()
+        ImageDraw.Draw(image).point((1, 1), fill=(255, 255, 255, 255))
+        image.save(path)
+    with pytest.raises(ValueError, match="sha256 mismatch"):
+        fetch_wordmark.validate_png(
+            path,
+            expected_size=fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE,
+            expected_sha256=expected,
+        )
+
+    wrong = tmp_path / "wrong.png"
+    Image.new("RGBA", (600, 230), (255, 255, 255, 255)).save(wrong)
+    with pytest.raises(ValueError, match="dimensions mismatch"):
+        fetch_wordmark.validate_png(
+            wrong,
+            expected_size=fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE,
+        )

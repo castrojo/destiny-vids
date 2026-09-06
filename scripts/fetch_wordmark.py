@@ -71,6 +71,24 @@ EXPECTED_VIEWBOX = WEBSITE_VIEWBOX
 DEFAULT_OUT = DEST / "bluefin-wordmark.png"
 DEFAULT_WIDTH = 1600
 
+# The ensemble uses a different, source-pinned contract from the legacy
+# credits fetch. Keep these values separate so the no-argument defaults remain
+# compatible with existing credits builds.
+PINNED_WEBSITE_SOURCE_URL = (
+    "https://raw.githubusercontent.com/projectbluefin/website/"
+    "c03567d972bb9cf52ab0676de5068a54f62f8a48/public/brands/"
+    "bluefin-wordmark-light.svg"
+)
+PINNED_WEBSITE_SOURCE_SHA256 = (
+    "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74"
+)
+PINNED_WEBSITE_PRESERVE_COLORS = False
+PINNED_WEBSITE_RASTER_WIDTH = 1200
+PINNED_WEBSITE_RASTER_SIZE = (1992, 765)
+PINNED_WEBSITE_RASTER_SHA256 = (
+    "e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e"
+)
+
 
 def _local_name(tag):
     return tag.rsplit("}", 1)[-1]
@@ -205,6 +223,85 @@ def trim(path):
     if box:
         img.crop(box).save(path)
     return img.size
+
+
+def sha256_file(path):
+    """Return the SHA-256 digest of a staged binary asset."""
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_png(
+    path,
+    *,
+    expected_size=None,
+    expected_sha256=None,
+):
+    """Validate the pinned transparent PNG contract without network access."""
+    from PIL import Image
+
+    path = Path(path)
+    if not path.is_file():
+        raise ValueError(f"wordmark PNG is missing: {path}")
+
+    actual_sha256 = sha256_file(path)
+    if expected_sha256 is not None and actual_sha256 != expected_sha256:
+        raise ValueError(
+            f"wordmark PNG sha256 mismatch: expected {expected_sha256}, "
+            f"got {actual_sha256}"
+        )
+
+    try:
+        with Image.open(path) as image:
+            if image.format != "PNG":
+                raise ValueError(f"wordmark asset is {image.format}, not PNG")
+            image.load()
+            actual_size = image.size
+            if image.mode != "RGBA":
+                raise ValueError(
+                    f"wordmark PNG must be RGBA, got {image.mode}"
+                )
+            if expected_size is not None and actual_size != tuple(expected_size):
+                raise ValueError(
+                    f"wordmark PNG dimensions mismatch: expected "
+                    f"{tuple(expected_size)}, got {actual_size}"
+                )
+            alpha = image.getchannel("A")
+            alpha_min, alpha_max = alpha.getextrema()
+            if alpha_min != 0 or alpha_max != 255:
+                raise ValueError(
+                    "wordmark PNG must have transparent background and "
+                    "opaque core pixels"
+                )
+            if alpha.getbbox() is None:
+                raise ValueError("wordmark PNG has no visible alpha")
+
+            has_white = False
+            has_fin = False
+            has_black = False
+            for red, green, blue, opacity in image.getdata():
+                if not opacity:
+                    continue
+                has_white |= (red, green, blue) == (255, 255, 255)
+                has_fin |= (red, green, blue) == (66, 133, 244)
+                has_black |= (red, green, blue) == (0, 0, 0)
+            if not has_white:
+                raise ValueError("wordmark PNG has no white lettering")
+            if not has_fin:
+                raise ValueError("wordmark PNG has no #4285f4 fin")
+            if has_black:
+                raise ValueError("wordmark PNG contains black lettering")
+    except OSError as exc:
+        raise ValueError(f"could not read wordmark PNG: {exc}") from exc
+
+    return {
+        "path": path,
+        "sha256": actual_sha256,
+        "size": tuple(expected_size) if expected_size is not None else actual_size,
+    }
 
 
 def build_parser():

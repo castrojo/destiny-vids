@@ -142,6 +142,11 @@ CONTACT_COLUMNS = 4
 CONTACT_CELL_WIDTH = 640
 CONTACT_CELL_HEIGHT = 440
 CONTACT_PREVIEW_WIDTH = 600
+PREFLIGHT_COLUMNS = 4
+PREFLIGHT_CELL_WIDTH = 640
+PREFLIGHT_CELL_HEIGHT = 420
+PREFLIGHT_PREVIEW_HEIGHT = 360
+WORDMARK_ASSET_PATH = Path(".work-uta-general/assets/bluefin-wordmark.png")
 
 
 def t_of(frame: int) -> float:
@@ -164,6 +169,83 @@ def load():
         json.loads(MONTAGE.read_text(encoding="utf-8")),
         {"items": load_equipment_catalog(LEONARDO)},
     )
+
+
+def _fetch_wordmark_module():
+    if str(REPO / "scripts") not in sys.path:
+        sys.path.insert(0, str(REPO / "scripts"))
+    import fetch_wordmark
+
+    return fetch_wordmark
+
+
+def validate_wordmark_record(record):
+    """Validate the ensemble's source and derived wordmark contract."""
+    fetch_wordmark = _fetch_wordmark_module()
+    spec = record["wordmark"]
+    expected = {
+        "source_url": fetch_wordmark.PINNED_WEBSITE_SOURCE_URL,
+        "sha256": fetch_wordmark.PINNED_WEBSITE_SOURCE_SHA256,
+        "preserve_colors": fetch_wordmark.PINNED_WEBSITE_PRESERVE_COLORS,
+        "raster_width": fetch_wordmark.PINNED_WEBSITE_RASTER_WIDTH,
+        "raster_size": list(fetch_wordmark.PINNED_WEBSITE_RASTER_SIZE),
+        "raster_sha256": fetch_wordmark.PINNED_WEBSITE_RASTER_SHA256,
+        "display_width": 600,
+        "x": 980,
+        "y": 48,
+    }
+    for key, value in expected.items():
+        if spec.get(key) != value:
+            raise ValueError(
+                f"wordmark.{key} is not pinned: expected {value!r}, "
+                f"got {spec.get(key)!r}"
+            )
+    return spec
+
+
+def wordmark_asset_path(record, hero_root):
+    spec = validate_wordmark_record(record)
+    return Path(hero_root) / spec.get("asset_path", WORDMARK_ASSET_PATH)
+
+
+def wordmark_stage_name(record):
+    spec = validate_wordmark_record(record)
+    return Path(spec.get("asset_path", WORDMARK_ASSET_PATH)).name
+
+
+def validate_wordmark_asset(record, path):
+    """Validate a staged wordmark and return its measured digest and size."""
+    fetch_wordmark = _fetch_wordmark_module()
+    spec = validate_wordmark_record(record)
+    return fetch_wordmark.validate_png(
+        path,
+        expected_size=spec["raster_size"],
+        expected_sha256=spec["raster_sha256"],
+    )
+
+
+def prepare_wordmark_asset(record, hero_root):
+    """Fetch the pinned wordmark only when absent, then validate it strictly."""
+    fetch_wordmark = _fetch_wordmark_module()
+    spec = validate_wordmark_record(record)
+    path = wordmark_asset_path(record, hero_root)
+    if not path.exists():
+        args = [
+            "--source-url",
+            spec["source_url"],
+            "--expected-sha256",
+            spec["sha256"],
+            "--out",
+            str(path),
+            "--width",
+            str(spec["raster_width"]),
+            "--force",
+        ]
+        if spec["preserve_colors"]:
+            args.append("--preserve-colors")
+        if fetch_wordmark.main(args) != 0:
+            raise ValueError("fetch_wordmark failed to create the pinned PNG")
+    return validate_wordmark_asset(record, path)
 
 
 def equipment_catalog(
@@ -287,6 +369,13 @@ def stage_windows(record):
 
 def validate_equipment_schedule(record, catalog, montage=None):
     """Reject missing, repeated, unreadable, or badly seated equipment cards."""
+    for entry in record["callout_schedule"]:
+        if entry.get("pocket") != "bottom":
+            raise ValueError(
+                f"{entry.get('item', '<missing>')}: equipment cards must use "
+                "the bottom pocket"
+            )
+
     scheduled = [entry.get("item") for entry in record["callout_schedule"]]
     if any(item_id is None for item_id in scheduled):
         raise ValueError("every equipment schedule entry must use an item id")
@@ -446,6 +535,11 @@ def wordmark_box(record, wordmark):
 def layout_review_frame(record, background, wordmark, cards=()):
     """Composite only supplied RGBA stills onto a still background."""
     frame = background.convert("RGBA")
+    if frame.size != (CANVAS_W, CANVAS_H):
+        raise ValueError(
+            f"layout review background must be {CANVAS_W}x{CANVAS_H}, "
+            f"got {frame.size}"
+        )
     mark = fit_wordmark(record, wordmark)
     spec = record["wordmark"]
     frame.alpha_composite(mark, (spec["x"], spec["y"]))
@@ -454,6 +548,13 @@ def layout_review_frame(record, background, wordmark, cards=()):
             raise ValueError("layout review cards must be RGBA")
         if card.size != frame.size:
             raise ValueError("layout review cards must match the canvas")
+        alpha = card.getchannel("A")
+        if alpha.getextrema()[0] == 255 and alpha.getbbox() == (
+            0,
+            0,
+            *frame.size,
+        ):
+            raise ValueError("layout review card is an opaque full-frame overlay")
         frame.alpha_composite(card)
     return frame
 
@@ -664,6 +765,20 @@ def audit_assets(record, montage, leonardo, hero_root):
 
     errors = []
     root = Path(hero_root)
+    try:
+        wordmark = validate_wordmark_asset(
+            record,
+            wordmark_asset_path(record, root),
+        )
+        print(
+            f"wordmark source={record['wordmark']['source_url']} "
+            f"dimensions={wordmark['size'][0]}x{wordmark['size'][1]} "
+            f"sha256={wordmark['sha256']}"
+        )
+    except (OSError, ValueError) as exc:
+        errors.append(f"wordmark: {exc}")
+        print(f"wordmark ERROR: {exc}", file=sys.stderr)
+
     catalog = equipment_catalog(record, montage, leonardo)
     pocket = dict(record["callout_pockets"]["bottom"])
     bounds = pocket.pop("bounds")
@@ -752,6 +867,8 @@ def render_cards(
     )
     faces = stage_background(record, hero_root) if faces is None else faces
     out_dir.mkdir(parents=True, exist_ok=True)
+    for stale_card in out_dir.glob("card*.png"):
+        stale_card.unlink()
     equipment_paths = {}
     equipment_bounds = {}
     for item_id, item in catalog.items():
@@ -822,6 +939,91 @@ def render_layout_previews(record, faces, wordmark, out_dir, cards=()):
         path = out_dir / f"stage-{theme}-wordmark.png"
         layout_review_frame(record, face, wordmark, cards=cards).save(path)
         paths.append(path)
+    return paths
+
+
+def render_card_preflight_sheet(record, face, wordmark, rows, out_path, theme):
+    """Render one actual day/night stage composite per card into a sheet."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    if not rows:
+        raise ValueError("card preflight sheet requires rendered cards")
+    title_height = 52
+    sheet_height = title_height + (
+        (len(rows) + PREFLIGHT_COLUMNS - 1) // PREFLIGHT_COLUMNS
+    ) * PREFLIGHT_CELL_HEIGHT
+    sheet = Image.new(
+        "RGBA",
+        (PREFLIGHT_COLUMNS * PREFLIGHT_CELL_WIDTH, sheet_height),
+        (18, 23, 31, 255),
+    )
+    draw = ImageDraw.Draw(sheet)
+    title_font = ImageFont.truetype(
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf", 24
+    )
+    meta_font = ImageFont.truetype(
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf", 14
+    )
+    draw.text(
+        (18, 14),
+        f"GENERAL OF THE DARK ARMY - {theme.upper()} PER-CARD PREFLIGHT "
+        f"({len(rows)})",
+        font=title_font,
+        fill=(240, 244, 248, 255),
+    )
+
+    for index, row in enumerate(rows):
+        col = index % PREFLIGHT_COLUMNS
+        grid_row = index // PREFLIGHT_COLUMNS
+        x = col * PREFLIGHT_CELL_WIDTH + 20
+        y = title_height + grid_row * PREFLIGHT_CELL_HEIGHT + 10
+        with Image.open(row["path"]) as opened:
+            card = opened.convert("RGBA").copy()
+        composite = layout_review_frame(
+            record,
+            face,
+            wordmark,
+            cards=(card,),
+        )
+        thumb = composite.resize(
+            (PREFLIGHT_CELL_WIDTH - 40, PREFLIGHT_PREVIEW_HEIGHT),
+            Image.Resampling.LANCZOS,
+        )
+        sheet.alpha_composite(thumb, (x, y))
+        metadata = (
+            f'{row["item_id"]} | {row["source_character"]} | '
+            f'desc={row["description_source"]} | '
+            f'hold={row["hold_seconds"]:g}s'
+        )
+        draw.text(
+            (x, y + PREFLIGHT_PREVIEW_HEIGHT + 6),
+            metadata,
+            font=meta_font,
+            fill=(226, 232, 240, 255),
+        )
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    sheet.save(out_path)
+    return out_path
+
+
+def render_card_preflight_sheets(record, faces, wordmark, rows, out_dir):
+    """Write the day and night per-card still-image review sheets."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    paths = []
+    for theme, face in zip(("day", "night"), faces):
+        paths.append(
+            render_card_preflight_sheet(
+                record,
+                face,
+                wordmark,
+                rows,
+                out_dir / f"stage-{theme}-cards.png",
+                theme,
+            )
+        )
     return paths
 
 
@@ -1016,6 +1218,7 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
     kids = stations(record)
     win = record["band_window"]
     wordmark = record["wordmark"]
+    wordmark_name = wordmark_stage_name(record)
     t0 = t_of(start_frame)
     # the drawings' clock counts stage frames only, so a segment resumes at
     # the frame the previous stage act stopped on, not at wall clock
@@ -1046,7 +1249,7 @@ def stage_segment(record, idx, start_frame, frames, cards, kid_offset):
     chain.append(f"[bg][band]overlay=x={win['x']}:y={win['y']}[stage0]")
 
     inputs.append(
-        f"-loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/bluefin-wordmark.png"
+        f"-loop 1 -framerate {FPS_NUM}/{FPS_DEN} -i /work/{wordmark_name}"
     )
     wordmark_idx = n
     n += 1
@@ -1192,11 +1395,19 @@ def container(image, cpu_req, cpu_lim, mem_req, mem_lim, script):
     )
 
 
-def workflow(record, montage, card_names):
+def workflow(record, montage, card_names, wordmark_sha256=None):
     kids = stations(record)
     segs = segments(record)
     src = montage["source"]
     output = record["delivery"]["output"]
+    wordmark = validate_wordmark_record(record)
+    wordmark_sha256 = wordmark_sha256 or wordmark.get("raster_sha256")
+    wordmark_name = Path(
+        wordmark.get("asset_path", WORDMARK_ASSET_PATH)
+    ).name
+    wordmark_source = wordmark.get("asset_path", str(WORDMARK_ASSET_PATH))
+    if not wordmark_sha256:
+        raise ValueError("wordmark raster sha256 is required for workflow generation")
 
     fetch = ["base=" + FETCH_BASE]
     fetch.append(
@@ -1211,8 +1422,11 @@ def workflow(record, montage, card_names):
         "$base/.work-uta-general/assets/INTRO_BLUEFIN.png"
     )
     fetch.append(
-        "curl -fsSL -o /work/bluefin-wordmark.png "
-        "$base/.work-uta-general/assets/bluefin-wordmark.png"
+        f"curl -fsSL -o /work/{wordmark_name} "
+        f"$base/{wordmark_source}"
+    )
+    fetch.append(
+        f'echo "{wordmark_sha256}  /work/{wordmark_name}" | sha256sum -c -'
     )
     for face in ("day", "night"):
         fetch.append(
@@ -1393,6 +1607,11 @@ def main():
         help="render the complete equipment contact sheet and still previews",
     )
     ap.add_argument(
+        "--prepare-wordmark",
+        action="store_true",
+        help="fetch and validate the pinned staged wordmark PNG",
+    )
+    ap.add_argument(
         "--hero-root",
         default=str(Path.home() / "Videos" / "Wolves" / "Hero"),
         help="Hero asset root used by asset audits and still generation",
@@ -1401,12 +1620,34 @@ def main():
     args = ap.parse_args()
 
     record, montage, leonardo = load()
+    wordmark_info = None
+    if args.prepare_wordmark or args.cards or args.contact_sheet or args.workflow:
+        try:
+            wordmark_info = prepare_wordmark_asset(record, args.hero_root)
+            print(
+                f"wordmark {wordmark_info['size'][0]}x{wordmark_info['size'][1]} "
+                f"sha256={wordmark_info['sha256']}"
+            )
+        except (OSError, ValueError) as exc:
+            print(f"wordmark ERROR: {exc}", file=sys.stderr)
+            return 1
+
     if args.audit_assets:
         errors = audit_assets(record, montage, leonardo, args.hero_root)
         if errors:
             return 1
-        if not args.cards and not args.contact_sheet and not args.workflow:
+        if not (
+            args.cards
+            or args.contact_sheet
+            or args.workflow
+            or args.prepare_wordmark
+        ):
             return 0
+    if args.prepare_wordmark and not (
+        args.cards or args.contact_sheet or args.workflow
+    ):
+        return 0
+
     catalog = equipment_catalog(record, montage, leonardo)
     validate_equipment_schedule(record, catalog, montage)
     out = Path(args.out_dir)
@@ -1434,10 +1675,9 @@ def main():
         from PIL import Image
 
         hero_root = Path(args.hero_root)
-        wordmark_path = (
-            hero_root / ".work-uta-general" / "assets" / "bluefin-wordmark.png"
-        )
-        with Image.open(wordmark_path) as wordmark:
+        wordmark_path = wordmark_asset_path(record, hero_root)
+        with Image.open(wordmark_path) as opened:
+            wordmark = opened.convert("RGBA").copy()
             faces = stage_background(record, hero_root)
             previews = render_layout_previews(
                 record,
@@ -1445,7 +1685,16 @@ def main():
                 wordmark,
                 out / "review",
             )
+            preflight = render_card_preflight_sheets(
+                record,
+                faces,
+                wordmark,
+                rows,
+                out / "review",
+            )
         for path in previews:
+            print(f"wrote {path}")
+        for path in preflight:
             print(f"wrote {path}")
         if args.contact_sheet:
             path = render_contact_sheet(
@@ -1459,7 +1708,14 @@ def main():
 
     if args.workflow:
         path = out / "uta-ensemble.yaml"
-        path.write_text(workflow(record, montage, names))
+        path.write_text(
+            workflow(
+                record,
+                montage,
+                names,
+                wordmark_sha256=wordmark_info["sha256"],
+            )
+        )
         total = sum(f for _, _, f in segments(record))
         print(f"wrote {path}")
         print(

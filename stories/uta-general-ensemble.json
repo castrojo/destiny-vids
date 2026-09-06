@@ -389,7 +389,11 @@
     "source_path": "public/brands/bluefin-wordmark-light.svg",
     "source_url": "https://raw.githubusercontent.com/projectbluefin/website/c03567d972bb9cf52ab0676de5068a54f62f8a48/public/brands/bluefin-wordmark-light.svg",
     "sha256": "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74",
+    "preserve_colors": false,
     "raster_width": 1200,
+    "raster_size": [1992, 765],
+    "raster_sha256": "e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e",
+    "asset_path": ".work-uta-general/assets/bluefin-wordmark.png",
     "display_width": 600,
     "x": 980,
     "y": 48

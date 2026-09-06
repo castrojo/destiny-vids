@@ -9,6 +9,8 @@ what it landed on.
 import json
 import subprocess
 import sys
+from collections import Counter
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
@@ -117,6 +119,14 @@ def test_every_unique_equipment_item_appears_once():
     assert set(scheduled) == set(CATALOG)
 
 
+def test_equipment_schedule_rejects_any_non_bottom_pocket():
+    mutated = deepcopy(RECORD)
+    mutated["callout_schedule"][0]["pocket"] = "top"
+
+    with pytest.raises(ValueError, match="bottom pocket"):
+        B.validate_equipment_schedule(mutated, CATALOG, MONTAGE)
+
+
 def test_schedule_invariants_are_enforced():
     B.validate_equipment_schedule(RECORD, CATALOG, MONTAGE)
 
@@ -212,8 +222,10 @@ def test_band_is_raised_to_give_bottom_equipment_room():
 
 def test_wordmark_is_centered_and_above_the_band():
     mark = RECORD["wordmark"]
+    assert mark["x"] == 980
+    assert mark["y"] == 48
+    assert mark["display_width"] == 600
     assert mark["x"] == (B.CANVAS_W - mark["display_width"]) // 2
-    assert mark["y"] >= 0
     assert mark["y"] < RECORD["band_window"]["y"]
 
 
@@ -306,6 +318,11 @@ def test_every_callout_uses_clean_equipment_not_review_crops():
         not spec["art"]["file"].startswith(".work-uta-general/review/")
         for spec in equipment.values()
     )
+    assert all(
+        not spec["art"]["file"].lower().endswith((".jpg", ".jpeg"))
+        and "cha design_" not in spec["art"]["file"].lower()
+        for spec in equipment.values()
+    )
 
 
 def test_tall_bottom_equipment_is_rotated_sideways():
@@ -353,6 +370,7 @@ def test_equipment_extraction_masks_context_crop_and_keeps_rgba(tmp_path):
     source = Image.new("RGBA", (120, 100), (0, 0, 0, 0))
     draw = ImageDraw.Draw(source)
     draw.rectangle((30, 25, 75, 75), fill=(0, 0, 255, 255))
+    draw.rectangle((45, 40, 55, 50), fill=(0, 0, 0, 0))
     path = tmp_path / "pose.png"
     source.save(path)
 
@@ -371,7 +389,9 @@ def test_equipment_extraction_masks_context_crop_and_keeps_rgba(tmp_path):
 
     assert art.mode == "RGBA"
     assert art.width > art.height
-    assert art.getchannel("A").getbbox()
+    alpha = art.getchannel("A")
+    assert alpha.getextrema()[0] == 0
+    assert alpha.getbbox()
 
 
 def test_context_crop_rejects_alpha_touching_every_crop_edge(tmp_path):
@@ -601,6 +621,49 @@ def test_workflow_fetches_the_wordmark_only_for_stage_graphs():
     assert text.count("-i /work/bluefin-wordmark.png") == sum(
         kind == "stage" for kind, _, _ in B.segments(RECORD)
     )
+    assert (
+        f'echo "{RECORD["wordmark"]["raster_sha256"]}  '
+        '/work/bluefin-wordmark.png" | sha256sum -c -'
+    ) in text
+
+
+def test_prepare_wordmark_reads_the_pinned_record_and_calls_fetcher(
+    monkeypatch, tmp_path
+):
+    seen = {}
+
+    def fake_fetch(args):
+        seen["args"] = args
+        return 0
+
+    monkeypatch.setattr(B._fetch_wordmark_module(), "main", fake_fetch)
+    monkeypatch.setattr(
+        B,
+        "validate_wordmark_asset",
+        lambda record, path: {
+            "path": path,
+            "sha256": record["wordmark"]["raster_sha256"],
+            "size": tuple(record["wordmark"]["raster_size"]),
+        },
+    )
+
+    result = B.prepare_wordmark_asset(RECORD, tmp_path)
+    args = seen["args"]
+    assert args[args.index("--source-url") + 1] == RECORD["wordmark"]["source_url"]
+    assert args[args.index("--expected-sha256") + 1] == RECORD["wordmark"]["sha256"]
+    assert args[args.index("--width") + 1] == str(RECORD["wordmark"]["raster_width"])
+    assert "--force" in args
+    assert "--preserve-colors" not in args
+    assert result["sha256"] == RECORD["wordmark"]["raster_sha256"]
+
+
+def test_prepare_wordmark_rejects_a_stale_existing_png(tmp_path):
+    path = tmp_path / RECORD["wordmark"]["asset_path"]
+    path.parent.mkdir(parents=True)
+    Image.new("RGBA", (600, 230), (255, 255, 255, 255)).save(path)
+
+    with pytest.raises(ValueError, match="sha256 mismatch|dimensions mismatch"):
+        B.prepare_wordmark_asset(RECORD, tmp_path)
 
 
 def test_layout_review_frame_composites_transparent_stills_only():
@@ -652,6 +715,10 @@ def test_image_level_layout_gate_renders_all_26_cards_and_previews(
 
     assert len(rows) == 26
     assert {row["item_id"] for row in rows} == set(CATALOG)
+    assert Counter(row["source_character"] for row in rows) == {
+        "RAFI": 8,
+        "LEONARDO": 18,
+    }
     pocket = B.pocket_box(RECORD, "bottom")
     bounds = (
         pocket[0],
@@ -687,6 +754,25 @@ def test_image_level_layout_gate_renders_all_26_cards_and_previews(
             assert preview.mode == "RGBA"
             assert preview.getpixel((0, 0))[:3] == face.getpixel((0, 0))
 
+    preflight_paths = B.render_card_preflight_sheets(
+        RECORD,
+        (day, night),
+        WORDMARK_IMAGE,
+        rows,
+        tmp_path / "review",
+    )
+    assert [path.name for path in preflight_paths] == [
+        "stage-day-cards.png",
+        "stage-night-cards.png",
+    ]
+    for path in preflight_paths:
+        with Image.open(path) as sheet:
+            assert sheet.mode == "RGBA"
+            assert sheet.size[0] == (
+                B.PREFLIGHT_COLUMNS * B.PREFLIGHT_CELL_WIDTH
+            )
+            assert sheet.size[1] > B.PREFLIGHT_PREVIEW_HEIGHT
+
     contact = B.render_contact_sheet(
         RECORD,
         MONTAGE,
@@ -707,3 +793,11 @@ def test_context_crop_items_keep_transparency_notes_and_no_sheet_art():
         if spec["mode"] == "context_crop":
             assert spec["context_note"].strip(), item_id
         assert not spec["file"].endswith(".jpg"), item_id
+
+
+def test_layout_review_rejects_an_opaque_full_frame_overlay():
+    background = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (23, 31, 42))
+    card = Image.new("RGBA", (B.CANVAS_W, B.CANVAS_H), (255, 255, 255, 255))
+
+    with pytest.raises(ValueError, match="opaque full-frame"):
+        B.layout_review_frame(RECORD, background, WORDMARK_IMAGE, cards=(card,))

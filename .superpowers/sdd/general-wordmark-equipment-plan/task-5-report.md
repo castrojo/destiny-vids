@@ -87,3 +87,55 @@ The still-image gate is intentionally not a substitute for a remote render:
 the actual band, keyed children, frame timing, and returned-frame visual review
 still require the Argo workflow in the next production pass.
 
+## Fix round 1
+
+**Status:** complete.
+
+The ensemble record now pins the source URL, source SHA-256, explicit
+`preserve_colors` policy, 1200px raster request, derived PNG dimensions, and
+staged PNG SHA-256. The builder reads that contract, fetches the PNG through
+`scripts/fetch_wordmark.py` only when absent, rejects an existing stale or
+wrong raster, and emits the verified digest in the Argo fetch task. The fetch
+task runs `sha256sum -c` after staging the PNG. Legacy no-argument fetch
+defaults remain unchanged.
+
+The schedule validator now rejects every pocket other than `bottom`, with a
+mutation regression covering the failure. Image coverage asserts the exact
+`x=980`, `y=48`, `display_width=600` contract, 26 current cards split into
+eight RAFI and eighteen Leonardo items, transparent context crops, no
+design-sheet display art, and no opaque full-frame card overlays. The local
+preflight now writes individual day and night composites for every rendered
+card over the actual Pillow stage faces and pinned wordmark, alongside the
+base wordmark stills and equipment contact sheet. It performs no video
+decode.
+
+The verified staged wordmark is `1992x765` with SHA-256
+`e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e`.
+
+### Validation
+
+- Focused suite: `81 passed`.
+- Real `--audit-assets`: all 18 Leonardo assets and the staged wordmark
+  passed.
+- Regeneration: 26 cards, the Argo workflow, two base wordmark stills, two
+  per-card day/night preflight sheets, and the equipment contact sheet.
+- Full offline suite: `4116 passed, 9 skipped`.
+- Corpus, derived metadata, schema-enum, identity, and all pre-commit checks
+  passed.
+
+### Artifacts
+
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/assets/bluefin-wordmark.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/review/stage-day-wordmark.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/review/stage-night-wordmark.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/review/stage-day-cards.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/review/stage-night-cards.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/review/equipment-contact-sheet.png`
+- `$HOME/Videos/Wolves/Hero/.work-uta-general/uta-ensemble.yaml`
+
+### Concerns
+
+No video was rendered by request. The per-card Pillow sheets verify the actual
+bottom rail against day/night stage faces and the pinned wordmark, but Argo
+returned frames remain the authoritative visual gate for the live band and
+keyed children.
