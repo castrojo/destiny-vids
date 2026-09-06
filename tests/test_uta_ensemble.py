@@ -144,6 +144,58 @@ def test_workflow_contains_remote_preview_and_full_review_artifacts():
     assert "audio_bitrate_actual" in text
 
 
+def test_full_upload_loop_contains_only_workflow_outputs():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+    start = text.index(f"for f in /work/{RECORD['delivery']['output']}")
+    end = text.index("; do\n", start)
+    body = text[start:end]
+    uploaded = set(body.split("for f in ", 1)[1].replace("\\\n", " ").split())
+
+    produced = {
+        f"/work/{RECORD['delivery']['output']}",
+        "/work/ens-probe.json",
+        "/work/ens-decode.txt",
+        "/work/ens-sha256.txt",
+        "/work/ens-ebur128.txt",
+        "/work/ens-gates.txt",
+        "/work/frame-plan.tsv",
+        "/work/review-sha256.txt",
+    }
+    produced.update(
+        f"/work/{row['label']}.jpg" for row in B.review_frame_plan(RECORD)
+    )
+    produced.update(
+        f"/work/{kid['id']}-proof.png" for kid in B.stations(RECORD)
+    )
+
+    assert uploaded == produced
+    assert all("*" not in path for path in uploaded)
+    assert "/work/ens-t*.jpg" not in body
+
+
+def test_workflow_parses_and_records_ebu_true_peak():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+
+    assert "true_peak_dbtp=$(awk '" in text
+    assert "/^ *True peak:/ { in_true_peak=1; next }" in text
+    assert "in_true_peak && /^ *Peak:/ { print $2; exit }" in text
+    assert (
+        "printf 'true_peak_dbtp=%s\\n' \"$true_peak_dbtp\" "
+        ">> /work/ens-gates.txt"
+    ) in text
+
+
+def test_workflow_rejects_true_peak_at_or_above_zero_dbtp():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+
+    assert (
+        "peak !~ /^[-+]?[0-9]+([.][0-9]+)?$/ || peak + 0 >= 0"
+    ) in text
+
+
 def test_ensemble_catalog_contains_all_rafi_and_leonardo_items():
     assert set(CATALOG) == (
         set(MONTAGE["composition"]["callouts"])
