@@ -17,6 +17,7 @@
           6891,
           5354
         ],
+        "format": "RGBA",
         "role": "reviewed RGBA display-art source"
       },
       "pose_03": {
@@ -25,6 +26,7 @@
           3871,
           5051
         ],
+        "format": "RGBA",
         "role": "reviewed RGBA display-art source"
       },
       "pose_04": {
@@ -33,6 +35,7 @@
           2561,
           2817
         ],
+        "format": "RGBA",
         "role": "reviewed RGBA display-art source"
       }
     }
@@ -474,42 +477,8 @@
       },
       "art": {
         "file": "Leonardo/CHA_LEONARDO_03.png",
-        "mode": "context_crop",
-        "source_size": [
-          3871,
-          5051
-        ],
-        "crop": [
-          1630,
-          2450,
-          1450,
-          1900
-        ],
-        "mask_polygon": [
-          [
-            1770,
-            2600
-          ],
-          [
-            2640,
-            2460
-          ],
-          [
-            3000,
-            3750
-          ],
-          [
-            2200,
-            4300
-          ],
-          [
-            1700,
-            3500
-          ]
-        ],
-        "context_note": "The module is strapped to the character's arm and equipment rig; supporting hand and forearm pixels remain so the attachment is not falsely presented as a loose object.",
-        "rotation_degrees": 0,
-        "art_width_share": 0.28
+        "mode": "text_only",
+        "degraded_reason": "The supplied RGBA pose does not provide a defensible crop that visibly isolates the named blue forearm module; retaining the surrounding arm and rig would make the display art claim more than the source proves."
       },
       "presentation": {
         "font_size": 88,
