@@ -2,7 +2,7 @@
 
 Date: 2026-09-06
 Branch: `feat/general-wordmark-equipment`
-Fix commit: `85e5ed9a3f68e98012ca5df51488f03d0fea02f7`
+Fix commit: `3874e36` (rebased onto the merged hero base)
 Pull request: [#455](https://github.com/castrojo/destiny-vids/pull/455)
 Pull request base: `feat/hero-videos`
 
@@ -74,10 +74,12 @@ be rerun after the report commit and before handoff.
 
 ## Delivery status
 
-The fix commit is pushed to `origin/feat/general-wordmark-equipment`, and PR
-#455 is open against `feat/hero-videos`. Auto-merge is the remaining GitHub
-operation after this report commit; the final handoff records the resulting
-green-check and merge status.
+The fix commits are ready to push to `origin/feat/general-wordmark-equipment`,
+and PR #455 is open against `feat/hero-videos`. The branch was rebased so the
+PR contains only this final fix wave rather than the already-merged Task 6
+history. Auto-merge is the remaining GitHub operation after the rebased branch
+is pushed; the final handoff records the resulting green-check and merge
+status.
 
 ## Concerns
 
