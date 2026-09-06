@@ -1,7 +1,7 @@
 ---
 name: hero-videos
-version: "1.5"
-last_updated: "2026-08-26"
+version: "1.6"
+last_updated: "2026-09-06"
 id: hero-videos
 one_line_purpose: Build a hero character music video from a paper-background animation.
 entry_point: docs/skills/hero-videos/SKILL.md
@@ -134,6 +134,10 @@ Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
 - **Use final-still alpha only for a verified completed closing interval.** It
   restores intentional transparent finishing treatment; using it earlier
   injects future art into unfinished frames.
+- **A design-sheet crop is evidence, not display art.** Equipment shown on
+  screen must be a reviewed transparent component extracted from a
+  source-backed RGBA asset. Quarter-turn tall equipment only after extraction,
+  then re-measure its fit.
 - **Furniture goes in the corners**, never centred. Owner: *"why are you blocking
   art?"*
 - **A QR is decoded off a rendered frame**, at both ends of the day/night

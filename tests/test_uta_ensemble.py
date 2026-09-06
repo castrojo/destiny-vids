@@ -16,6 +16,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 
 import build_uta_ensemble as B  # noqa: E402
+import render_uta_callout as C  # noqa: E402
 
 RECORD, MONTAGE = B.load()
 
@@ -78,6 +79,17 @@ def test_each_animation_is_retimed_onto_the_frames_the_stage_is_up():
         assert abs(out - span["frames"]) < 1
 
 
+def test_each_animation_has_its_own_retime_factor():
+    factors = [B.retime(RECORD, kid)[0] for kid in RECORD["kids"]]
+    assert len(set(factors)) == len(RECORD["kids"])
+
+
+def test_builder_uses_the_declared_delivery_name():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+    assert f"/work/{RECORD['delivery']['output']}" in text
+
+
 def test_no_kid_covers_the_band_and_no_kid_covers_another():
     win = RECORD["band_window"]
     band = (win["x"], win["y"], win["width"], win["height"])
@@ -95,6 +107,12 @@ def test_no_kid_covers_the_band_and_no_kid_covers_another():
             assert not rects_overlap(a, b)
 
 
+def test_leonardos_spear_faces_inward():
+    leonardo = next(k for k in RECORD["kids"] if k["id"] == "LEONARDO")
+    assert leonardo["station"] == "right-top"
+    assert leonardo["flip"] is False
+
+
 def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
     kids = [
         (k["x"], k["y"], k["scaled_width"], k["scaled_height"])
@@ -110,6 +128,11 @@ def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
         assert not rects_overlap(area, picture), name
         for kid in kids:
             assert not rects_overlap(area, kid), name
+
+
+def test_band_is_raised_to_give_bottom_equipment_room():
+    assert RECORD["band_window"]["y"] == 407
+    assert RECORD["callout_pockets"]["bottom"]["height"] == 400
 
 
 def test_every_card_is_up_while_the_stage_is_up():
@@ -133,6 +156,72 @@ def test_no_two_cards_are_up_at_once():
         assert start > end
 
 
+def test_every_callout_uses_clean_equipment_not_review_crops():
+    equipment = RECORD["equipment_assets"]
+    for entry in RECORD["callout_schedule"]:
+        assert "art" not in entry
+        assert entry["equipment"] in equipment
+    assert all(
+        not spec["file"].startswith(".work-uta-general/review/")
+        for name, spec in equipment.items()
+        if name != "_what"
+    )
+
+
+def test_tall_bottom_equipment_is_rotated_sideways():
+    equipment = RECORD["equipment_assets"]
+    assert equipment["spear"]["rotation_degrees"] == 90
+    assert equipment["double_kopis"]["rotation_degrees"] == 90
+    for name, spec in equipment.items():
+        if name != "_what":
+            assert spec["rotation_degrees"] in (0, 90, 180, 270)
+
+
+def test_equipment_extraction_selects_only_reviewed_components(tmp_path):
+    from PIL import Image, ImageDraw
+
+    source = Image.new("RGBA", (80, 60), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(source)
+    draw.rectangle((5, 5, 20, 25), fill=(255, 0, 0, 255))
+    draw.rectangle((50, 10, 58, 45), fill=(0, 255, 0, 255))
+    path = tmp_path / "source.png"
+    source.save(path)
+
+    art = B.extract_equipment(
+        {
+            "file": "source.png",
+            "component_seeds": [[54, 20]],
+            "rotation_degrees": 90,
+        },
+        tmp_path,
+        tmp_path / "art.png",
+    )
+
+    assert art.width > art.height
+    colors = {
+        art.getpixel((x, y))[:3]
+        for y in range(art.height)
+        for x in range(art.width)
+        if art.getpixel((x, y))[3]
+    }
+    assert colors == {(0, 255, 0)}
+
+
+def test_callout_renderer_rejects_an_opaque_sheet_crop(tmp_path):
+    from PIL import Image
+
+    crop = tmp_path / "sheet-crop.png"
+    Image.new("RGB", (100, 100), "white").save(crop)
+    callout = json.loads(json.dumps(
+        MONTAGE["composition"]["callouts"]["bomb_10mm"]
+    ))
+    callout["label_box"] = {"x": 0, "y": 0, "width": 800, "height": 300}
+    callout["plate_luma"] = {"mean": 64}
+
+    with pytest.raises(ValueError, match="extracted RGBA"):
+        C.render_callout(callout, art_path=crop, canvas=(1280, 720))
+
+
 def test_the_owner_protected_passage_carries_nothing():
     for entry in RECORD["callout_schedule"]:
         a = entry["start_seconds"]
@@ -151,6 +240,25 @@ def test_every_kid_keeps_its_own_measured_keying_chain():
             assert "colorkey=0x0000FF" in chain
 
 
+def test_leonardo_preserves_enclosed_white_paper():
+    """Only Leonardo's connected outer paper is transparent.
+
+    A global colorkey removed enclosed white regions inside his silhouette,
+    leaving the top-right drawing dark against the stage.
+    """
+    chain = B.KEY_CHAINS["LEONARDO"]
+    assert "split[c][m]" in chain
+    assert "floodfill" in chain
+    assert "alphaextract[al]" in chain
+    assert "[c][al]alphamerge" in chain
+
+
+def test_leonardos_name_is_masked_before_keying():
+    chain = B.KEY_CHAINS["LEONARDO"]
+    assert B.LEONARDO_NAME_MASK in chain
+    assert chain.index(B.LEONARDO_NAME_MASK) < chain.index("floodfill")
+
+
 def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():
     yaml = pytest.importorskip("yaml")
     names = [
@@ -164,6 +272,8 @@ def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():
     assert f"-frames:v {RECORD['delivery']['slide_frames']}" in text
     # the audio is decoded once and encoded once
     assert text.count("-c:a aac") == 1
+    assert ": > /work/list.txt" in text
+    assert "-v error -y -i \"$out\" -af ebur128" not in text
 
 
 def test_no_hero_step_shells_out_to_a_local_ffmpeg():

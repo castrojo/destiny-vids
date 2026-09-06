@@ -13,7 +13,14 @@
     "we may want the band in a window and the kids around them",
     "and then I want the weapons interspersed for variety, mix them up",
     "1440p is fine don't overdo it",
-    "flip them around for variety in this last one"
+    "flip them around for variety in this last one",
+    "the top left leonardo drawing is black instead of white, redo it so it matches the others",
+    "the equipment is just randomly cropped from the pictures, I want nice clean extraction of equipment to display on the screen properly",
+    "the timing of all the pictures needs to be timed individually for each video to complete by the end of the song",
+    "the vertically tall weapons can be turned on their sides to fit the bottom area better",
+    "ensure the name he had on his artwork is omitted",
+    "bring the video up a tad to give more room to the equipment",
+    "flip leonardo the other way so his spear is facing inward"
   ],
   "delivery": {
     "width": 2560,
@@ -36,7 +43,7 @@
   "band_window": {
     "_what": "The band's own film in the stage aperture. The 140px letterbox bars are removed here and ONLY here -- they carry no picture, and leaving them in put a hard black-to-wallpaper seam through both callout pockets. The picture itself is never cropped, panned or graded, and the two full-frame interludes and the credits keep the band's frame exactly as delivered.",
     "x": 640,
-    "y": 447,
+    "y": 407,
     "width": 1280,
     "height": 546,
     "letterbox_crop": "crop=2048:872:0:140",
@@ -77,7 +84,7 @@
       "x": 1940,
       "y": 60,
       "width": 600,
-      "flip": true,
+      "flip": false,
       "use_frames": 18552,
       "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     },
@@ -94,7 +101,7 @@
       "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     }
   ],
-  "flip_note": "The right-hand pair is mirrored so all four face in towards the band, owner 2026-09-05 'flip them around for variety in this last one'. Only the two stations that gain by facing inward are flipped; a mirrored drawing is still the kid's own line work, and every title plate is masked out before the key, so no lettering is reversed on screen.",
+  "flip_note": "RAFI_02 is mirrored to face inward. Leonardo keeps his source orientation so his spear points toward the band; his authored nameplate is masked before the matte is derived and never appears on screen.",
   "timeline": {
     "_what": "Source frame indices at 24000/1001. Every boundary is an exact frame index and the segments tile the source's 11427 frames exactly, because summing rounded segment durations is what put 0.29s of A/V drift into an earlier pass.",
     "intro_end_frame": 361,
@@ -110,7 +117,7 @@
     "start_frame": 361,
     "end_frame": 10532,
     "frames": 9407,
-    "_what": "The drawings' clock counts only the frames the stage is actually up: 7311 + 2096 = 9407. Running them against wall clock would hide 764 frames of drawing behind the protected passage and hand the audience a visible jump when the stage came back. They pause with the stage and resume on the next drawing frame, and all four finish together as the credits arrive."
+    "_what": "The drawings' clock counts only the frames the stage is actually up: 7311 + 2096 = 9407. Each source animation gets its own retime factor from its own usable frame count; no timing value is shared between videos. Running them against wall clock would hide 764 frames of drawing behind the protected passage and hand the audience a visible jump when the stage came back. They pause with the stage, resume on the next drawing frame, and each completes as the credits arrive before the song ends."
   },
   "callout_pockets": {
     "_what": "The stage's own margins above and below the aperture. A card never crosses a kid station and never touches the band.",
@@ -118,95 +125,146 @@
       "x": 664,
       "y": 60,
       "width": 1232,
-      "height": 300,
+      "height": 280,
       "bounds": [
         640,
         0,
         1920,
-        431
+        391
       ]
     },
     "bottom": {
       "x": 664,
-      "y": 1030,
+      "y": 990,
       "width": 1232,
-      "height": 360,
+      "height": 400,
       "bounds": [
         640,
-        1009,
+        969,
         1920,
         1424
       ]
     },
     "bounds_note": "The bounds stop short of the frame edge on purpose: a bounding box cannot report pixels that were clipped off the canvas, so a bound ON the edge can never fail. Fit is measured on the type and art, never on the feathered halo behind them."
   },
+  "equipment_assets": {
+    "_what": "Display art is extracted from existing transparent equipment PNGs by selecting only the named connected alpha components. Design-sheet crops remain transcription evidence and never appear on screen. Rotation is a per-use editorial transform applied after extraction; positive degrees are counter-clockwise.",
+    "spear": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_04.png",
+      "component_seeds": [[766, 1763]],
+      "rotation_degrees": 90,
+      "art_width_share": 0.46
+    },
+    "composite_bow": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_01.png",
+      "component_seeds": [[712, 731]],
+      "rotation_degrees": 0,
+      "art_width_share": 0.38
+    },
+    "double_kopis": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_05.png",
+      "component_seeds": [[426, 1102], [713, 921]],
+      "rotation_degrees": 90,
+      "art_width_share": 0.46
+    },
+    "bead_catcher": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_02.png",
+      "component_seeds": [[451, 877]],
+      "rotation_degrees": 0,
+      "art_width_share": 0.30
+    },
+    "hippershell_exox": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_03.png",
+      "component_seeds": [[1314, 1616]],
+      "rotation_degrees": 0,
+      "art_width_share": 0.34
+    },
+    "bomb_10mm": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_02.png",
+      "component_seeds": [[1107, 1446]],
+      "rotation_degrees": 0,
+      "art_width_share": 0.20
+    },
+    "magazine_20": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_02.png",
+      "component_seeds": [[795, 873], [956, 824], [1122, 817]],
+      "rotation_degrees": 90,
+      "art_width_share": 0.42
+    },
+    "ai_control_module": {
+      "file": ".work-uta-general/assets/RAFI_WEAPONS_03.png",
+      "component_seeds": [[2713, 1024]],
+      "rotation_degrees": 0,
+      "art_width_share": 0.34
+    }
+  },
   "callout_schedule": [
     {
       "callout": "spear",
-      "art": "xcrop-spear.png",
+      "equipment": "spear",
       "pocket": "bottom",
       "start_seconds": 34.0,
       "hold_seconds": 12.0
     },
     {
       "callout": "composite_bow",
-      "art": "xcrop-bow_top.png",
+      "equipment": "composite_bow",
       "pocket": "top",
       "start_seconds": 76.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "double_kopis",
-      "art": "xcrop-kopis.png",
+      "equipment": "double_kopis",
       "pocket": "bottom",
       "start_seconds": 116.0,
       "hold_seconds": 12.0
     },
     {
       "callout": "bead_catcher",
-      "art": "xcrop-beads.png",
+      "equipment": "bead_catcher",
       "pocket": "top",
       "start_seconds": 154.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "hippershell_exox",
-      "art": "xcrop-exox_br.png",
+      "equipment": "hippershell_exox",
       "pocket": "bottom",
       "start_seconds": 196.0,
       "hold_seconds": 10.0
     },
     {
       "callout": "bomb_10mm",
-      "art": null,
+      "equipment": "bomb_10mm",
       "pocket": "top",
       "start_seconds": 236.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "magazine_20",
-      "art": null,
+      "equipment": "magazine_20",
       "pocket": "top",
       "start_seconds": 268.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "ai_control_module",
-      "art": null,
+      "equipment": "ai_control_module",
       "pocket": "bottom",
       "start_seconds": 300.0,
       "hold_seconds": 10.0
     },
     {
       "callout": "bead_catcher",
-      "art": "xcrop-beads.png",
+      "equipment": "bead_catcher",
       "pocket": "bottom",
       "start_seconds": 372.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "composite_bow",
-      "art": "xcrop-bow_top.png",
+      "equipment": "composite_bow",
       "pocket": "bottom",
       "start_seconds": 404.0,
       "hold_seconds": 9.0

@@ -426,6 +426,12 @@ def test_registered_assets_are_existing_files(edit):
         assert entry["file"].endswith(".png"), asset_id
 
 
+def test_every_callout_names_its_source_backed_art_asset(edit):
+    assets = edit["composition"]["assets"]
+    for callout_id, callout in edit["composition"]["callouts"].items():
+        assert callout["art_asset"] in assets, callout_id
+
+
 OWNER_REVIEWED_CHONKERS = {
     "CHONKY_ACHILLIBATOR_POSE1", "CHONKY_ACHILLIBATOR_POSE2",
     "CHONKY_ALAMO_BLUE", "CHONKY_DAKOSAURUS_BLUEFINSKIN",
