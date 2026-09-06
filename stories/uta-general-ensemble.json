@@ -225,77 +225,179 @@
   },
   "callout_schedule": [
     {
-      "callout": "spear",
-      "equipment": "spear",
+      "item": "leonardo_magical_hi_tech_spear",
+      "pocket": "bottom",
+      "start_seconds": 18.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "spear",
       "pocket": "bottom",
       "start_seconds": 34.0,
       "hold_seconds": 12.0
     },
     {
-      "callout": "composite_bow",
-      "equipment": "composite_bow",
+      "item": "leonardo_diy_crossbow",
+      "pocket": "bottom",
+      "start_seconds": 48.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_automatic_folding_shield",
+      "pocket": "bottom",
+      "start_seconds": 60.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "composite_bow",
       "pocket": "bottom",
       "start_seconds": 76.0,
       "hold_seconds": 9.0
     },
     {
-      "callout": "double_kopis",
-      "equipment": "double_kopis",
+      "item": "leonardo_regular_hunting_arrow",
+      "pocket": "bottom",
+      "start_seconds": 87.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_tungsten_throwing_axe",
+      "pocket": "bottom",
+      "start_seconds": 99.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "double_kopis",
       "pocket": "bottom",
       "start_seconds": 116.0,
       "hold_seconds": 12.0
     },
     {
-      "callout": "bead_catcher",
-      "equipment": "bead_catcher",
+      "item": "leonardo_plasma_arrow",
+      "pocket": "bottom",
+      "start_seconds": 130.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_magnetic_grenade",
+      "pocket": "bottom",
+      "start_seconds": 142.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "bead_catcher",
       "pocket": "bottom",
       "start_seconds": 154.0,
       "hold_seconds": 9.0
     },
     {
-      "callout": "hippershell_exox",
-      "equipment": "hippershell_exox",
+      "item": "leonardo_explosion_arrow",
+      "pocket": "bottom",
+      "start_seconds": 165.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_steel_knife",
+      "pocket": "bottom",
+      "start_seconds": 177.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "hippershell_exox",
       "pocket": "bottom",
       "start_seconds": 196.0,
       "hold_seconds": 10.0
     },
     {
-      "callout": "bomb_10mm",
-      "equipment": "bomb_10mm",
+      "item": "leonardo_chili_smoke_grenade",
+      "pocket": "bottom",
+      "start_seconds": 207.0,
+      "hold_seconds": 20.0
+    },
+    {
+      "item": "bomb_10mm",
       "pocket": "bottom",
       "start_seconds": 236.0,
       "hold_seconds": 9.0
     },
     {
-      "callout": "magazine_20",
-      "equipment": "magazine_20",
+      "item": "leonardo_electroshock_grenade",
+      "pocket": "bottom",
+      "start_seconds": 247.0,
+      "hold_seconds": 16.0
+    },
+    {
+      "item": "magazine_20",
       "pocket": "bottom",
       "start_seconds": 268.0,
       "hold_seconds": 9.0
     },
     {
-      "callout": "ai_control_module",
-      "equipment": "ai_control_module",
+      "item": "leonardo_ai_control_module",
+      "pocket": "bottom",
+      "start_seconds": 279.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "ai_control_module",
       "pocket": "bottom",
       "start_seconds": 300.0,
       "hold_seconds": 10.0
     },
     {
-      "callout": "bead_catcher",
-      "equipment": "bead_catcher",
+      "item": "leonardo_provision_bag",
       "pocket": "bottom",
-      "start_seconds": 372.0,
-      "hold_seconds": 9.0
+      "start_seconds": 311.0,
+      "hold_seconds": 8.0
     },
     {
-      "callout": "composite_bow",
-      "equipment": "composite_bow",
+      "item": "leonardo_camel_bag",
       "pocket": "bottom",
-      "start_seconds": 404.0,
-      "hold_seconds": 9.0
+      "start_seconds": 354.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_tungsten_armor",
+      "pocket": "bottom",
+      "start_seconds": 366.0,
+      "hold_seconds": 10.0
+    },
+    {
+      "item": "leonardo_hippershell_exo_x",
+      "pocket": "bottom",
+      "start_seconds": 384.0,
+      "hold_seconds": 12.0
+    },
+    {
+      "item": "leonardo_hi_tech_sword",
+      "pocket": "bottom",
+      "start_seconds": 402.0,
+      "hold_seconds": 14.0
+    },
+    {
+      "item": "leonardo_hard_leather_gauntlet",
+      "pocket": "bottom",
+      "start_seconds": 418.0,
+      "hold_seconds": 10.0
     }
   ],
-  "callout_note": "Mixed up rather than run in sheet order, and the two reprises in the second stage act come back in the opposite pocket to the one they first appeared in. The two callouts carrying a full description sit in the deep bottom pocket, because copy that cannot be read in the time it is up is a gap one step later. Copy is verbatim from uta-general-dark-army.json.",
+  "callout_note": "The merged RAFI and Leonardo catalogs are each shown exactly once, mixed through the two measured stage windows. All equipment stays in the bottom rail; copy-only and context-bound Leonardo items degrade truthfully rather than borrowing pixels from the design sheets.",
+  "wordmark": {
+    "_what": "Canonical website Bluefin wordmark, centered in the top rail during stage segments only.",
+    "source_repo": "projectbluefin/website",
+    "source_commit": "c03567d972bb9cf52ab0676de5068a54f62f8a48",
+    "source_path": "public/brands/bluefin-wordmark-light.svg",
+    "source_url": "https://raw.githubusercontent.com/projectbluefin/website/c03567d972bb9cf52ab0676de5068a54f62f8a48/public/brands/bluefin-wordmark-light.svg",
+    "sha256": "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74",
+    "preserve_colors": false,
+    "raster_width": 1200,
+    "raster_size": [1992, 765],
+    "raster_sha256": "e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e",
+    "asset_path": ".work-uta-general/assets/bluefin-wordmark.png",
+    "display_width": 600,
+    "x": 980,
+    "y": 48
+  },
   "dropped": {
     "chonkers": "Owner: drop everything else except the kid animations and the band.",
     "static_kid_stills": "Replaced by the animations they were standing in for.",

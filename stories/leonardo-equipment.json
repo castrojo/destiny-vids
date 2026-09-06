@@ -1,0 +1,830 @@
+{
+  "_what": "The complete source-backed Leonardo equipment catalog. Copy is transcribed from the Leonardo design sheet without copyedit; the sheet is evidence only, while display art points to reviewed RGBA sources.",
+  "character": "LEONARDO",
+  "sources": {
+    "design_sheet": {
+      "file": "Leonardo/Cha Design_LEONARDO.jpg",
+      "size": [
+        7342,
+        9075
+      ],
+      "role": "copy and label evidence only"
+    },
+    "rgba_assets": {
+      "weapons": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "size": [
+          6891,
+          5354
+        ],
+        "format": "RGBA",
+        "role": "reviewed RGBA display-art source"
+      },
+      "pose_03": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "size": [
+          3871,
+          5051
+        ],
+        "format": "RGBA",
+        "role": "reviewed RGBA display-art source"
+      },
+      "pose_04": {
+        "file": "Leonardo/CHA_LEONARDO_04.png",
+        "size": [
+          2561,
+          2817
+        ],
+        "format": "RGBA",
+        "role": "reviewed RGBA display-art source"
+      }
+    }
+  },
+  "items": {
+    "leonardo_diy_crossbow": {
+      "copy": {
+        "label": "DIY CROSSBOW",
+        "subtitle": "MIX MATERIALS",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          700,
+          2080,
+          850,
+          240
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            1624,
+            3758
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.38
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.2
+      }
+    },
+    "leonardo_regular_hunting_arrow": {
+      "copy": {
+        "label": "REGULAR HUNTING ARROW",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          1350,
+          2500,
+          1350,
+          700
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            1874,
+            3340
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.25
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_plasma_arrow": {
+      "copy": {
+        "label": "PLASMA ARROW",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          900,
+          3450,
+          1050,
+          700
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            968,
+            4234
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.22
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_explosion_arrow": {
+      "copy": {
+        "label": "EXPLOSION ARROW",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          180,
+          3450,
+          1250,
+          900
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            752,
+            4409
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.22
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_tungsten_armor": {
+      "copy": {
+        "label": "TUNGSTEN ARMOR",
+        "subtitle": "GRAPHENE COATING",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          3880,
+          2790,
+          700,
+          260
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_04.png",
+        "mode": "context_crop",
+        "source_size": [
+          2561,
+          2817
+        ],
+        "crop": [
+          260,
+          1180,
+          1450,
+          1350
+        ],
+        "mask_polygon": [
+          [
+            390,
+            1370
+          ],
+          [
+            1250,
+            1280
+          ],
+          [
+            1650,
+            1850
+          ],
+          [
+            1420,
+            2450
+          ],
+          [
+            620,
+            2480
+          ]
+        ],
+        "context_note": "The armor is mounted on the shoulder and remains attached to the fur mantle and upper torso in the reviewed pose.",
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.2
+      }
+    },
+    "leonardo_tungsten_throwing_axe": {
+      "copy": {
+        "label": "TUNGSTEN TROWING AXE",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          3600,
+          3340,
+          750,
+          260
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            4736,
+            2981
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_magnetic_grenade": {
+      "copy": {
+        "label": "MAGNETIC GRENADE",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          5280,
+          3330,
+          800,
+          250
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "text_only",
+        "degraded_reason": "The sheet names the grenade group but supplies no dedicated isolated magnetic-grenade visual distinct from the two typed grenade variants."
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "text-only",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_chili_smoke_grenade": {
+      "copy": {
+        "label": "CHILI SMOKE GRENADE",
+        "description": "A CHILI SMOKE GRENADE THAT PRODUCES THICK SMOKE CAPABLE OF STINGING THE EYES, BURNING THE SKIN, AND CAUSING BREATHING DIFFICULTIES IF INHALED. IT CAUSES A MASSIVE FIRE EXPLOSION WHEN IT COMES INTO CONTACT WITH ELECTRONICS OR ALIEN ROBOTS.",
+        "description_source": "authored"
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          5050,
+          4180,
+          850,
+          1060
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            3055,
+            3344
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.22
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.5
+      }
+    },
+    "leonardo_electroshock_grenade": {
+      "copy": {
+        "label": "ELECTROSHOCK GRENADE",
+        "description": "DISRUPTS SIGNAL WAVES AND DESTROYS THE COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH POMODORO TIMER SYSTEM",
+        "description_source": "authored"
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          5730,
+          4180,
+          850,
+          920
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            3535,
+            3418
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.22
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.0
+      }
+    },
+    "leonardo_hippershell_exo_x": {
+      "copy": {
+        "label": "DIY HIPPERSHELL EXO-X",
+        "subtitle": "TUNGSTEN ALLOY",
+        "description": "100K MAH BATERRY IMPROVES MUSCLE PERFORMANCE: 50% EXTRA LOAD CAPACITY: 47 KG",
+        "description_source": "authored"
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          330,
+          5000,
+          950,
+          660
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "mode": "context_crop",
+        "source_size": [
+          3871,
+          5051
+        ],
+        "crop": [
+          280,
+          1520,
+          2150,
+          2500
+        ],
+        "mask_polygon": [
+          [
+            420,
+            1750
+          ],
+          [
+            1850,
+            1630
+          ],
+          [
+            2300,
+            2650
+          ],
+          [
+            1960,
+            3850
+          ],
+          [
+            620,
+            4000
+          ]
+        ],
+        "context_note": "The Hippershell is worn across the character pose; the minimum retained pixels include the attached mantle and torso needed to show that relationship.",
+        "rotation_degrees": 0,
+        "art_width_share": 0.34
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.0
+      }
+    },
+    "leonardo_ai_control_module": {
+      "copy": {
+        "label": "SNAP ON GADGET AI CONTROL MODULE",
+        "subtitle": "WITH GPS",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          3350,
+          6940,
+          720,
+          360
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "mode": "text_only",
+        "degraded_reason": "The supplied RGBA pose does not provide a defensible crop that visibly isolates the named blue forearm module; retaining the surrounding arm and rig would make the display art claim more than the source proves."
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "text-only",
+        "min_hold_seconds": 2.4
+      }
+    },
+    "leonardo_hard_leather_gauntlet": {
+      "copy": {
+        "label": "HARD LEATHER GUNTLET",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          4370,
+          6350,
+          900,
+          300
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "mode": "context_crop",
+        "source_size": [
+          3871,
+          5051
+        ],
+        "crop": [
+          2050,
+          1650,
+          1500,
+          2150
+        ],
+        "mask_polygon": [
+          [
+            2180,
+            1800
+          ],
+          [
+            3100,
+            1710
+          ],
+          [
+            3500,
+            3100
+          ],
+          [
+            2850,
+            3750
+          ],
+          [
+            2100,
+            3200
+          ]
+        ],
+        "context_note": "The gauntlet encloses the hand and forearm in the reviewed pose; those attached supporting pixels remain in the crop.",
+        "rotation_degrees": 0,
+        "art_width_share": 0.28
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.2
+      }
+    },
+    "leonardo_camel_bag": {
+      "copy": {
+        "label": "3 LITERS CAMEL BAG",
+        "subtitle": "WITH A KINETIC CHARGING SYSTEM",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          240,
+          7130,
+          900,
+          700
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "mode": "context_crop",
+        "source_size": [
+          3871,
+          5051
+        ],
+        "crop": [
+          180,
+          2750,
+          1800,
+          1750
+        ],
+        "mask_polygon": [
+          [
+            260,
+            2880
+          ],
+          [
+            1600,
+            2750
+          ],
+          [
+            1950,
+            3900
+          ],
+          [
+            820,
+            4450
+          ],
+          [
+            220,
+            3900
+          ]
+        ],
+        "context_note": "The camel bag is strapped across the lower back and cape; the attached body and cape pixels remain to keep that physical placement truthful.",
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.4
+      }
+    },
+    "leonardo_provision_bag": {
+      "copy": {
+        "label": "PROVISION BAG",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          200,
+          7800,
+          900,
+          260
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_03.png",
+        "mode": "context_crop",
+        "source_size": [
+          3871,
+          5051
+        ],
+        "crop": [
+          100,
+          2850,
+          2300,
+          1900
+        ],
+        "mask_polygon": [
+          [
+            180,
+            3050
+          ],
+          [
+            2180,
+            2950
+          ],
+          [
+            2350,
+            4300
+          ],
+          [
+            1200,
+            4700
+          ],
+          [
+            160,
+            4200
+          ]
+        ],
+        "context_note": "The provision bag is part of the character's lower-body rig and cape; the crop retains only the supporting pixels needed to show that attachment.",
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_automatic_folding_shield": {
+      "copy": {
+        "label": "AUTOMATIC FOLDING SHIELD",
+        "subtitle": "0.12-INCH-THICK TITANIUM ALLOY",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          3900,
+          7920,
+          800,
+          500
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            3227,
+            1441
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.4
+      }
+    },
+    "leonardo_steel_knife": {
+      "copy": {
+        "label": "DIY STEEL KNIFE",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          5650,
+          7560,
+          750,
+          360
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            5412,
+            4557
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.18
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.0
+      }
+    },
+    "leonardo_hi_tech_sword": {
+      "copy": {
+        "label": "DIY HI TECH SWORD",
+        "subtitle": "TUNGSTEN ALLOY",
+        "description": "FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM",
+        "description_source": "authored"
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          5750,
+          6650,
+          800,
+          760
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            5745,
+            3710
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.30
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "dedicated-hold",
+        "min_hold_seconds": 4.0
+      }
+    },
+    "leonardo_magical_hi_tech_spear": {
+      "copy": {
+        "label": "DIY MAGICAL/ HI TECH SPEAR",
+        "subtitle": "TUNGSTEN ALLOY",
+        "description_source": "placeholder",
+        "placeholder_chars": 84
+      },
+      "evidence": {
+        "sheet": "Leonardo/Cha Design_LEONARDO.jpg",
+        "label_crop": [
+          6080,
+          5100,
+          1000,
+          420
+        ]
+      },
+      "art": {
+        "file": "Leonardo/CHA_LEONARDO_WEAPONS.png",
+        "mode": "components",
+        "source_size": [
+          6891,
+          5354
+        ],
+        "component_seeds": [
+          [
+            6165,
+            2587
+          ]
+        ],
+        "rotation_degrees": 0,
+        "art_width_share": 0.25
+      },
+      "presentation": {
+        "font_size": 88,
+        "description_font_size": 52,
+        "usage": "accompany-art",
+        "min_hold_seconds": 2.4
+      }
+    }
+  }
+}

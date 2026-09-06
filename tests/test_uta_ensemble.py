@@ -7,10 +7,14 @@ what it landed on.
 """
 
 import json
+import subprocess
 import sys
+from collections import Counter
+from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from PIL import Image, ImageDraw
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
@@ -18,7 +22,20 @@ sys.path.insert(0, str(REPO / "scripts"))
 import build_uta_ensemble as B  # noqa: E402
 import render_uta_callout as C  # noqa: E402
 
-RECORD, MONTAGE = B.load()
+RECORD, MONTAGE, LEONARDO = B.load()
+CATALOG = B.equipment_catalog(RECORD, MONTAGE, LEONARDO)
+HERO_ROOT = Path.home() / "Videos" / "Wolves" / "Hero"
+
+
+def _wordmark_image():
+    image = Image.new("RGBA", (1200, 300), (0, 0, 0, 0))
+    ImageDraw.Draw(image).rounded_rectangle(
+        (0, 0, 1199, 299), radius=24, fill=(255, 255, 255, 255)
+    )
+    return image
+
+
+WORDMARK_IMAGE = _wordmark_image()
 
 
 def rects_overlap(a, b):
@@ -90,6 +107,106 @@ def test_builder_uses_the_declared_delivery_name():
     assert f"/work/{RECORD['delivery']['output']}" in text
 
 
+def test_review_plan_uses_exact_programme_frame_offset_math():
+    plan = B.review_frame_plan(RECORD)
+    row = next(
+        row for row in plan if row["item"] == "leonardo_chili_smoke_grenade"
+    )
+    entry = next(
+        entry
+        for entry in RECORD["callout_schedule"]
+        if entry["item"] == row["item"]
+    )
+    expected = RECORD["delivery"]["slide_frames"] + round(
+        (entry["start_seconds"] + entry["hold_seconds"] / 2)
+        * B.FPS_NUM
+        / B.FPS_DEN
+    )
+    assert row["programme_frame"] == expected
+    assert row["programme_pts"] == expected * B.FPS_DEN
+    assert len(
+        [row for row in plan if row["kind"] == "callout"]
+    ) == len(RECORD["callout_schedule"])
+
+
+def test_workflow_contains_remote_preview_and_full_review_artifacts():
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+    assert 'MODE="{{workflow.parameters.render_mode}}"' in text
+    for preview in B.PREVIEW_SLICES:
+        assert f"/work/{preview['name']}.mp4" in text
+        assert f"/work/{preview['name']}-decode.txt" in text
+    assert "/work/frame-plan.tsv" in text
+    assert "/work/ens-gates.txt" in text
+    assert "/work/review-sha256.txt" in text
+    assert "select='eq(pts\\," in text
+    assert 'ffmpeg -xerror -v error -i "$out" -f null - 2>' in text
+    assert "audio_bitrate_actual" in text
+
+
+def test_ensemble_catalog_contains_all_rafi_and_leonardo_items():
+    assert set(CATALOG) == (
+        set(MONTAGE["composition"]["callouts"])
+        | set(LEONARDO["items"])
+    )
+
+
+def test_every_unique_equipment_item_appears_once():
+    scheduled = [entry["item"] for entry in RECORD["callout_schedule"]]
+    assert len(scheduled) == len(set(scheduled))
+    assert set(scheduled) == set(CATALOG)
+
+
+def test_equipment_schedule_rejects_any_non_bottom_pocket():
+    mutated = deepcopy(RECORD)
+    mutated["callout_schedule"][0]["pocket"] = "top"
+
+    with pytest.raises(ValueError, match="bottom pocket"):
+        B.validate_equipment_schedule(mutated, CATALOG, MONTAGE)
+
+
+def test_schedule_invariants_are_enforced():
+    B.validate_equipment_schedule(RECORD, CATALOG, MONTAGE)
+
+
+def test_every_hold_clears_copy_readability_floor():
+    for entry in RECORD["callout_schedule"]:
+        callout = B.normalize_callout(entry["item"], CATALOG[entry["item"]])
+        assert entry["hold_seconds"] >= B.required_hold_seconds(callout)
+
+
+def test_normalized_callouts_preserve_rafi_render_copy():
+    normalized = B.normalize_callout("spear", CATALOG["spear"])
+    assert normalized["copy"] == {
+        "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+        "subtitle_render": "TUNGSTEN ALLOY",
+        "description_render": (
+            "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL "
+            "PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR "
+            "CAVALRY COMBAT."
+        ),
+    }
+    assert normalized["font_size"] == 96
+    assert normalized["description_font_size"] == 54
+
+
+def test_normalized_callouts_fill_only_placeholder_descriptions():
+    placeholder = B.normalize_callout(
+        "leonardo_regular_hunting_arrow",
+        CATALOG["leonardo_regular_hunting_arrow"],
+    )
+    authored = B.normalize_callout(
+        "leonardo_hi_tech_sword",
+        CATALOG["leonardo_hi_tech_sword"],
+    )
+    assert placeholder["copy"]["description_render"].strip()
+    assert placeholder["copy"]["description_render"] != "REGULAR HUNTING ARROW"
+    assert placeholder["copy"]["description_render"].startswith("[PLACEHOLDER] ")
+    assert authored["copy"]["description_render"] == (
+        "FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM"
+    )
+
+
 def test_no_kid_covers_the_band_and_no_kid_covers_another():
     win = RECORD["band_window"]
     band = (win["x"], win["y"], win["width"], win["height"])
@@ -142,6 +259,23 @@ def test_band_is_raised_to_give_bottom_equipment_room():
     assert RECORD["callout_pockets"]["bottom"]["height"] == 425
 
 
+def test_wordmark_is_centered_and_above_the_band():
+    mark = RECORD["wordmark"]
+    assert mark["x"] == 980
+    assert mark["y"] == 48
+    assert mark["display_width"] == 600
+    assert mark["x"] == (B.CANVAS_W - mark["display_width"]) // 2
+    assert mark["y"] < RECORD["band_window"]["y"]
+
+
+def test_wordmark_does_not_overlap_kids_band_or_equipment():
+    box = B.wordmark_box(RECORD, WORDMARK_IMAGE)
+    assert not rects_overlap(box, B.band_box(RECORD))
+    for kid in B.stations(RECORD):
+        assert not rects_overlap(box, B.station_box(kid))
+    assert not rects_overlap(box, B.pocket_box(RECORD, "bottom"))
+
+
 def test_all_equipment_uses_the_bottom_rail():
     assert {entry["pocket"] for entry in RECORD["callout_schedule"]} == {"bottom"}
 
@@ -164,18 +298,132 @@ def test_no_two_cards_are_up_at_once():
         for e in RECORD["callout_schedule"]
     )
     for (_, end), (start, _) in zip(times, times[1:]):
-        assert start > end
+        assert start >= end + 1.0
+
+
+def test_solid_card_alpha_stays_inside_bottom_bounds(tmp_path):
+    from PIL import Image, ImageDraw
+
+    art_path = tmp_path / "synthetic-art.png"
+    art = Image.new("RGBA", (240, 160), (0, 0, 0, 0))
+    ImageDraw.Draw(art).rounded_rectangle(
+        (24, 20, 215, 139), radius=18, fill=(255, 255, 255, 220)
+    )
+    art.save(art_path)
+
+    pocket = dict(RECORD["callout_pockets"]["bottom"])
+    bounds = pocket.pop("bounds")
+    for item_id, item in CATALOG.items():
+        callout = B.normalize_callout(item_id, item)
+        art = (
+            str(art_path)
+            if item["art"].get("mode", "components") != "text_only"
+            else None
+        )
+        image, _, _ = B.render_card(
+            callout,
+            item,
+            pocket,
+            bounds,
+            art_path=art,
+            plate_mean=64,
+        )
+        assert B.fits(B.ink_bbox(image), bounds), item_id
+
+
+@pytest.mark.skipif(
+    not HERO_ROOT.is_dir(),
+    reason="local Hero RGBA assets are unavailable",
+)
+def test_real_hero_assets_render_every_merged_equipment_card(tmp_path):
+    """Run the complete merged catalog against the supplied Hero sources."""
+    pocket = dict(RECORD["callout_pockets"]["bottom"])
+    bounds = pocket.pop("bounds")
+    assert len(CATALOG) == 26
+
+    for item_id, item in CATALOG.items():
+        spec = item["art"]
+        source_path = HERO_ROOT / spec["file"]
+        assert source_path.is_file(), item_id
+        assert source_path.suffix.lower() == ".png", item_id
+        assert "design" not in source_path.name.lower(), item_id
+
+        output_path = tmp_path / f"{item_id}.png"
+        extracted = B.extract_equipment(spec, HERO_ROOT, output_path)
+        if spec.get("mode", "components") == "text_only":
+            assert extracted is None, item_id
+            assert not output_path.exists(), item_id
+            art_path = None
+        else:
+            assert extracted is not None, item_id
+            assert extracted.mode == "RGBA", item_id
+            assert extracted.getchannel("A").getbbox(), item_id
+            assert output_path.is_file(), item_id
+            art_path = output_path
+
+            if spec.get("mode") == "context_crop":
+                assert extracted.getchannel("A").getextrema()[0] == 0, item_id
+
+            rotation = spec.get("rotation_degrees", 0)
+            if rotation:
+                unrotated_spec = {**spec, "rotation_degrees": 0}
+                unrotated = B.extract_equipment(
+                    unrotated_spec,
+                    HERO_ROOT,
+                    tmp_path / f"{item_id}-unrotated.png",
+                )
+                assert unrotated is not None, item_id
+                if rotation in (90, 270):
+                    assert extracted.size == (
+                        unrotated.height,
+                        unrotated.width,
+                    ), item_id
+                else:
+                    assert extracted.size == unrotated.size, item_id
+                    assert extracted.tobytes() != unrotated.tobytes(), item_id
+
+        callout = B.normalize_callout(item_id, item)
+        image, _, _ = B.render_card(
+            callout,
+            item,
+            pocket,
+            bounds,
+            art_path,
+            plate_mean=64,
+        )
+        assert B.fits(B.ink_bbox(image), bounds), item_id
+
+
+def test_audit_assets_propagates_failure_to_cli_exit_code(tmp_path):
+    script = REPO / "scripts" / "build_uta_ensemble.py"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--audit-assets",
+            "--hero-root",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode != 0
+    assert "ERROR" in result.stderr
 
 
 def test_every_callout_uses_clean_equipment_not_review_crops():
-    equipment = RECORD["equipment_assets"]
+    equipment = CATALOG
     for entry in RECORD["callout_schedule"]:
         assert "art" not in entry
-        assert entry["equipment"] in equipment
+        assert entry["item"] in equipment
     assert all(
-        not spec["file"].startswith(".work-uta-general/review/")
-        for name, spec in equipment.items()
-        if name != "_what"
+        not spec["art"]["file"].startswith(".work-uta-general/review/")
+        for spec in equipment.values()
+    )
+    assert all(
+        not spec["art"]["file"].lower().endswith((".jpg", ".jpeg"))
+        and "cha design_" not in spec["art"]["file"].lower()
+        for spec in equipment.values()
     )
 
 
@@ -216,6 +464,74 @@ def test_equipment_extraction_selects_only_reviewed_components(tmp_path):
         if art.getpixel((x, y))[3]
     }
     assert colors == {(0, 255, 0)}
+
+
+def test_equipment_extraction_masks_context_crop_and_keeps_rgba(tmp_path):
+    from PIL import Image, ImageDraw
+
+    source = Image.new("RGBA", (120, 100), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(source)
+    draw.rectangle((30, 25, 75, 75), fill=(0, 0, 255, 255))
+    draw.rectangle((45, 40, 55, 50), fill=(0, 0, 0, 0))
+    path = tmp_path / "pose.png"
+    source.save(path)
+
+    art = B.extract_equipment(
+        {
+            "file": "pose.png",
+            "mode": "context_crop",
+            "crop": [20, 15, 70, 70],
+            "mask_polygon": [[25, 20], [80, 20], [80, 80], [25, 80]],
+            "context_note": "synthetic attached context",
+            "rotation_degrees": 90,
+        },
+        tmp_path,
+        tmp_path / "art.png",
+    )
+
+    assert art.mode == "RGBA"
+    assert art.width > art.height
+    alpha = art.getchannel("A")
+    assert alpha.getextrema()[0] == 0
+    assert alpha.getbbox()
+
+
+def test_context_crop_rejects_alpha_touching_every_crop_edge(tmp_path):
+    from PIL import Image, ImageDraw
+
+    source = Image.new("RGBA", (80, 80), (0, 0, 0, 0))
+    ImageDraw.Draw(source).rectangle((10, 10, 69, 69), fill=(255, 0, 0, 255))
+    source.save(tmp_path / "pose.png")
+
+    with pytest.raises(ValueError, match="touches every edge"):
+        B.extract_equipment(
+            {
+                "file": "pose.png",
+                "mode": "context_crop",
+                "crop": [10, 10, 60, 60],
+                "mask_polygon": [[10, 10], [69, 10], [69, 69], [10, 69]],
+                "context_note": "invalid synthetic context",
+                "rotation_degrees": 0,
+            },
+            tmp_path,
+            tmp_path / "art.png",
+        )
+
+
+def test_text_only_equipment_has_no_display_art(tmp_path):
+    from PIL import Image
+
+    Image.new("RGBA", (32, 32), (255, 0, 0, 0)).save(tmp_path / "pose.png")
+    assert B.extract_equipment(
+        {
+            "file": "pose.png",
+            "mode": "text_only",
+            "degraded_reason": "synthetic degraded source",
+        },
+        tmp_path,
+        tmp_path / "not-written.png",
+    ) is None
+    assert not (tmp_path / "not-written.png").exists()
 
 
 def test_callout_renderer_rejects_an_opaque_sheet_crop(tmp_path):
@@ -298,6 +614,9 @@ def test_the_workflow_is_valid_yaml_and_asks_for_the_right_frame_counts():
     text = B.workflow(RECORD, MONTAGE, names)
     doc = yaml.safe_load(text)
     assert doc["kind"] == "Workflow"
+    assert doc["spec"]["arguments"]["parameters"] == [
+        {"name": "render_mode", "value": "full"}
+    ]
     for _, start, frames in B.segments(RECORD):
         assert f"-frames:v {frames}" in text
     assert f"-frames:v {RECORD['delivery']['slide_frames']}" in text
@@ -353,7 +672,7 @@ def test_only_the_aperture_is_rounded():
     # the kids' own keying chains alphamerge too, so count the aperture's
     assert text.count("[bandpix][amask]alphamerge") == sum(
         1 for kind, _, _ in B.segments(RECORD) if kind == "stage"
-    )
+    ) + len(B.PREVIEW_SLICES)
     # the clean segments carry no mask and no alpha work at all
     for kind, start, frames in B.segments(RECORD):
         if kind == "clean":
@@ -361,8 +680,6 @@ def test_only_the_aperture_is_rounded():
 
 
 def test_the_aperture_mask_matches_the_aperture():
-    from PIL import Image
-
     win = RECORD["band_window"]
     path = B.WORK / "cards" / B.APERTURE_MASK
     if not path.exists():
@@ -374,3 +691,218 @@ def test_the_aperture_mask_matches_the_aperture():
     assert mask.getpixel((win["width"] // 2, win["height"] // 2)) == 255
     assert mask.getpixel((0, 0)) == 0
     assert 0 < mask.getpixel((win["corner_radius"], 0)) <= 255
+
+
+def test_stage_segments_add_the_wordmark_but_clean_segments_do_not():
+    stage = B.stage_segment(
+        RECORD,
+        1,
+        RECORD["timeline"]["intro_end_frame"],
+        10,
+        [],
+        0,
+    )
+    assert "-i /work/bluefin-wordmark.png" in stage
+    assert (
+        f"scale={RECORD['wordmark']['display_width']}:-2:flags=lanczos"
+        in stage
+    )
+    assert (
+        f"overlay=x={RECORD['wordmark']['x']}:y={RECORD['wordmark']['y']}"
+        in stage
+    )
+
+    clean = B.clean_segment(0, 0, 10)
+    assert "bluefin-wordmark.png" not in clean
+    assert "overlay=x=980:y=48" not in clean
+
+
+def test_workflow_fetches_the_wordmark_only_for_stage_graphs():
+    names = [
+        B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])
+    ]
+    text = B.workflow(RECORD, MONTAGE, names)
+    assert "$base/.work-uta-general/assets/bluefin-wordmark.png" in text
+    assert text.count("-i /work/bluefin-wordmark.png") == sum(
+        kind == "stage" for kind, _, _ in B.segments(RECORD)
+    ) + len(B.PREVIEW_SLICES)
+    assert (
+        f'echo "{RECORD["wordmark"]["raster_sha256"]}  '
+        '/work/bluefin-wordmark.png" | sha256sum -c -'
+    ) in text
+
+
+def test_prepare_wordmark_reads_the_pinned_record_and_calls_fetcher(
+    monkeypatch, tmp_path
+):
+    seen = {}
+
+    def fake_fetch(args):
+        seen["args"] = args
+        return 0
+
+    monkeypatch.setattr(B._fetch_wordmark_module(), "main", fake_fetch)
+    monkeypatch.setattr(
+        B,
+        "validate_wordmark_asset",
+        lambda record, path: {
+            "path": path,
+            "sha256": record["wordmark"]["raster_sha256"],
+            "size": tuple(record["wordmark"]["raster_size"]),
+        },
+    )
+
+    result = B.prepare_wordmark_asset(RECORD, tmp_path)
+    args = seen["args"]
+    assert args[args.index("--source-url") + 1] == RECORD["wordmark"]["source_url"]
+    assert args[args.index("--expected-sha256") + 1] == RECORD["wordmark"]["sha256"]
+    assert args[args.index("--width") + 1] == str(RECORD["wordmark"]["raster_width"])
+    assert "--force" in args
+    assert "--preserve-colors" not in args
+    assert result["sha256"] == RECORD["wordmark"]["raster_sha256"]
+
+
+def test_prepare_wordmark_rejects_a_stale_existing_png(tmp_path):
+    path = tmp_path / RECORD["wordmark"]["asset_path"]
+    path.parent.mkdir(parents=True)
+    Image.new("RGBA", (600, 230), (255, 255, 255, 255)).save(path)
+
+    with pytest.raises(ValueError, match="sha256 mismatch|dimensions mismatch"):
+        B.prepare_wordmark_asset(RECORD, tmp_path)
+
+
+def test_layout_review_frame_composites_transparent_stills_only():
+    background = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (23, 31, 42))
+    card = Image.new("RGBA", (B.CANVAS_W, B.CANVAS_H), (0, 0, 0, 0))
+    ImageDraw.Draw(card).rectangle(
+        (700, 1100, 1850, 1280), fill=(255, 255, 255, 220)
+    )
+
+    frame = B.layout_review_frame(
+        RECORD,
+        background,
+        WORDMARK_IMAGE,
+        cards=(card,),
+    )
+
+    assert frame.mode == "RGBA"
+    assert frame.size == (B.CANVAS_W, B.CANVAS_H)
+    assert frame.getpixel((0, 0))[:3] == background.getpixel((0, 0))
+    assert frame.getchannel("A").getbbox()
+    assert card.getchannel("A").getextrema()[0] == 0
+
+
+def test_image_level_layout_gate_renders_all_26_cards_and_previews(
+    monkeypatch, tmp_path
+):
+    def fake_extract(spec, hero_root, out_path):
+        if B._art_mode(spec) == "text_only":
+            return None
+        art = Image.new("RGBA", (96, 64), (0, 0, 0, 0))
+        ImageDraw.Draw(art).rounded_rectangle(
+            (8, 8, 87, 55), radius=8, fill=(230, 240, 255, 235)
+        )
+        art.save(out_path)
+        return art
+
+    monkeypatch.setattr(B, "extract_equipment", fake_extract)
+    day = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (232, 240, 246))
+    night = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (18, 24, 34))
+    cards_dir = tmp_path / "cards"
+    rows = B.render_cards(
+        RECORD,
+        MONTAGE,
+        LEONARDO,
+        cards_dir,
+        hero_root=tmp_path,
+        faces=(day, night),
+    )
+
+    assert len(rows) == 26
+    assert {row["item_id"] for row in rows} == set(CATALOG)
+    assert Counter(row["source_character"] for row in rows) == {
+        "RAFI": 8,
+        "LEONARDO": 18,
+    }
+    pocket = B.pocket_box(RECORD, "bottom")
+    bounds = (
+        pocket[0],
+        pocket[1],
+        pocket[0] + pocket[2],
+        pocket[1] + pocket[3],
+    )
+    for row in rows:
+        with Image.open(row["path"]) as card:
+            assert card.mode == "RGBA"
+            assert card.getchannel("A").getbbox()
+            assert B.fits(B.ink_bbox(card), bounds), row["item_id"]
+        assert row["art_bounds"] is None or len(row["art_bounds"]) == 4
+
+    mark = B.fit_wordmark(RECORD, WORDMARK_IMAGE)
+    box = B.wordmark_box(RECORD, WORDMARK_IMAGE)
+    assert mark.mode == "RGBA"
+    assert mark.getchannel("A").getbbox()
+    assert box[0] == (B.CANVAS_W - box[2]) // 2
+
+    preview_paths = B.render_layout_previews(
+        RECORD,
+        (day, night),
+        WORDMARK_IMAGE,
+        tmp_path / "review",
+    )
+    assert [path.name for path in preview_paths] == [
+        "stage-day-wordmark.png",
+        "stage-night-wordmark.png",
+    ]
+    for path, face in zip(preview_paths, (day, night)):
+        with Image.open(path) as preview:
+            assert preview.mode == "RGBA"
+            assert preview.getpixel((0, 0))[:3] == face.getpixel((0, 0))
+
+    preflight_paths = B.render_card_preflight_sheets(
+        RECORD,
+        (day, night),
+        WORDMARK_IMAGE,
+        rows,
+        tmp_path / "review",
+    )
+    assert [path.name for path in preflight_paths] == [
+        "stage-day-cards.png",
+        "stage-night-cards.png",
+    ]
+    for path in preflight_paths:
+        with Image.open(path) as sheet:
+            assert sheet.mode == "RGBA"
+            assert sheet.size[0] == (
+                B.PREFLIGHT_COLUMNS * B.PREFLIGHT_CELL_WIDTH
+            )
+            assert sheet.size[1] > B.PREFLIGHT_PREVIEW_HEIGHT
+
+    contact = B.render_contact_sheet(
+        RECORD,
+        MONTAGE,
+        LEONARDO,
+        rows,
+        tmp_path / "review" / "equipment-contact-sheet.png",
+    )
+    assert contact.exists()
+    with Image.open(contact) as sheet:
+        assert sheet.mode == "RGBA"
+        assert sheet.size[0] == 4 * B.CONTACT_CELL_WIDTH
+
+
+def test_context_crop_items_keep_transparency_notes_and_no_sheet_art():
+    for item_id, item in LEONARDO["items"].items():
+        spec = item["art"]
+        assert "Cha Design_LEONARDO.jpg" not in spec["file"], item_id
+        if spec["mode"] == "context_crop":
+            assert spec["context_note"].strip(), item_id
+        assert not spec["file"].endswith(".jpg"), item_id
+
+
+def test_layout_review_rejects_an_opaque_full_frame_overlay():
+    background = Image.new("RGB", (B.CANVAS_W, B.CANVAS_H), (23, 31, 42))
+    card = Image.new("RGBA", (B.CANVAS_W, B.CANVAS_H), (255, 255, 255, 255))
+
+    with pytest.raises(ValueError, match="opaque full-frame"):
+        B.layout_review_frame(RECORD, background, WORDMARK_IMAGE, cards=(card,))

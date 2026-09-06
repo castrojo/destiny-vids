@@ -86,6 +86,16 @@ def _wrap(draw, text, font, max_width, tracking=0):
     return lines
 
 
+def visible_character_count(copy):
+    """Count every rendered copy row, including generated descriptions."""
+    count = 0
+    for key in ("label_render", "subtitle_render", "description_render"):
+        value = copy.get(key)
+        if isinstance(value, str) and value.strip():
+            count += len(value.strip())
+    return count
+
+
 def render_callout(
     callout,
     art_path=None,
