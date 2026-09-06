@@ -196,3 +196,38 @@ def test_no_kid_carries_its_sources_closing_white_flash():
         assert "use_frames" in kid, kid["id"]
         assert kid["use_frames"] < kid["source_frames"] - 40, kid["id"]
         assert "flash" in kid["use_frames_note"] or "dim" in kid["use_frames_note"]
+
+
+def test_only_the_aperture_is_rounded():
+    """The corners are rounded on the band's window, not on the delivery.
+
+    Rounding the delivered frame would put black corners on a television,
+    and the full-frame segments include an interval the owner protected
+    from any filter at all.
+    """
+    names = [B.card_name(i, e) for i, e in enumerate(RECORD["callout_schedule"])]
+    text = B.workflow(RECORD, MONTAGE, names)
+    # the kids' own keying chains alphamerge too, so count the aperture's
+    assert text.count("[bandpix][amask]alphamerge") == sum(
+        1 for kind, _, _ in B.segments(RECORD) if kind == "stage"
+    )
+    # the clean segments carry no mask and no alpha work at all
+    for kind, start, frames in B.segments(RECORD):
+        if kind == "clean":
+            assert B.APERTURE_MASK not in B.clean_segment(0, start, frames)
+
+
+def test_the_aperture_mask_matches_the_aperture():
+    from PIL import Image
+
+    win = RECORD["band_window"]
+    path = B.WORK / "cards" / B.APERTURE_MASK
+    if not path.exists():
+        pytest.skip("mask not rendered in this checkout")
+    mask = Image.open(path)
+    assert mask.size == (win["width"], win["height"])
+    assert mask.mode == "L"
+    # opaque in the middle, cut away at the corner, and soft in between
+    assert mask.getpixel((win["width"] // 2, win["height"] // 2)) == 255
+    assert mask.getpixel((0, 0)) == 0
+    assert 0 < mask.getpixel((win["corner_radius"], 0)) <= 255
