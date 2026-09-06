@@ -216,6 +216,31 @@ def test_missing_descriptions_are_explicit_placeholders(catalog):
             assert copy_fields["placeholder_chars"] >= 60
 
 
+def test_placeholder_equipment_descriptions_fill_without_touching_labels(catalog):
+    from tools import placeholder
+
+    for item_id, item in catalog["items"].items():
+        copy_fields = item["copy"]
+        filled = placeholder.fill_equipment_description(item_id, copy_fields)
+        assert filled["label"] == copy_fields["label"], item_id
+        assert filled.get("subtitle") == copy_fields.get("subtitle"), item_id
+        if copy_fields["description_source"] == "placeholder":
+            assert filled["description_source"] == "placeholder", item_id
+            assert filled["description"].strip(), item_id
+            assert filled == placeholder.fill_equipment_description(
+                item_id, copy_fields
+            ), item_id
+        else:
+            assert filled == copy_fields, item_id
+
+
+def test_leonardo_has_fourteen_placeholder_descriptions(catalog):
+    assert sum(
+        1 for item in catalog["items"].values()
+        if item["copy"]["description_source"] == "placeholder"
+    ) == 14
+
+
 def test_authored_descriptions_are_not_marked_placeholder(catalog):
     for item_id, item in catalog["items"].items():
         copy_fields = item["copy"]

@@ -38,6 +38,7 @@ import argparse
 import hashlib
 import json
 import sys
+from collections import Counter
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -170,9 +171,26 @@ def fill(spec, uncast_name=None):
     return out
 
 
+def fill_equipment_description(item_id, copy):
+    """Return equipment copy with a deterministic placeholder description."""
+    if copy.get("description_source") != MARKER:
+        return copy
+    if (copy.get("description") or "").strip():
+        raise ValueError(
+            f"{item_id}: placeholder description must be generated, not authored inline"
+        )
+    out = dict(copy)
+    out["description"] = lorem(
+        int(out.get("placeholder_chars") or 84),
+        seed=f"equipment:{item_id}",
+    )
+    return out
+
+
 # --- the punch list ---------------------------------------------------------
 
 MANIFESTS = ("stories/*.json", "stories/megacut/*.json")
+EQUIPMENT_MANIFESTS = ("stories/*-equipment.json",)
 
 
 def scan(root=None):
@@ -199,11 +217,34 @@ def scan(root=None):
                         "file": str(path.relative_to(root)),
                         "act": doc.get("act"),
                         "id": entry.get("id"),
-                            "kind": ("prose" if needs_prose(entry)
+                        "kind": ("prose" if needs_prose(entry)
                                  else "named-badge"),
                         "pending": entry.get("speaker_pending")
                                    or entry.get("speaker")
                                    or entry.get("name"),
+                    })
+    for pattern in EQUIPMENT_MANIFESTS:
+        for path in sorted(root.glob(pattern)):
+            try:
+                doc = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                continue
+            if not isinstance(doc, dict):
+                continue
+            items = doc.get("items")
+            if not isinstance(items, dict):
+                continue
+            for item_id, item in items.items():
+                if not isinstance(item, dict):
+                    continue
+                copy = item.get("copy")
+                if isinstance(copy, dict) and copy.get("description_source") == MARKER:
+                    found.append({
+                        "file": str(path.relative_to(root)),
+                        "act": None,
+                        "id": item_id,
+                        "kind": "equipment-description",
+                        "pending": None,
                     })
     return found
 
@@ -223,9 +264,14 @@ def main(argv=None):
         pending = f"  (for {item['pending']})" if item["pending"] else ""
         print(f"{item['act'] or '?':<4} {item['kind']:<12} {item['id']:<26} "
               f"{item['file']}{pending}")
-    prose = sum(1 for i in found if i["kind"] == "prose")
-    print(f"\n{len(found)} placeholder(s): {prose} with no prose (lorem stands "
-          f"in), {len(found) - prose} named badge(s) with rows nobody authored")
+    counts = Counter(item["kind"] for item in found)
+    if counts:
+        kinds = ", ".join(
+            f"{count} {kind}" for kind, count in sorted(counts.items())
+        )
+    else:
+        kinds = "none"
+    print(f"\n{len(found)} placeholder(s): {kinds}")
     return 1 if (args.check and found) else 0
 
 

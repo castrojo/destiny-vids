@@ -47,6 +47,29 @@ def test_lorem_is_latin_so_nobody_mistakes_it_for_approved_english():
 def test_a_zero_length_request_is_empty_not_an_error():
     assert placeholder.lorem(0, "x") == ""
 
+def test_equipment_placeholder_is_deterministic():
+    copy = {
+        "label": "DIY STEEL KNIFE",
+        "description_source": "placeholder",
+        "placeholder_chars": 84,
+    }
+    first = placeholder.fill_equipment_description("leonardo_steel_knife", copy)
+    second = placeholder.fill_equipment_description("leonardo_steel_knife", copy)
+    assert first == second
+    assert first["description"].startswith(
+        tuple(w.capitalize() for w in placeholder.WORDS)
+    )
+    assert first["description_source"] == "placeholder"
+
+
+def test_authored_equipment_description_is_untouched():
+    copy = {
+        "label": "CHILI SMOKE GRENADE",
+        "description": "AUTHORED SHEET COPY",
+        "description_source": "authored",
+    }
+    assert placeholder.fill_equipment_description("chili", copy) == copy
+
 # --- what makes a placeholder -----------------------------------------------
 
 def test_a_chat_pill_with_no_text_is_a_placeholder():
@@ -142,6 +165,37 @@ def test_scan_ignores_unreadable_files(tmp_path):
     (tmp_path / "stories" / "bad.json").write_text("{not json", encoding="utf-8")
     assert placeholder.scan(tmp_path) == []
 
+def test_scan_finds_equipment_descriptions_in_a_manifest(tmp_path):
+    (tmp_path / "stories").mkdir()
+    (tmp_path / "stories" / "leonardo-equipment.json").write_text(json.dumps({
+        "_what": "equipment catalog",
+        "character": "LEONARDO",
+        "items": {
+            "leonardo_steel_knife": {
+                "copy": {
+                    "label": "DIY STEEL KNIFE",
+                    "description_source": "placeholder",
+                    "placeholder_chars": 84,
+                }
+            },
+            "leonardo_chili_smoke_grenade": {
+                "copy": {
+                    "label": "CHILI SMOKE GRENADE",
+                    "description": "AUTHORED SHEET COPY",
+                    "description_source": "authored",
+                }
+            },
+        },
+    }), encoding="utf-8")
+    found = placeholder.scan(tmp_path)
+    assert found == [{
+        "file": "stories/leonardo-equipment.json",
+        "act": None,
+        "id": "leonardo_steel_knife",
+        "kind": "equipment-description",
+        "pending": None,
+    }]
+
 def test_check_exits_nonzero_only_when_something_is_unwritten(tmp_path, capsys):
     (tmp_path / "stories").mkdir()
     (tmp_path / "stories" / "a.json").write_text(json.dumps(
@@ -183,6 +237,21 @@ def test_the_committed_lorem_titles_are_listed():
     """The two act II cards are on the list until somebody writes their rows."""
     found = {f["id"] for f in placeholder.scan()}
     assert {"late_poor_technical_decisions", "mapped_haters"} <= found
+
+def test_list_summary_groups_arbitrary_placeholder_kinds(monkeypatch, capsys):
+    monkeypatch.setattr(placeholder, "scan", lambda root=None: [
+        {"file": "stories/a.json", "act": "I", "id": "a",
+         "kind": "prose", "pending": "TBD"},
+        {"file": "stories/b.json", "act": None, "id": "b",
+         "kind": "equipment-description", "pending": None},
+        {"file": "stories/c.json", "act": "II", "id": "c",
+         "kind": "named-badge", "pending": "c"},
+    ])
+    assert placeholder.main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "1 equipment-description" in out
+    assert "1 named-badge" in out
+    assert "1 prose" in out
 
 # --- the dialogue record's own placeholder ----------------------------------
 
