@@ -142,6 +142,7 @@ def render_callout(
     # Side-by-side art narrows the text column, matching the sheet's habit of
     # setting a label beside the thing it names.
     art = None
+    art_h = 0
     if art_path:
         art = Image.open(art_path)
         if art.mode != "RGBA" or art.getchannel("A").getextrema()[0] == 255:
@@ -161,11 +162,11 @@ def render_callout(
         art = art.resize((art_w, art_h), Image.LANCZOS)
         text_w = box["width"] - art_w - int(title_size * 0.9)
 
-    y = y0
     tracking = max(2, title_size // 22)
+    y = y0
     for line in _wrap(draw, copy["label_render"], f_title, text_w, tracking):
         _tracked(draw, (x0, y), line, f_title, INK, tracking)
-        y += int(title_size * 1.16)
+        y += int(title_size * 1.22)
 
     y += int(title_size * 0.10)
     rule_y = y
@@ -177,27 +178,37 @@ def render_callout(
     if copy.get("subtitle_render"):
         _tracked(draw, (x0, y), copy["subtitle_render"], f_sub, INK,
                  max(1, sub_size // 18))
-        y += int(sub_size * 1.7)
+        y += int(sub_size * 1.85)
 
+    body_spans_art = False
     if copy.get("description_render"):
         y += int(body_size * 0.35)
-        for line in _wrap(draw, copy["description_render"], f_body, text_w):
+        body_spans_art = art is not None and y - y0 >= art_h
+        body_w = box["width"] if body_spans_art else text_w
+        for line in _wrap(draw, copy["description_render"], f_body, body_w):
             draw.text((x0, y), line, font=f_body, fill=INK)
-            y += int(body_size * 1.42)
+            y += int(body_size * 1.58)
+        if y > y0 + box["height"]:
+            raise ValueError(
+                "callout copy exceeds its label_box; widen the layout rather "
+                "than clipping or shrinking below the readable type floor"
+            )
 
     if art is not None:
         ax = x0 + box["width"] - art.width
         card.alpha_composite(art, (ax, y0))
-        # Leader line from the text column to the art it describes.
-        ly = y0 + box["height"] // 2
-        draw.line([(x0 + text_w + int(title_size * 0.18), ly),
-                   (ax - int(title_size * 0.22), ly)],
-                  fill=RULE, width=max(3, title_size // 26))
-        draw.ellipse(
-            [ax - int(title_size * 0.22) - 9, ly - 9,
-             ax - int(title_size * 0.22) + 9, ly + 9],
-            fill=RULE,
-        )
+        if not body_spans_art:
+            # Side-by-side cards point from copy to object. A description that
+            # spans beneath the art needs the space more than a floating line.
+            ly = y0 + box["height"] // 2
+            draw.line([(x0 + text_w + int(title_size * 0.18), ly),
+                       (ax - int(title_size * 0.22), ly)],
+                      fill=RULE, width=max(3, title_size // 26))
+            draw.ellipse(
+                [ax - int(title_size * 0.22) - 9, ly - 9,
+                 ax - int(title_size * 0.22) + 9, ly + 9],
+                fill=RULE,
+            )
 
     # Protect the glyphs, never with a scrim panel: a tight near-opaque core
     # hugging the letters plus a wider soft falloff, so the protection travels

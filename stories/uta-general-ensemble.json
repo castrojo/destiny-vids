@@ -20,7 +20,8 @@
     "the vertically tall weapons can be turned on their sides to fit the bottom area better",
     "ensure the name he had on his artwork is omitted",
     "bring the video up a tad to give more room to the equipment",
-    "flip leonardo the other way so his spear is facing inward"
+    "flip leonardo the other way so his spear is facing inward",
+    "put all the equipment in the bottom section, a new wordmark is going on the top"
   ],
   "delivery": {
     "width": 2560,
@@ -61,9 +62,9 @@
       "source_frames": 28705,
       "use_frames": 27684,
       "use_frames_note": "Frames 27684..28704 are the source's own dim closing treatment (corner luma 254 -> 90, measured in .work-lakshmi01/verify-notes.md). The ensemble uses the drawing only, so it ends on the finished bright artwork.",
-      "x": 54,
+      "x": 101,
       "y": 20,
-      "width": 532,
+      "width": 438,
       "flip": false
     },
     {
@@ -71,9 +72,9 @@
       "station": "left-bottom",
       "source": "RAFI_01_SP.mp4",
       "source_frames": 24265,
-      "x": 20,
-      "y": 785,
-      "width": 600,
+      "x": 59,
+      "y": 868,
+      "width": 522,
       "flip": false,
       "use_frames": 24216,
       "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
@@ -83,9 +84,9 @@
       "station": "right-top",
       "source": "Leonardo/CHA_LEONARDO_01.mp4",
       "source_frames": 18601,
-      "x": 1940,
-      "y": 60,
-      "width": 600,
+      "x": 1920,
+      "y": 20,
+      "width": 640,
       "flip": false,
       "use_frames": 18552,
       "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
@@ -95,15 +96,37 @@
       "station": "right-bottom",
       "source": "RAFI_02_SP.mp4",
       "source_frames": 30661,
-      "x": 1940,
-      "y": 820,
-      "width": 600,
+      "x": 1986,
+      "y": 912,
+      "width": 508,
       "flip": true,
       "use_frames": 30612,
       "use_frames_note": "Measured closing flash: the animation flashes to pure white at this frame and decays back over the ~49 frames that follow. That flourish belongs to the timelapse, not to the film, and left in it put a white ghost of the child on screen for a third of a second before the credits. Measured with signalstats YAVG over the drawing's last frames on the farm."
     }
   ],
   "flip_note": "RAFI_02 is mirrored to face inward. Leonardo keeps his source orientation so his spear points toward the band; his authored nameplate is masked before the matte is derived and never appears on screen.",
+  "character_balance": {
+    "_what": "Measured from the returned keyed proof PNGs with alpha > 16. The first ensemble used equal-ish widths, which made Leonardo visibly smallest because his spear makes his source crop wide. The revised widths target equal visible ink area rather than equal boxes.",
+    "before_opaque_pixels": {
+      "LAKSHMI": 194905,
+      "RAFI_01": 175555,
+      "LEONARDO": 131728,
+      "RAFI_02": 185431
+    },
+    "measured_after_cutout_before_rebalance": {
+      "LAKSHMI": 146188,
+      "RAFI_01": 145415,
+      "LEONARDO": 132556,
+      "RAFI_02": 144950
+    },
+    "measured_final_opaque_pixels": {
+      "LAKSHMI": 132363,
+      "RAFI_01": 132927,
+      "LEONARDO": 132556,
+      "RAFI_02": 133266
+    },
+    "alpha_threshold": 16
+  },
   "timeline": {
     "_what": "Source frame indices at 24000/1001. Every boundary is an exact frame index and the segments tile the source's 11427 frames exactly, because summing rounded segment durations is what put 0.29s of A/V drift into an earlier pass.",
     "intro_end_frame": 361,
@@ -122,7 +145,7 @@
     "_what": "The drawings' clock counts only the frames the stage is actually up: 7311 + 2096 = 9407. Each source animation gets its own retime factor from its own usable frame count; no timing value is shared between videos. Running them against wall clock would hide 764 frames of drawing behind the protected passage and hand the audience a visible jump when the stage came back. They pause with the stage, resume on the next drawing frame, and each completes as the credits arrive before the song ends."
   },
   "callout_pockets": {
-    "_what": "The stage's own margins above and below the aperture. A card never crosses a kid station and never touches the band.",
+    "_what": "The bottom-center rail is the only equipment zone. The top-center area stays empty for the future wordmark. Equipment never crosses a kid station or touches the band.",
     "top": {
       "x": 664,
       "y": 60,
@@ -136,15 +159,15 @@
       ]
     },
     "bottom": {
-      "x": 664,
-      "y": 990,
-      "width": 1232,
-      "height": 400,
+      "x": 640,
+      "y": 965,
+      "width": 1280,
+      "height": 425,
       "bounds": [
-        640,
-        969,
-        1920,
-        1424
+        620,
+        953,
+        1940,
+        1430
       ]
     },
     "bounds_note": "The bounds stop short of the frame edge on purpose: a bounding box cannot report pixels that were clipped off the canvas, so a bound ON the edge can never fail. Fit is measured on the type and art, never on the feathered halo behind them."
@@ -211,7 +234,7 @@
     {
       "callout": "composite_bow",
       "equipment": "composite_bow",
-      "pocket": "top",
+      "pocket": "bottom",
       "start_seconds": 76.0,
       "hold_seconds": 9.0
     },
@@ -225,7 +248,7 @@
     {
       "callout": "bead_catcher",
       "equipment": "bead_catcher",
-      "pocket": "top",
+      "pocket": "bottom",
       "start_seconds": 154.0,
       "hold_seconds": 9.0
     },
@@ -239,14 +262,14 @@
     {
       "callout": "bomb_10mm",
       "equipment": "bomb_10mm",
-      "pocket": "top",
+      "pocket": "bottom",
       "start_seconds": 236.0,
       "hold_seconds": 9.0
     },
     {
       "callout": "magazine_20",
       "equipment": "magazine_20",
-      "pocket": "top",
+      "pocket": "bottom",
       "start_seconds": 268.0,
       "hold_seconds": 9.0
     },
