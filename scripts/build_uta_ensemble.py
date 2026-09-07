@@ -1541,7 +1541,7 @@ def container(image, cpu_req, cpu_lim, mem_req, mem_lim, script):
     )
 
 
-def workflow(record, montage, card_names, wordmark_sha256=None):
+def workflow(record, montage, card_names, wordmark_sha256=None, pvc=PVC):
     kids = stations(record)
     segs = segments(record)
     src = montage["source"]
@@ -1843,7 +1843,7 @@ def workflow(record, montage, card_names, wordmark_sha256=None):
         "        value: full",
         "  volumes:",
         f"    - name: work",
-        f"      persistentVolumeClaim: {{claimName: {PVC}}}",
+        f"      persistentVolumeClaim: {{claimName: {pvc}}}",
         "  templates:",
         "    - name: main",
         "      dag:",
@@ -1909,6 +1909,7 @@ def main():
         help="Hero asset root used by asset audits and still generation",
     )
     ap.add_argument("--out-dir", default=str(WORK))
+    ap.add_argument("--pvc", default=PVC, help="PVC claim name for Argo workflow")
     args = ap.parse_args()
 
     record, montage, leonardo = load()
@@ -2006,6 +2007,7 @@ def main():
                 montage,
                 names,
                 wordmark_sha256=wordmark_info["sha256"],
+                pvc=args.pvc,
             )
         )
         total = sum(f for _, _, f in segments(record))
