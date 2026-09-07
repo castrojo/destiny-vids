@@ -6,7 +6,7 @@
   character: LEONARDO
   start_seconds: 18.0
   hold_seconds: 10.0
-  label: DIY MAGICAL / HI-TECH SPEAR
+  label: MAGICAL / CRUDE GLAIVE
   subtitle: TUNGSTEN ALLOY
   description: Tactical spear capable of lengthening or shortening for close-quarters engagement or cavalry combat.
 
@@ -22,7 +22,7 @@
   character: LEONARDO
   start_seconds: 48.0
   hold_seconds: 10.0
-  label: DIY CROSSBOW
+  label: LEGENDARY CROSSBOW
   subtitle: MIX MATERIALS
   description: Silent high-tension mechanical crossbow firing precision bolts for stealth interdiction and long-range engagement.
 
@@ -40,7 +40,7 @@
   hold_seconds: 9.0
   label: COMPOSITE BOW
   subtitle: TITANIUM ALLOY
-  description: "[PLACEHOLDER] Lightweight titanium alloy bow engineered for rapid draw and high-penetration arrow delivery."
+  description: "Lightweight titanium alloy bow engineered for rapid draw and high-penetration arrow delivery."
 
 - id: leonardo_regular_hunting_arrow
   character: LEONARDO
@@ -48,7 +48,7 @@
   hold_seconds: 10.0
   label: REGULAR HUNTING ARROW
   subtitle: AERODYNAMIC SHAFT
-  description: "[PLACEHOLDER] Standard aerodynamic hunting arrow tipped with carbon steel for consistent ballistic trajectory."
+  description: "Standard aerodynamic hunting arrow tipped with carbon steel for consistent ballistic trajectory."
 
 - id: leonardo_tungsten_throwing_axe
   character: LEONARDO
@@ -56,7 +56,7 @@
   hold_seconds: 10.0
   label: TUNGSTEN THROWING AXE
   subtitle: BALANCED HEAD
-  description: "[PLACEHOLDER] High-density tungsten throwing axe balanced for aerodynamic spin and maximum kinetic impact."
+  description: "High-density tungsten throwing axe balanced for maximum kinetic impact, designed to remove limbs from clankers."
 
 - id: double_kopis
   character: RAFI
@@ -72,7 +72,7 @@
   hold_seconds: 10.0
   label: PLASMA ARROW
   subtitle: IONIZED CHARGE
-  description: "[PLACEHOLDER] High-energy ionized plasma payload that superheats upon impact, melting armor and alien tech."
+  description: "High-energy ionized plasma payload that superheats upon impact, melting armor and clanker components."
 
 - id: leonardo_magnetic_grenade
   character: LEONARDO
@@ -80,7 +80,7 @@
   hold_seconds: 10.0
   label: MAGNETIC GRENADE
   subtitle: ADHESIVE CASING
-  description: DISRUPTS SIGNAL WAVES AND DESTROYS THE COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH POMODORO TIMER SYSTEM
+  description: DISRUPTS SIGNAL WAVES AND ELECTRONIC DEVICES WITH GNOME POMODORO TIMER SYSTEM
 
 - id: bead_catcher
   character: RAFI
@@ -88,7 +88,7 @@
   hold_seconds: 9.0
   label: MAGNETIC BEAD CATCHER
   subtitle: AMMUNITION RECOVERY
-  description: "[PLACEHOLDER] Handheld magnetic retrieval unit designed to collect 10mm munitions."
+  description: "Handheld magnetic retrieval unit designed to collect 10mm munitions."
 
 - id: leonardo_explosion_arrow
   character: LEONARDO
@@ -96,15 +96,15 @@
   hold_seconds: 10.0
   label: EXPLOSION ARROW
   subtitle: CONCUSSIVE WARHEAD
-  description: "[PLACEHOLDER] Micro-explosive arrow tip delivering localized concussive blast on contact."
+  description: "Micro-explosive arrow tip delivering localized concussive blast on contact."
 
 - id: leonardo_steel_knife
   character: LEONARDO
   start_seconds: 176.0
   hold_seconds: 10.0
-  label: DIY STEEL KNIFE
+  label: VIBRASTEEL KNIFE
   subtitle: CARBON TEMPERED
-  description: "[PLACEHOLDER] Custom field knife crafted from tempered carbon steel for utility cutting and close defence."
+  description: "SIMPLE IS GOOD"
 
 - id: hippershell_exox
   character: RAFI
@@ -112,7 +112,7 @@
   hold_seconds: 10.0
   label: HIPPERSHELL EXO-X
   subtitle: TUNGSTEN ALLOY
-  description: "EXTRA LOAD CAPACITY: 47 KG"
+  description: "EXTRA LOAD CAPACITY: 47 KG | CAN DEPLOY ON RIDER OR DINO MOUNT"
 
 - id: leonardo_chili_smoke_grenade
   character: LEONARDO
@@ -136,7 +136,7 @@
   hold_seconds: 15.0
   label: ELECTROSHOCK GRENADE
   subtitle: HIGH VOLTAGE DISCHARGE
-  description: DISRUPTS SIGNAL WAVES AND DESTROYS THE COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH POMODORO TIMER SYSTEM
+  description: DISRUPTS SIGNAL WAVES AND DESTROYS COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH GNOME POMODORO TIMER SYSTEM
 
 - id: magazine_20
   character: RAFI
@@ -152,7 +152,7 @@
   hold_seconds: 9.0
   label: SNAP ON GADGET AI CONTROL MODULE
   subtitle: WITH GPS
-  description: "[PLACEHOLDER] Snap-on tactical computing module providing targeting telemetry and real-time navigation."
+  description: "HIJACKS CRUDE-MODEL CLANKERS AND REPURPOSES THEM TO THE BLUEFIN HIVE"
 
 - id: ai_control_module
   character: RAFI
@@ -160,7 +160,7 @@
   hold_seconds: 9.0
   label: AI CONTROL MODULE
   subtitle: WITH GPS
-  description: "[PLACEHOLDER] Autonomous guidance unit coordinating perimeter telemetry and GPS tracking."
+  description: "HIJACKS FRONTIER-MODEL CLANKERS AND REPURPOSES THEM TO THE BLUEFIN HIVE"
 
 - id: leonardo_provision_bag
   character: LEONARDO
@@ -168,15 +168,15 @@
   hold_seconds: 9.0
   label: PROVISION BAG
   subtitle: WEATHERPROOF CANVAS
-  description: "[PLACEHOLDER] Compact field pack containing essential rations and gear."
+  description: "Compact field pack containing essential rations and gear."
 
 - id: leonardo_camel_bag
   character: LEONARDO
   start_seconds: 356.0
-  hold_seconds: 10.0
+  hold_seconds: 10.7
   label: 3 LITERS CAMEL BAG
   subtitle: WITH A KINETIC CHARGING SYSTEM
-  description: "[PLACEHOLDER] Three-liter hydration reservoir with integrated kinetic dynamo to trickle-charge equipment."
+  description: "Three-liter hydration reservoir for rider and dino mount with integrated kinetic dynamo to trickle-charge equipment."
 
 - id: leonardo_tungsten_armor
   character: LEONARDO
@@ -184,7 +184,7 @@
   hold_seconds: 10.0
   label: TUNGSTEN ARMOR
   subtitle: GRAPHENE COATING
-  description: "[PLACEHOLDER] Layered ballistic chest plating reinforced with graphene coating for superior thermal and impact defense."
+  description: "Layered ballistic chest plating reinforced with graphene coating for superior thermal and impact defense."
 
 - id: leonardo_hippershell_exo_x
   character: LEONARDO
@@ -192,15 +192,15 @@
   hold_seconds: 10.0
   label: DIY HIPPERSHELL EXO-X
   subtitle: TUNGSTEN ALLOY // 100K MAH BATTERY
-  description: "100K MAH BATERRY IMPROVES MUSCLE PERFORMANCE: 50% EXTRA LOAD CAPACITY: 47 KG"
+  description: "100K MAH BATERRY IMPROVES MUSCLE PERFORMANCE FOR DINO MOUNT AND RIDER: 50% EXTRA LOAD CAPACITY: 47 KG"
 
 - id: leonardo_hi_tech_sword
   character: LEONARDO
   start_seconds: 402.0
   hold_seconds: 14.0
-  label: DIY HI TECH SWORD
+  label: CROWN-SPLITTER SWORD
   subtitle: TUNGSTEN ALLOY
-  description: FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM
+  description: FEATURING A SHOCK-WAVE AIR BLAST AND A HIGH-ENERGY PLASMA EDGE, THIS SWORD IS DESIGNED TO CUT THROUGH THE TOUGHEST ARMOR AND CLANKER COMPONENTS.
 
 - id: leonardo_hard_leather_gauntlet
   character: LEONARDO
@@ -208,4 +208,4 @@
   hold_seconds: 10.0
   label: HARD LEATHER GAUNTLET
   subtitle: REINFORCED BRACER
-  description: "[PLACEHOLDER] Heavy leather wrist guard reinforced with internal shock-absorbing composite ribs."
+  description: "Heavy leather wrist guard reinforced with internal shock-absorbing composite ribs."

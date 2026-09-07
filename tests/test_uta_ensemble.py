@@ -243,19 +243,20 @@ def test_normalized_callouts_preserve_rafi_render_copy():
 
 
 def test_normalized_callouts_fill_only_placeholder_descriptions():
-    placeholder = B.normalize_callout(
+    arrow = B.normalize_callout(
         "leonardo_regular_hunting_arrow",
         CATALOG["leonardo_regular_hunting_arrow"],
     )
-    authored = B.normalize_callout(
+    sword = B.normalize_callout(
         "leonardo_hi_tech_sword",
         CATALOG["leonardo_hi_tech_sword"],
     )
-    assert placeholder["copy"]["description_render"].strip()
-    assert placeholder["copy"]["description_render"] != "REGULAR HUNTING ARROW"
-    assert placeholder["copy"]["description_render"].startswith("[PLACEHOLDER] ")
-    assert authored["copy"]["description_render"] == (
-        "FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM"
+    assert arrow["copy"]["description_render"].strip()
+    assert arrow["copy"]["description_render"] == (
+        "Standard aerodynamic hunting arrow tipped with carbon steel for consistent ballistic trajectory."
+    )
+    assert sword["copy"]["description_render"] == (
+        "FEATURING A SHOCK-WAVE AIR BLAST AND A HIGH-ENERGY PLASMA EDGE, THIS SWORD IS DESIGNED TO CUT THROUGH THE TOUGHEST ARMOR AND CLANKER COMPONENTS."
     )
 
 
