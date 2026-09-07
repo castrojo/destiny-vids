@@ -230,12 +230,12 @@ def test_every_hold_clears_copy_readability_floor():
 def test_normalized_callouts_preserve_rafi_render_copy():
     normalized = B.normalize_callout("spear", CATALOG["spear"])
     assert normalized["copy"] == {
-        "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+        "label_render": "MAGICAL / LEGENDARY SPEAR",
         "subtitle_render": "TUNGSTEN ALLOY",
         "description_render": (
             "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL "
             "PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR "
-            "CAVALRY COMBAT."
+            "MOUNTED CAVALRY COMBAT."
         ),
     }
     assert normalized["font_size"] == 96
