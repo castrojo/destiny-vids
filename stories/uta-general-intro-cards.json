@@ -8,11 +8,11 @@
       "dur": 5.5,
       "label": "PROJECT BLUEFIN",
       "accent": "BLUEFIN",
-      "title": "unleash the raptors",
+      "title": "Children of the Dark Army",
       "body": [
         "Maybe someday we can do this for real!"
       ],
-      "note": "Head slide, owner-authored 2026-09-05. Title is authored lowercase because .title carries text-transform: uppercase -- the string is the copy, the casing is the treatment. Seated on black so it cuts straight into the official intro's own black, which begins with the UNLEASH THE ARCHERS logo at 0 s."
+      "note": "Head slide, owner-authored 2026-09-07. Title is rendered with text-transform: uppercase -- the string is the copy, the casing is the treatment. Seated on black so it cuts straight into the official intro's own black, which begins with the UNLEASH THE ARCHERS logo at 0 s."
     }
   ]
 }
