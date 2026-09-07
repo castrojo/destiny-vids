@@ -21,7 +21,8 @@
     "ensure the name he had on his artwork is omitted",
     "bring the video up a tad to give more room to the equipment",
     "flip leonardo the other way so his spear is facing inward",
-    "put all the equipment in the bottom section, a new wordmark is going on the top"
+    "put all the equipment in the bottom section, a new wordmark is going on the top",
+    "the new wordmark logo doesn't match the light wallpaper, let's change the wallpaper to the october one and rerender."
   ],
   "delivery": {
     "width": 2560,
@@ -36,9 +37,9 @@
   },
   "stage": {
     "_what": "The kids are keyed pencil-and-ink line art. On black they are invisible, which is why every cut in this series lays them over a Bluefin wallpaper that crossfades day to night. This one does the same and calls it the stage.",
-    "day": ".work-rafi01/bg-day.png",
-    "night": ".work-rafi01/bg-night.png",
-    "wallpaper": "Bluefin month 01, 6300x2700 native, cropped to 16:9 and scaled -- no upscale",
+    "day": ".work-uta-general/assets/bg10-day.png",
+    "night": ".work-uta-general/assets/bg10-night.png",
+    "wallpaper": "Bluefin month 10, 6300x2700 native, cropped to 16:9 and scaled -- no upscale",
     "crossfade_start_seconds": 120.0,
     "crossfade_end_seconds": 315.0,
     "crossfade_note": "The fade completes inside the first stage act, so the protected passage and the second stage act are both fully night and no junction carries a background jump."
