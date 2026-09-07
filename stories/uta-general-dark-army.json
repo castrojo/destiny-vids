@@ -154,19 +154,13 @@
     "callouts": {
       "spear": {
         "copy": {
-          "label": "DIY MAGICAL/ HI TECH SPEAR",
-          "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+          "label": "MAGICAL / LEGENDARY SPEAR",
+          "label_render": "MAGICAL / LEGENDARY SPEAR",
           "subtitle": "TUNGSTEN ALLOY",
           "subtitle_render": "TUNGSTEN ALLOY",
-          "description": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR CAVALRY COMBAT.",
-          "description_render": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR CAVALRY COMBAT.",
-          "copyedits": [
-            {
-              "from": "MAGICAL/ HI TECH",
-              "to": "MAGICAL / HI-TECH",
-              "reason": "punctuation and spelling: space the solidus and hyphenate the compound modifier 'hi-tech'"
-            }
-          ]
+          "description": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR MOUNTED CAVALRY COMBAT.",
+          "description_render": "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR MOUNTED CAVALRY COMBAT.",
+          "copyedits": []
         },
         "source": {
           "sheet": "Cha Design_RAFI.jpg",
@@ -192,21 +186,12 @@
         "description_font_size": 54,
         "usage": "dedicated-hold",
         "min_hold_seconds": 4.5,
-        "art_asset": "RAFI_WEAPONS_04",
-        "plate_luma": {
-          "window": "190.2+5.2",
-          "box": "1120:200:860:430",
-          "mean": 92.9,
-          "p95": 93.05,
-          "max": 153,
-          "measured_by": "signalstats YAVG/YMAX on the farm",
-          "evidence": "luma-summary.txt"
-        }
+        "art_asset": "RAFI_WEAPONS_04"
       },
       "hippershell_exox": {
         "copy": {
-          "label": "DIY HIPPERSHELL EXO-X",
-          "label_render": "DIY HIPPERSHELL EXO-X",
+          "label": "HIPPERSHELL EXO-X",
+          "label_render": "HIPPERSHELL EXO-X",
           "subtitle": "TUNGSTEN ALLOY",
           "subtitle_render": "TUNGSTEN ALLOY",
           "description": "EXTRA LOAD CAPACITY: 47 KG",
@@ -244,8 +229,8 @@
           "label_render": "DAMASCUS STEEL DOUBLE KOPIS",
           "subtitle": "WITH BONE & SKIN ORNAMENT",
           "subtitle_render": "WITH BONE & SKIN ORNAMENT",
-          "description": "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
-          "description_render": "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
+          "description": "A GIFT FROM JORDAN: ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
+          "description_render": "A GIFT FROM JORDAN: ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING.",
           "copyedits": []
         },
         "source": {
@@ -280,6 +265,8 @@
           "label_render": "COMPOSITE BOW",
           "subtitle": "TITANIUM ALLOY",
           "subtitle_render": "TITANIUM ALLOY",
+          "description": "[PLACEHOLDER: Description for composite bow]",
+          "description_render": "[PLACEHOLDER: Description for composite bow]",
           "copyedits": []
         },
         "source": {
@@ -303,6 +290,7 @@
           "y": 480
         },
         "font_size": 88,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_01"
       },
@@ -312,6 +300,8 @@
           "label_render": "AI CONTROL MODULE",
           "subtitle": "WITH GPS",
           "subtitle_render": "WITH GPS",
+          "description": "[PLACEHOLDER: Description for AI control module]",
+          "description_render": "[PLACEHOLDER: Description for AI control module]",
           "copyedits": []
         },
         "source": {
@@ -335,6 +325,7 @@
           "y": 480
         },
         "font_size": 88,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_03"
       },
@@ -342,6 +333,8 @@
         "copy": {
           "label": "MAGNET BEADS CATCHER",
           "label_render": "MAGNETIC BEAD CATCHER",
+          "description": "[PLACEHOLDER: Description for magnetic bead catcher]",
+          "description_render": "[PLACEHOLDER: Description for magnetic bead catcher]",
           "copyedits": [
             {
               "from": "MAGNET BEADS",
@@ -371,6 +364,7 @@
           "y": 430
         },
         "font_size": 84,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_02"
       },
@@ -378,6 +372,8 @@
         "copy": {
           "label": "10MM BOM",
           "label_render": "10MM BOMB",
+          "description": "[PLACEHOLDER: Description for 10mm bomb]",
+          "description_render": "[PLACEHOLDER: Description for 10mm bomb]",
           "copyedits": [
             {
               "from": "BOM",
@@ -407,6 +403,7 @@
           "y": 410
         },
         "font_size": 84,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_02"
       },
@@ -414,6 +411,8 @@
         "copy": {
           "label": "20 ROUND MAGAZINE",
           "label_render": "20-ROUND MAGAZINE",
+          "description": "[PLACEHOLDER: Description for 20-round magazine]",
+          "description_render": "[PLACEHOLDER: Description for 20-round magazine]",
           "copyedits": [
             {
               "from": "20 ROUND",

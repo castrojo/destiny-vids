@@ -27,30 +27,21 @@ def crop(x, y, w, h):
 CALLOUTS = {
     "spear": {
         "copy": {
-            "label": "DIY MAGICAL/ HI TECH SPEAR",
-            "label_render": "DIY MAGICAL / HI-TECH SPEAR",
+            "label": "MAGICAL / LEGENDARY SPEAR",
+            "label_render": "MAGICAL / LEGENDARY SPEAR",
             "subtitle": "TUNGSTEN ALLOY",
             "subtitle_render": "TUNGSTEN ALLOY",
             "description": (
                 "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL "
                 "PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR "
-                "CAVALRY COMBAT."
+                "MOUNTED CAVALRY COMBAT."
             ),
             "description_render": (
                 "A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL "
                 "PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR "
-                "CAVALRY COMBAT."
+                "MOUNTED CAVALRY COMBAT."
             ),
-            "copyedits": [
-                {
-                    "from": "MAGICAL/ HI TECH",
-                    "to": "MAGICAL / HI-TECH",
-                    "reason": (
-                        "punctuation and spelling: space the solidus and "
-                        "hyphenate the compound modifier 'hi-tech'"
-                    ),
-                }
-            ],
+            "copyedits": [],
         },
         "source": {
             "sheet": SHEET,
@@ -67,8 +58,8 @@ CALLOUTS = {
     },
     "hippershell_exox": {
         "copy": {
-            "label": "DIY HIPPERSHELL EXO-X",
-            "label_render": "DIY HIPPERSHELL EXO-X",
+            "label": "HIPPERSHELL EXO-X",
+            "label_render": "HIPPERSHELL EXO-X",
             "subtitle": "TUNGSTEN ALLOY",
             "subtitle_render": "TUNGSTEN ALLOY",
             "description": "EXTRA LOAD CAPACITY: 47 KG",
@@ -94,11 +85,11 @@ CALLOUTS = {
             "subtitle": "WITH BONE & SKIN ORNAMENT",
             "subtitle_render": "WITH BONE & SKIN ORNAMENT",
             "description": (
-                "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED "
+                "A GIFT FROM JORDAN: ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED "
                 "BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING."
             ),
             "description_render": (
-                "THIS IS AN ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED "
+                "A GIFT FROM JORDAN: ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED "
                 "BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING."
             ),
             "copyedits": [],
@@ -122,6 +113,8 @@ CALLOUTS = {
             "label_render": "COMPOSITE BOW",
             "subtitle": "TITANIUM ALLOY",
             "subtitle_render": "TITANIUM ALLOY",
+            "description": "[PLACEHOLDER: Description for composite bow]",
+            "description_render": "[PLACEHOLDER: Description for composite bow]",
             "copyedits": [],
         },
         "source": {
@@ -132,6 +125,7 @@ CALLOUTS = {
         "label_box": {"x": 320, "y": 320, "width": 1200, "height": 320},
         "leader_anchor": {"x": 1580, "y": 480},
         "font_size": 88,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_01",
     },
@@ -141,6 +135,8 @@ CALLOUTS = {
             "label_render": "AI CONTROL MODULE",
             "subtitle": "WITH GPS",
             "subtitle_render": "WITH GPS",
+            "description": "[PLACEHOLDER: Description for AI control module]",
+            "description_render": "[PLACEHOLDER: Description for AI control module]",
             "copyedits": [],
         },
         "source": {
@@ -151,6 +147,7 @@ CALLOUTS = {
         "label_box": {"x": 320, "y": 320, "width": 1200, "height": 320},
         "leader_anchor": {"x": 1580, "y": 480},
         "font_size": 88,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_03",
     },
@@ -158,6 +155,8 @@ CALLOUTS = {
         "copy": {
             "label": "MAGNET BEADS CATCHER",
             "label_render": "MAGNETIC BEAD CATCHER",
+            "description": "[PLACEHOLDER: Description for magnetic bead catcher]",
+            "description_render": "[PLACEHOLDER: Description for magnetic bead catcher]",
             "copyedits": [
                 {
                     "from": "MAGNET BEADS",
@@ -177,6 +176,7 @@ CALLOUTS = {
         "label_box": {"x": 300, "y": 300, "width": 1200, "height": 260},
         "leader_anchor": {"x": 1560, "y": 430},
         "font_size": 84,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_02",
     },
@@ -184,6 +184,8 @@ CALLOUTS = {
         "copy": {
             "label": "10MM BOM",
             "label_render": "10MM BOMB",
+            "description": "[PLACEHOLDER: Description for 10mm bomb]",
+            "description_render": "[PLACEHOLDER: Description for 10mm bomb]",
             "copyedits": [
                 {
                     "from": "BOM",
@@ -200,6 +202,7 @@ CALLOUTS = {
         "label_box": {"x": 300, "y": 300, "width": 900, "height": 220},
         "leader_anchor": {"x": 1260, "y": 410},
         "font_size": 84,
+        "description_font_size": 52,
         "usage": "accompany-art",
         "art_asset": "RAFI_WEAPONS_02",
     },
@@ -207,6 +210,8 @@ CALLOUTS = {
         "copy": {
             "label": "20 ROUND MAGAZINE",
             "label_render": "20-ROUND MAGAZINE",
+            "description": "[PLACEHOLDER: Description for 20-round magazine]",
+            "description_render": "[PLACEHOLDER: Description for 20-round magazine]",
             "copyedits": [
                 {
                     "from": "20 ROUND",
