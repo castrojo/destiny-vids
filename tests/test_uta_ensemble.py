@@ -307,8 +307,8 @@ def test_no_pocket_reaches_a_kid_station_or_the_bands_picture():
 
 
 def test_band_is_raised_to_give_bottom_equipment_room():
-    assert RECORD["band_window"]["y"] == 407
-    assert RECORD["callout_pockets"]["bottom"]["height"] == 425
+    assert RECORD["band_window"]["y"] == 330
+    assert RECORD["callout_pockets"]["bottom"]["height"] == 500
 
 
 def test_wordmark_is_centered_and_above_the_band():

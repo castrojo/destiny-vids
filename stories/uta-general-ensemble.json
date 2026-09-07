@@ -23,7 +23,10 @@
     "flip leonardo the other way so his spear is facing inward",
     "put all the equipment in the bottom section, a new wordmark is going on the top",
     "the new wordmark logo doesn't match the light wallpaper, let's change the wallpaper to the october one and rerender.",
-    "make our title \"Children of the Dark Army\" in our splash intro screen"
+    "make our title \"Children of the Dark Army\" in our splash intro screen",
+    "I hate that all the item descriptions are spread everywhere this system is stupid design a centralized thing",
+    "add a slight shadow to the wordmark so it shows up better. Do the individual letters, make it subtle",
+    "bring the video up about an inch to leave more space for equipment descrpitions"
   ],
   "delivery": {
     "width": 2560,
@@ -48,7 +51,7 @@
   "band_window": {
     "_what": "The band's own film in the stage aperture. The 140px letterbox bars are removed here and ONLY here -- they carry no picture, and leaving them in put a hard black-to-wallpaper seam through both callout pockets. The picture itself is never cropped, panned or graded, and the two full-frame interludes and the credits keep the band's frame exactly as delivered.",
     "x": 640,
-    "y": 407,
+    "y": 330,
     "width": 1280,
     "height": 546,
     "letterbox_crop": "crop=2048:872:0:140",
@@ -152,22 +155,22 @@
       "x": 664,
       "y": 60,
       "width": 1232,
-      "height": 280,
+      "height": 250,
       "bounds": [
         640,
         0,
         1920,
-        391
+        320
       ]
     },
     "bottom": {
       "x": 640,
-      "y": 965,
+      "y": 890,
       "width": 1280,
-      "height": 425,
+      "height": 500,
       "bounds": [
         620,
-        953,
+        878,
         1940,
         1430
       ]
@@ -393,8 +396,8 @@
     "sha256": "d336d743082bded58c561c2c53baf1896dae87d7346224d9d06512e6c247cf74",
     "preserve_colors": false,
     "raster_width": 1200,
-    "raster_size": [1992, 765],
-    "raster_sha256": "e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e",
+    "raster_size": [1992, 769],
+    "raster_sha256": "c82c42c39df3e9b2337f2dbad4c33c9a015abcfce6cce249ea7b88c428b634c6",
     "asset_path": ".work-uta-general/assets/bluefin-wordmark.png",
     "display_width": 600,
     "x": 980,

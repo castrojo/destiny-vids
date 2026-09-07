@@ -50,7 +50,7 @@ def test_manifest_uses_the_verified_website_asset_hash():
     assert wordmark["sha256"] == WEBSITE_SHA256
     assert wordmark["preserve_colors"] is False
     assert wordmark["raster_width"] == 1200
-    assert wordmark["raster_size"] == [1992, 765]
+    assert wordmark["raster_size"] == [1992, 769]
     assert wordmark["raster_sha256"] == fetch_wordmark.PINNED_WEBSITE_RASTER_SHA256
 
 

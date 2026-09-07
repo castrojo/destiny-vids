@@ -1,0 +1,211 @@
+# General of the Dark Army — Centralized Equipment Catalog & Descriptions
+# Every item rendered in the bottom equipment rail is listed here in appearance order.
+# Edit labels, subtitles, and descriptions directly in this file.
+
+- id: leonardo_magical_hi_tech_spear
+  character: LEONARDO
+  start_seconds: 18.0
+  hold_seconds: 10.0
+  label: DIY MAGICAL / HI-TECH SPEAR
+  subtitle: TUNGSTEN ALLOY
+  description: Tactical spear capable of lengthening or shortening for close-quarters engagement or cavalry combat.
+
+- id: spear
+  character: RAFI
+  start_seconds: 34.0
+  hold_seconds: 12.0
+  label: MAGICAL / LEGENDARY SPEAR
+  subtitle: TUNGSTEN ALLOY
+  description: A SPEAR THAT CAN BE SHORTENED OR LENGTHENED FOR TACTICAL PURPOSES, WHETHER FOR CLOSE-QUARTERS INDIVIDUAL COMBAT OR MOUNTED CAVALRY COMBAT.
+
+- id: leonardo_diy_crossbow
+  character: LEONARDO
+  start_seconds: 48.0
+  hold_seconds: 10.0
+  label: DIY CROSSBOW
+  subtitle: MIX MATERIALS
+  description: Silent high-tension mechanical crossbow firing precision bolts for stealth interdiction and long-range engagement.
+
+- id: leonardo_automatic_folding_shield
+  character: LEONARDO
+  start_seconds: 60.0
+  hold_seconds: 10.0
+  label: AUTOMATIC FOLDING SHIELD
+  subtitle: 0.12-INCH-THICK TITANIUM ALLOY
+  description: Rapid-deploying ballistic shield balancing extreme maneuverability with high impact protection.
+
+- id: composite_bow
+  character: RAFI
+  start_seconds: 76.0
+  hold_seconds: 9.0
+  label: COMPOSITE BOW
+  subtitle: TITANIUM ALLOY
+  description: "[PLACEHOLDER] Lightweight titanium alloy bow engineered for rapid draw and high-penetration arrow delivery."
+
+- id: leonardo_regular_hunting_arrow
+  character: LEONARDO
+  start_seconds: 87.0
+  hold_seconds: 10.0
+  label: REGULAR HUNTING ARROW
+  subtitle: AERODYNAMIC SHAFT
+  description: "[PLACEHOLDER] Standard aerodynamic hunting arrow tipped with carbon steel for consistent ballistic trajectory."
+
+- id: leonardo_tungsten_throwing_axe
+  character: LEONARDO
+  start_seconds: 99.0
+  hold_seconds: 10.0
+  label: TUNGSTEN THROWING AXE
+  subtitle: BALANCED HEAD
+  description: "[PLACEHOLDER] High-density tungsten throwing axe balanced for aerodynamic spin and maximum kinetic impact."
+
+- id: double_kopis
+  character: RAFI
+  start_seconds: 116.0
+  hold_seconds: 12.0
+  label: DAMASCUS STEEL DOUBLE KOPIS
+  subtitle: WITH BONE & SKIN ORNAMENT
+  description: "A GIFT FROM JORDAN: ANCIENT GREEK SWORD WITH A SINGLE-EDGED, CURVED BLADE THAT IS HIGHLY EFFECTIVE FOR SLASHING AND THRUSTING."
+
+- id: leonardo_plasma_arrow
+  character: LEONARDO
+  start_seconds: 130.0
+  hold_seconds: 10.0
+  label: PLASMA ARROW
+  subtitle: IONIZED CHARGE
+  description: "[PLACEHOLDER] High-energy ionized plasma payload that superheats upon impact, melting armor and alien tech."
+
+- id: leonardo_magnetic_grenade
+  character: LEONARDO
+  start_seconds: 142.0
+  hold_seconds: 10.0
+  label: MAGNETIC GRENADE
+  subtitle: ADHESIVE CASING
+  description: DISRUPTS SIGNAL WAVES AND DESTROYS THE COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH POMODORO TIMER SYSTEM
+
+- id: bead_catcher
+  character: RAFI
+  start_seconds: 154.0
+  hold_seconds: 9.0
+  label: MAGNETIC BEAD CATCHER
+  subtitle: AMMUNITION RECOVERY
+  description: "[PLACEHOLDER] Handheld magnetic retrieval unit designed to collect 10mm munitions."
+
+- id: leonardo_explosion_arrow
+  character: LEONARDO
+  start_seconds: 165.0
+  hold_seconds: 10.0
+  label: EXPLOSION ARROW
+  subtitle: CONCUSSIVE WARHEAD
+  description: "[PLACEHOLDER] Micro-explosive arrow tip delivering localized concussive blast on contact."
+
+- id: leonardo_steel_knife
+  character: LEONARDO
+  start_seconds: 176.0
+  hold_seconds: 10.0
+  label: DIY STEEL KNIFE
+  subtitle: CARBON TEMPERED
+  description: "[PLACEHOLDER] Custom field knife crafted from tempered carbon steel for utility cutting and close defence."
+
+- id: hippershell_exox
+  character: RAFI
+  start_seconds: 187.0
+  hold_seconds: 10.0
+  label: HIPPERSHELL EXO-X
+  subtitle: TUNGSTEN ALLOY
+  description: "EXTRA LOAD CAPACITY: 47 KG"
+
+- id: leonardo_chili_smoke_grenade
+  character: LEONARDO
+  start_seconds: 198.0
+  hold_seconds: 15.0
+  label: CHILI SMOKE GRENADE
+  subtitle: TACTICAL IRRITANT
+  description: A CHILI SMOKE GRENADE THAT PRODUCES THICK SMOKE CAPABLE OF STINGING THE EYES, BURNING THE SKIN, AND CAUSING BREATHING DIFFICULTIES IF INHALED. IT CAUSES A MASSIVE FIRE EXPLOSION WHEN IT COMES INTO CONTACT WITH ELECTRONICS OR ALIEN ROBOTS.
+
+- id: bomb_10mm
+  character: RAFI
+  start_seconds: 223.0
+  hold_seconds: 8.0
+  label: 10MM BOMB
+  subtitle: HIGH-DENSITY EXPLOSIVE
+  description: "[PLACEHOLDER] Compact 10mm explosive charge engineered for magnetic deployment and rapid clearing."
+
+- id: leonardo_electroshock_grenade
+  character: LEONARDO
+  start_seconds: 232.0
+  hold_seconds: 15.0
+  label: ELECTROSHOCK GRENADE
+  subtitle: HIGH VOLTAGE DISCHARGE
+  description: DISRUPTS SIGNAL WAVES AND DESTROYS THE COMMUNICATION STRUCTURE IN ELECTRONIC DEVICES WITH POMODORO TIMER SYSTEM
+
+- id: magazine_20
+  character: RAFI
+  start_seconds: 258.0
+  hold_seconds: 8.0
+  label: 20-ROUND MAGAZINE
+  subtitle: HIGH-CAPACITY FEED
+  description: "[PLACEHOLDER] Curved high-capacity 20-round magazine providing reliable cycling for 10mm ordnance."
+
+- id: leonardo_ai_control_module
+  character: LEONARDO
+  start_seconds: 267.0
+  hold_seconds: 9.0
+  label: SNAP ON GADGET AI CONTROL MODULE
+  subtitle: WITH GPS
+  description: "[PLACEHOLDER] Snap-on tactical computing module providing targeting telemetry and real-time navigation."
+
+- id: ai_control_module
+  character: RAFI
+  start_seconds: 277.0
+  hold_seconds: 9.0
+  label: AI CONTROL MODULE
+  subtitle: WITH GPS
+  description: "[PLACEHOLDER] Autonomous guidance unit coordinating perimeter telemetry and GPS tracking."
+
+- id: leonardo_provision_bag
+  character: LEONARDO
+  start_seconds: 299.0
+  hold_seconds: 9.0
+  label: PROVISION BAG
+  subtitle: WEATHERPROOF CANVAS
+  description: "[PLACEHOLDER] Compact field pack containing essential rations and gear."
+
+- id: leonardo_camel_bag
+  character: LEONARDO
+  start_seconds: 356.0
+  hold_seconds: 10.0
+  label: 3 LITERS CAMEL BAG
+  subtitle: WITH A KINETIC CHARGING SYSTEM
+  description: "[PLACEHOLDER] Three-liter hydration reservoir with integrated kinetic dynamo to trickle-charge equipment."
+
+- id: leonardo_tungsten_armor
+  character: LEONARDO
+  start_seconds: 367.0
+  hold_seconds: 10.0
+  label: TUNGSTEN ARMOR
+  subtitle: GRAPHENE COATING
+  description: "[PLACEHOLDER] Layered ballistic chest plating reinforced with graphene coating for superior thermal and impact defense."
+
+- id: leonardo_hippershell_exo_x
+  character: LEONARDO
+  start_seconds: 385.0
+  hold_seconds: 10.0
+  label: DIY HIPPERSHELL EXO-X
+  subtitle: TUNGSTEN ALLOY // 100K MAH BATTERY
+  description: "100K MAH BATERRY IMPROVES MUSCLE PERFORMANCE: 50% EXTRA LOAD CAPACITY: 47 KG"
+
+- id: leonardo_hi_tech_sword
+  character: LEONARDO
+  start_seconds: 402.0
+  hold_seconds: 14.0
+  label: DIY HI TECH SWORD
+  subtitle: TUNGSTEN ALLOY
+  description: FEATURING A SHOCK-WAVE AIR BLAST WITH A COCKING/PUMPING SYSTEM
+
+- id: leonardo_hard_leather_gauntlet
+  character: LEONARDO
+  start_seconds: 418.0
+  hold_seconds: 10.0
+  label: HARD LEATHER GAUNTLET
+  subtitle: REINFORCED BRACER
+  description: "[PLACEHOLDER] Heavy leather wrist guard reinforced with internal shock-absorbing composite ribs."

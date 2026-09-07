@@ -31,6 +31,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import yaml
+
 REPO = Path(__file__).resolve().parents[1]
 RECORD = REPO / "stories" / "uta-general-ensemble.json"
 MONTAGE = REPO / "stories" / "uta-general-dark-army.json"
@@ -288,6 +290,26 @@ def equipment_catalog(
         if item_id in merged:
             raise ValueError(f"duplicate equipment id: {item_id}")
         merged[item_id] = {**item, "source_character": "LEONARDO"}
+
+    central = REPO / "stories" / "general-equipment.yaml"
+    if central.exists():
+        with central.open(encoding="utf-8") as fh:
+            central_items = yaml.safe_load(fh) or []
+        for entry in central_items:
+            cid = entry.get("id") or entry.get("item_id")
+            if cid in merged:
+                target_copy = merged[cid]["copy"]
+                if "label" in entry:
+                    target_copy["label"] = entry["label"]
+                    target_copy["label_render"] = entry["label"]
+                if "subtitle" in entry:
+                    target_copy["subtitle"] = entry["subtitle"]
+                    target_copy["subtitle_render"] = entry["subtitle"]
+                if "description" in entry:
+                    target_copy["description"] = entry["description"]
+                    target_copy["description_render"] = entry["description"]
+                    if "description_source" in target_copy:
+                        target_copy["description_source"] = "authored"
     return merged
 
 

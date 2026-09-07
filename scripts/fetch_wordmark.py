@@ -84,9 +84,9 @@ PINNED_WEBSITE_SOURCE_SHA256 = (
 )
 PINNED_WEBSITE_PRESERVE_COLORS = False
 PINNED_WEBSITE_RASTER_WIDTH = 1200
-PINNED_WEBSITE_RASTER_SIZE = (1992, 765)
+PINNED_WEBSITE_RASTER_SIZE = (1992, 769)
 PINNED_WEBSITE_RASTER_SHA256 = (
-    "e8ad8bbf657fd486a933f0ea30004817ae59cffd21fd588925b7dd0be897d44e"
+    "c82c42c39df3e9b2337f2dbad4c33c9a015abcfce6cce249ea7b88c428b634c6"
 )
 
 
@@ -214,14 +214,45 @@ await b.close();
         subprocess.run(["node", str(script)], cwd=REPO_ROOT, check=True)
 
 
-def trim(path):
+def add_letter_shadow(
+    img,
+    dx=0,
+    dy=4,
+    blur_radius=3,
+    opacity=0.65,
+):
+    """Add a subtle drop shadow directly behind non-transparent letterforms."""
+    from PIL import Image, ImageFilter
+
+    alpha = img.getchannel("A")
+    shadow_alpha = alpha.filter(ImageFilter.GaussianBlur(radius=blur_radius))
+    shadow_alpha = shadow_alpha.point(lambda p: int(p * opacity))
+
+    pad = max(abs(dx), abs(dy)) + blur_radius * 2 + 4
+    w, h = img.width + pad * 2, img.height + pad * 2
+    canvas = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+
+    shadow_layer = Image.new("RGBA", (img.width, img.height), (0, 0, 0, 255))
+    shadow_layer.putalpha(shadow_alpha)
+
+    canvas.alpha_composite(shadow_layer, (pad + dx, pad + dy))
+    canvas.alpha_composite(img, (pad, pad))
+
+    box = canvas.getbbox()
+    return canvas.crop(box) if box else img
+
+
+def trim(path, shadow=True):
     """Crop to the mark's own ink, so layout can position it by its real box."""
     from PIL import Image
 
     img = Image.open(path).convert("RGBA")
     box = img.getbbox()
     if box:
-        img.crop(box).save(path)
+        img = img.crop(box)
+    if shadow:
+        img = add_letter_shadow(img)
+    img.save(path)
     return img.size
 
 
@@ -287,7 +318,7 @@ def validate_png(
                     continue
                 has_white |= (red, green, blue) == (255, 255, 255)
                 has_fin |= (red, green, blue) == (66, 133, 244)
-                has_black |= (red, green, blue) == (0, 0, 0)
+                has_black |= (opacity >= 240 and (red, green, blue) == (0, 0, 0))
             if not has_white:
                 raise ValueError("wordmark PNG has no white lettering")
             if not has_fin:
