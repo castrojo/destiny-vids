@@ -1,0 +1,18 @@
+{
+  "_what": "The Bluefin head slide for the Bluefin: Not Your Monster cut. It is the Wolves main-title lockup (cards/maintitle.html, the site's own .wolves-intro-overlay-text-slim rules), carrying this cut's copy: the PROJECT BLUEFIN eyebrow with its accented B, the film line, and one owner line on the bottom row.",
+  "plates": [
+    {
+      "id": "nym-intro-bluefin",
+      "kind": "maintitle",
+      "at": 0.0,
+      "dur": 5.5,
+      "label": "PROJECT BLUEFIN",
+      "accent": "BLUEFIN",
+      "title": "Not Your Monster",
+      "body": [
+        "Maybe someday we can do this for real!"
+      ],
+      "note": "Head slide, title is 'Not Your Monster'. Seated on black so it cuts into the music video intro."
+    }
+  ]
+}
