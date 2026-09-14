@@ -5,10 +5,10 @@
   "_source_duration_sec": 120.93,
   "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // FIRST WARLOCK / Troll Slayer / Joanna Lee / Adjudicator of the Law.",
   "bed": {
-    "source_url": "https://www.youtube.com/watch?v=hTdhXxxWREo",
-    "source_title": "NIGHTWISH - Bye Bye Beautiful (OFFICIAL MUSIC VIDEO)",
-    "start_sec": 0.0,
-    "why": "Recovered Whisp brief directs music only, with the bed beginning at the cut's first frame."
+    "source_url": "https://www.youtube.com/watch?v=nbtcFghyuN8",
+    "source_title": "Storytime (Remastered)",
+    "start_sec": 172.0,
+    "why": "Owner direction, 2026-09-14: replace the recovered Whisp bed with Storytime (Remastered), beginning at source 02:52."
   },
   "tail_takeover": {
     "at_sec": 110.0,
