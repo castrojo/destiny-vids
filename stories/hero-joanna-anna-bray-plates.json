@@ -281,8 +281,10 @@
       "position": "letterbox",
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
-      "speaker": "katiegreenly",
-      "text": "Still don't remember his name do you"
+      "speaker": "k8tgreenley",
+      "text": "Still don't remember his name do you",
+      "avatar": "renders/avatars/k8tgreenley.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/97549260?v=4"
     }
   ],
   "unresolved": [
@@ -291,12 +293,6 @@
       "reason": "unseated_authored_copy",
       "automatable": false,
       "blocked_on": "The recovered Whisp brief supplies the title but no source-time seat or approved title-card treatment."
-    },
-    {
-      "id": "chat-19-katiegreenly-avatar",
-      "reason": "unresolved_github_avatar",
-      "automatable": false,
-      "blocked_on": "No GitHub account exists for the supplied katiegreenly login. The card renders with the standard drawn crest rather than a guessed photo."
     }
   ]
 }
