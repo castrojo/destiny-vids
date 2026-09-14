@@ -28,8 +28,8 @@
     },
     {
       "id": "joanna-lee-anna-bray-reveal",
-      "at": 35.67,
-      "dur": 3.4,
+      "at": 28.0,
+      "dur": 10.0,
       "position": "left",
       "copy_source": "owner_supplied",
       "label": "TRUSTEE // FIRST WARLOCK",
@@ -37,7 +37,7 @@
       "name": "Joanna Lee",
       "title": "Adjudicator of the Law",
       "variant": "leader",
-      "why": "Ana Bray is visibly in the 00:35.67-00:39.07 close-up, leaving the lower-left picture area open for the gold Guardian plate."
+      "why": "Owner-directed seat over Ana Bray's badge shot from 00:28.00 through 00:38.00."
     },
     {
       "id": "chat-01-castrojo",
@@ -184,7 +184,7 @@
     },
     {
       "id": "chat-12-joannalee333-question",
-      "at": 25.918,
+      "at": 38.1,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -197,7 +197,7 @@
     },
     {
       "id": "chat-13-joannalee333-leaving",
-      "at": 28.118,
+      "at": 40.3,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -210,7 +210,7 @@
     },
     {
       "id": "chat-14-castrojo-budget",
-      "at": 30.318,
+      "at": 42.5,
       "dur": 3.824,
       "kind": "chat",
       "position": "letterbox",
@@ -223,7 +223,7 @@
     },
     {
       "id": "chat-15-joannalee333-value",
-      "at": 39.1,
+      "at": 46.324,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -236,7 +236,7 @@
     },
     {
       "id": "chat-16-nimbinatus-casual",
-      "at": 41.3,
+      "at": 48.524,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -249,7 +249,7 @@
     },
     {
       "id": "chat-17-nwoods",
-      "at": 43.5,
+      "at": 50.724,
       "dur": 4.588,
       "kind": "chat",
       "position": "letterbox",
@@ -262,7 +262,7 @@
     },
     {
       "id": "chat-18-castrojo-bun",
-      "at": 48.088,
+      "at": 55.312,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -275,7 +275,7 @@
     },
     {
       "id": "chat-19-katiegreenly",
-      "at": 50.288,
+      "at": 57.512,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
