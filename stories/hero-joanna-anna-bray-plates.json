@@ -11,9 +11,9 @@
     "why": "Owner direction, 2026-09-14: replace the recovered Whisp bed with Storytime (Remastered), beginning at source 02:52."
   },
   "tail_takeover": {
-    "at_sec": 110.0,
+    "at_sec": 107.0,
     "asset": "assets/cta/linux-foundation-training-forest.png",
-    "why": "Owner direction, 2026-09-14: farm the Linux Foundation Training Forest from 1:50 through the end; the source audio continues unchanged."
+    "why": "Owner direction, 2026-09-14: cut the picture after 01:47 and begin the Linux Foundation Training Forest ending splash; the source audio continues unchanged."
   },
   "plates": [
     {
@@ -86,9 +86,9 @@
       "position": "letterbox",
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
-      "speaker": "mrtoph",
+      "speaker": "MrToph",
       "text": "I am retired.",
-      "avatar": "renders/avatars/mrtoph.png",
+      "avatar": "renders/avatars/MrToph.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/3176721?v=4"
     },
     {
