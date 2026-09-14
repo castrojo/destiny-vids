@@ -11,9 +11,30 @@
     "why": "Owner direction, 2026-09-14: replace Storytime with the supplied instrumental source."
   },
   "tail_takeover": {
-    "at_sec": 113.0,
+    "at_sec": 114.5,
     "asset": "assets/cta/linux-foundation-training-forest.png",
-    "why": "Owner direction, 2026-09-14: cut the picture after 01:47 and begin the Linux Foundation Training Forest ending splash; the source audio continues unchanged."
+    "why": "Owner direction, 2026-09-14: cut the picture after 01:47 and begin the Linux Foundation Training Forest ending splash. The slow-motion beat extends the delivered timeline by 1.5 seconds while preserving this source cut point."
+  },
+  "sfx_overlay": {
+    "kind": "diagnostic_center_residual_not_sfx_only",
+    "source_window_sec": {
+      "start": 62.594,
+      "end": 107.0
+    },
+    "delivery_window_sec": {
+      "start": 68.594,
+      "end": 113.0
+    },
+    "gain_db": -18.0,
+    "why": "The remote isolation pass could recover only a center-residual diagnostic, not a clean effects stem. Owner authorized its conservative fixed-gain mix under the instrumental for the second half."
+  },
+  "slow_motion": {
+    "delivery_at_sec": 82.0,
+    "source_at_sec": 76.0,
+    "source_duration_sec": 1.5,
+    "speed": 0.5,
+    "delivery_duration_sec": 3.0,
+    "why": "Owner direction, 2026-09-14: a short dramatic slow-motion beat at 01:22. The music and diagnostic residual continue at normal speed."
   },
   "plates": [
     {
