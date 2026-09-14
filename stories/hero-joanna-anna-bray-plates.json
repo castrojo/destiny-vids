@@ -11,14 +11,29 @@
     "why": "Owner direction, 2026-09-14: replace the recovered Whisp bed with Storytime (Remastered), beginning at source 02:52."
   },
   "tail_takeover": {
-    "at_sec": 107.0,
+    "at_sec": 113.0,
     "asset": "assets/cta/linux-foundation-training-forest.png",
     "why": "Owner direction, 2026-09-14: cut the picture after 01:47 and begin the Linux Foundation Training Forest ending splash; the source audio continues unchanged."
   },
   "plates": [
     {
+      "id": "joanna-mission-brief",
+      "at": 0.0,
+      "dur": 6.0,
+      "kind": "act",
+      "position": "full",
+      "label": "MISSION BRIEF",
+      "title": "7 Day Old Guardian",
+      "body": [
+        "Lorem ipsum dolor sit amet.",
+        "Lorem ipsum dolor sit amet."
+      ],
+      "copy_source": "placeholder",
+      "why": "Owner requested a Wolves-style mission-brief title slide. The briefing prose remains visibly placeholder text until authored."
+    },
+    {
       "id": "hidden-liabilities",
-      "at": 22.0,
+      "at": 28.0,
       "dur": 3.2,
       "kind": "status",
       "position": "status",
@@ -28,7 +43,7 @@
     },
     {
       "id": "joanna-lee-anna-bray-reveal",
-      "at": 28.0,
+      "at": 34.0,
       "dur": 10.0,
       "position": "left",
       "copy_source": "owner_supplied",
@@ -41,7 +56,7 @@
     },
     {
       "id": "chat-01-castrojo",
-      "at": 0.0,
+      "at": 6.0,
       "dur": 3.059,
       "kind": "chat",
       "position": "letterbox",
@@ -54,7 +69,7 @@
     },
     {
       "id": "chat-02-krook",
-      "at": 3.059,
+      "at": 9.059,
       "dur": 3.059,
       "kind": "chat",
       "position": "letterbox",
@@ -67,7 +82,7 @@
     },
     {
       "id": "chat-03-mrbobbytables",
-      "at": 6.118,
+      "at": 12.118,
       "dur": 2.412,
       "kind": "chat",
       "position": "letterbox",
@@ -80,7 +95,7 @@
     },
     {
       "id": "chat-04-cblecker",
-      "at": 8.53,
+      "at": 14.53,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -93,7 +108,7 @@
     },
     {
       "id": "chat-05-joannalee333-outperform",
-      "at": 10.73,
+      "at": 16.73,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -106,7 +121,7 @@
     },
     {
       "id": "chat-06-joannalee333-right",
-      "at": 12.93,
+      "at": 18.93,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -119,7 +134,7 @@
     },
     {
       "id": "chat-07-nimbinatus",
-      "at": 15.13,
+      "at": 21.13,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -132,7 +147,7 @@
     },
     {
       "id": "chat-08-joannalee333-see",
-      "at": 17.33,
+      "at": 23.33,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -145,7 +160,7 @@
     },
     {
       "id": "chat-09-castrojo-work",
-      "at": 19.53,
+      "at": 25.53,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -158,7 +173,7 @@
     },
     {
       "id": "chat-10-jeefy",
-      "at": 21.73,
+      "at": 27.73,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -171,7 +186,7 @@
     },
     {
       "id": "chat-11-krook-creepy",
-      "at": 23.93,
+      "at": 29.93,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -184,7 +199,7 @@
     },
     {
       "id": "chat-12-joannalee333-question",
-      "at": 38.1,
+      "at": 44.1,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -197,7 +212,7 @@
     },
     {
       "id": "chat-13-joannalee333-leaving",
-      "at": 40.3,
+      "at": 46.3,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -210,7 +225,7 @@
     },
     {
       "id": "chat-14-castrojo-budget",
-      "at": 42.5,
+      "at": 48.5,
       "dur": 3.824,
       "kind": "chat",
       "position": "letterbox",
@@ -223,7 +238,7 @@
     },
     {
       "id": "chat-15-joannalee333-value",
-      "at": 46.324,
+      "at": 52.324,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -236,7 +251,7 @@
     },
     {
       "id": "chat-16-nimbinatus-casual",
-      "at": 48.524,
+      "at": 54.524,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -249,7 +264,7 @@
     },
     {
       "id": "chat-17-nwoods",
-      "at": 50.724,
+      "at": 56.724,
       "dur": 4.588,
       "kind": "chat",
       "position": "letterbox",
@@ -262,7 +277,7 @@
     },
     {
       "id": "chat-18-castrojo-bun",
-      "at": 55.312,
+      "at": 61.312,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -275,7 +290,7 @@
     },
     {
       "id": "chat-19-katiegreenly",
-      "at": 57.512,
+      "at": 63.512,
       "dur": 2.2,
       "kind": "chat",
       "position": "letterbox",
@@ -288,7 +303,7 @@
     },
     {
       "id": "chat-20-joannalee333-clear-comms",
-      "at": 59.712,
+      "at": 65.712,
       "dur": 2.882,
       "kind": "chat",
       "position": "letterbox",
