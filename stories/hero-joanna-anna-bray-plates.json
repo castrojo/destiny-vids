@@ -20,10 +20,10 @@
       "id": "hidden-liabilities",
       "at": 22.0,
       "dur": 3.2,
-      "kind": "caption",
-      "position": "caption",
+      "kind": "status",
+      "position": "status",
       "copy_source": "owner_supplied",
-      "text": "Hidden Liabilities",
+      "label": "Hidden Liabilities",
       "why": "Owner-directed label over the ships beneath the ice at 00:22."
     },
     {
