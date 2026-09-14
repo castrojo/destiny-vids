@@ -76,7 +76,7 @@
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
       "speaker": "krook",
-      "text": "The community notices when we fight along their side.",
+      "text": "The community notices when we fight alongside them.",
       "avatar": "renders/avatars/krook.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/1499840?v=4"
     },
@@ -89,7 +89,7 @@
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
       "speaker": "mrbobbytables",
-      "text": "Some choose not to fight. They're at home.",
+      "text": "Some choose not to fight. They're at home",
       "avatar": "renders/avatars/mrbobbytables.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/6500863?v=4"
     },
@@ -115,7 +115,7 @@
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
       "speaker": "joannalee333",
-      "text": "Oh outperforming him should be easy",
+      "text": "Outperforming him should be easy",
       "avatar": "renders/avatars/joannalee333.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
     },
@@ -258,49 +258,11 @@
       "copy_source": "owner_supplied",
       "text_source": "owner_supplied",
       "speaker": "nimbatus",
-      "text": "She makes it look so casual",
+      "text": "Good luck, we'll be back in 24h",
       "avatar": "renders/avatars/nimbinatus.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/1538692?v=4"
     },
-    {
-      "id": "chat-17-nwoods",
-      "at": 56.724,
-      "dur": 4.588,
-      "kind": "chat",
-      "position": "letterbox",
-      "copy_source": "owner_supplied",
-      "text_source": "owner_supplied",
-      "speaker": "nwoods",
-      "text": "Delivery incoming: CNCF Marketing Material",
-      "avatar": "renders/avatars/nwoods.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/4604751?v=4"
-    },
-    {
-      "id": "chat-18-castrojo-bun",
-      "at": 61.312,
-      "dur": 2.2,
-      "kind": "chat",
-      "position": "letterbox",
-      "copy_source": "owner_supplied",
-      "text_source": "owner_supplied",
-      "speaker": "castrojo",
-      "text": "The man in the bun delivers",
-      "avatar": "renders/avatars/castrojo.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
-    },
-    {
-      "id": "chat-19-katiegreenly",
-      "at": 63.512,
-      "dur": 2.2,
-      "kind": "chat",
-      "position": "letterbox",
-      "copy_source": "owner_supplied",
-      "text_source": "owner_supplied",
-      "speaker": "k8tgreenley",
-      "text": "Still don't remember his name do you",
-      "avatar": "renders/avatars/k8tgreenley.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/97549260?v=4"
-    },
+
     {
       "id": "chat-20-joannalee333-clear-comms",
       "at": 65.712,
