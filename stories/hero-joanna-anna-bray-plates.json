@@ -55,12 +55,12 @@
     {
       "id": "hidden-liabilities",
       "at": 24.0,
-      "dur": 3.2,
+      "dur": 7.0,
       "kind": "scan",
       "position": "scan",
       "copy_source": "owner_supplied",
       "label": "Hidden Liabilities",
-      "why": "Frame review: Ana's red scan scope activates over the ships beneath the ice at 00:24 on the delivered timeline; the open amber reticle and leader attach the label to the scan map instead of adding a separate badge."
+      "why": "Frame review: Ana's red scan scope activates over the ships beneath the ice at 00:24 on the delivered timeline. Held through 00:31 to cover the full multi-ship scan pass; the open amber reticle and leader attach the label to the scan map instead of adding a separate badge."
     },
     {
       "id": "joanna-lee-anna-bray-reveal",
