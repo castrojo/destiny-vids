@@ -3,7 +3,18 @@
   "_source": "https://www.youtube.com/watch?v=wdQBD73mOh4",
   "_source_title": "Destiny 2: Warmind | Ana Bray Cinematic",
   "_source_duration_sec": 120.93,
-  "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // GUARDIAN / Troll Slayer / Joanna Lee / Law of the Frontier.",
+  "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // FIRST WARLOCK / Troll Slayer / Joanna Lee / Adjudicator of the Law.",
+  "bed": {
+    "source_url": "https://www.youtube.com/watch?v=hTdhXxxWREo",
+    "source_title": "NIGHTWISH - Bye Bye Beautiful (OFFICIAL MUSIC VIDEO)",
+    "start_sec": 0.0,
+    "why": "Recovered Whisp brief directs music only, with the bed beginning at the cut's first frame."
+  },
+  "tail_takeover": {
+    "at_sec": 110.0,
+    "asset": "assets/cta/linux-foundation-training-forest.png",
+    "why": "Owner direction, 2026-09-14: farm the Linux Foundation Training Forest from 1:50 through the end; the source audio continues unchanged."
+  },
   "plates": [
     {
       "id": "joanna-lee-anna-bray-reveal",
@@ -11,13 +22,20 @@
       "dur": 3.4,
       "position": "left",
       "copy_source": "owner_supplied",
-      "label": "TRUSTEE // GUARDIAN",
+      "label": "TRUSTEE // FIRST WARLOCK",
       "class": "Troll Slayer",
       "name": "Joanna Lee",
-      "title": "Law of the Frontier",
+      "title": "Adjudicator of the Law",
       "variant": "leader",
       "why": "Ana Bray is visibly in the 00:35.67-00:39.07 close-up, leaving the lower-left picture area open for the gold Guardian plate."
     }
   ],
-  "unresolved": []
+  "unresolved": [
+    {
+      "id": "seven-day-old-guardian-title-and-conversation",
+      "reason": "unseated_authored_copy",
+      "automatable": false,
+      "blocked_on": "The recovered Whisp brief supplies the title and 19-line conversation but no source-time seats. Rendering them without measured black-and-white-sequence boundaries would invent their placement."
+    }
+  ]
 }
