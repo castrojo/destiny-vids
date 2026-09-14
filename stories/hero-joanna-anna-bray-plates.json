@@ -25,8 +25,8 @@
       "start": 68.594,
       "end": 113.0
     },
-    "gain_db": -18.0,
-    "why": "The remote isolation pass could recover only a center-residual diagnostic, not a clean effects stem. Owner authorized its conservative fixed-gain mix under the instrumental for the second half."
+    "gain_db": -6.0,
+    "why": "The remote isolation pass could recover only a center-residual diagnostic, not a clean effects stem. Owner authorized a fixed -6 dB mix under the instrumental for the second half after the initial -18 dB audition was inaudible."
   },
   "slow_motion": {
     "delivery_at_sec": 86.5,
