@@ -1861,6 +1861,74 @@ def test_status_card_sits_top_left_not_in_the_lower_third():
     assert top < plate.FRAME_H * 0.25, "status card is not at the top"
     assert left < plate.FRAME_W * 0.25, "status card is not at the left"
 
+
+def test_scan_readout_is_open_amber_geometry_not_a_badge():
+    img = plate.render_plate({
+        "id": "scan-result",
+        "at": 24.0,
+        "dur": 3.2,
+        "kind": "scan",
+        "position": "scan",
+        "label": "Hidden Liabilities",
+    })
+    assert img.size == (plate.FRAME_W, plate.FRAME_H)
+    box = img.getbbox()
+    assert box is not None
+    assert box[0] < plate.SCAN_TEXT_X
+    assert box[2] > plate.SCAN_TARGET_X
+
+    visible = img.width * img.height - img.getchannel("A").histogram()[0]
+    bbox_area = (box[2] - box[0]) * (box[3] - box[1])
+    assert visible < bbox_area * 0.4, "scan treatment became a filled panel"
+
+    blue_pixels = sum(
+        1 for red, green, blue, alpha in img.get_flattened_data()
+        if alpha > 40 and blue > red and blue > green
+    )
+    assert blue_pixels == 0
+
+
+def test_scan_readout_preserves_the_authored_label_case(monkeypatch):
+    drawn = []
+    original = plate._draw_tracked
+
+    def capture(draw, xy, text, font, fill, spacing):
+        drawn.append(text)
+        return original(draw, xy, text, font, fill, spacing)
+
+    monkeypatch.setattr(plate, "_draw_tracked", capture)
+    plate.render_plate({
+        "id": "scan-result",
+        "at": 24.0,
+        "dur": 3.2,
+        "kind": "scan",
+        "position": "scan",
+        "label": "Hidden Liabilities",
+    })
+    assert drawn == ["Hidden Liabilities"]
+
+
+def test_joanna_hidden_liabilities_is_the_scan_readout_at_the_authored_clock():
+    manifest = json.loads(
+        (plate.REPO_ROOT / "stories/hero-joanna-anna-bray-plates.json")
+        .read_text(encoding="utf-8")
+    )
+    cue = next(p for p in manifest["plates"] if p["id"] == "hidden-liabilities")
+    assert {
+        "at": cue["at"],
+        "dur": cue["dur"],
+        "kind": cue["kind"],
+        "position": cue["position"],
+        "label": cue["label"],
+    } == {
+        "at": 24.0,
+        "dur": 3.2,
+        "kind": "scan",
+        "position": "scan",
+        "label": "Hidden Liabilities",
+    }
+
+
 def test_glitch_splits_the_type_and_tears_the_card():
     """The CSS applies the split as a *text*-shadow, so the panel keeps clean
     edges; the clip-path tear cuts a band out of the whole card."""
