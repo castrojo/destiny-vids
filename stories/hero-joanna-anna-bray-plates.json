@@ -285,6 +285,19 @@
       "text": "Still don't remember his name do you",
       "avatar": "renders/avatars/k8tgreenley.png",
       "avatar_url": "https://avatars.githubusercontent.com/u/97549260?v=4"
+    },
+    {
+      "id": "chat-20-joannalee333-clear-comms",
+      "at": 59.712,
+      "dur": 2.882,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "Clear comms, time to go to work, see you soon ...",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
     }
   ],
   "unresolved": [
