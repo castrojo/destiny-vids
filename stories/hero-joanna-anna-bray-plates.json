@@ -33,13 +33,13 @@
     },
     {
       "id": "hidden-liabilities",
-      "at": 28.0,
+      "at": 24.0,
       "dur": 3.2,
       "kind": "status",
       "position": "status",
       "copy_source": "owner_supplied",
       "label": "Hidden Liabilities",
-      "why": "Owner-directed label over the ships beneath the ice at 00:22."
+      "why": "Frame review: Ana's red scan scope activates over the ships beneath the ice at 00:24 on the delivered timeline."
     },
     {
       "id": "joanna-lee-anna-bray-reveal",
