@@ -5,10 +5,10 @@
   "_source_duration_sec": 120.93,
   "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // FIRST WARLOCK / Troll Slayer / Joanna Lee / Adjudicator of the Law.",
   "bed": {
-    "source_url": "https://www.youtube.com/watch?v=nbtcFghyuN8",
-    "source_title": "Storytime (Remastered)",
-    "start_sec": 172.0,
-    "why": "Owner direction, 2026-09-14: replace the recovered Whisp bed with Storytime (Remastered), beginning at source 02:52."
+    "source_url": "https://www.youtube.com/watch?v=tweTY6Y_G5E",
+    "source_title": "Nightwish - Where Were You Last Night (Instrumental)",
+    "start_sec": 0.0,
+    "why": "Owner direction, 2026-09-14: replace Storytime with the supplied instrumental source."
   },
   "tail_takeover": {
     "at_sec": 113.0,
