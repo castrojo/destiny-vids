@@ -11,9 +11,9 @@
     "why": "Owner direction, 2026-09-14: replace Storytime with the supplied instrumental source."
   },
   "tail_takeover": {
-    "at_sec": 114.5,
+    "at_sec": 110.0,
     "asset": "assets/cta/linux-foundation-training-forest.png",
-    "why": "Owner direction, 2026-09-14: cut the picture after 01:47 and begin the Linux Foundation Training Forest ending splash. The slow-motion beat extends the delivered timeline by 1.5 seconds while preserving this source cut point."
+    "why": "Owner direction, 2026-09-14: begin the Linux Foundation Training Forest ending splash at the black cut at 01:50."
   },
   "sfx_overlay": {
     "kind": "diagnostic_center_residual_not_sfx_only",
