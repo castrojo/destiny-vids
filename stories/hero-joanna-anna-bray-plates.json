@@ -29,12 +29,12 @@
     "why": "The remote isolation pass could recover only a center-residual diagnostic, not a clean effects stem. Owner authorized its conservative fixed-gain mix under the instrumental for the second half."
   },
   "slow_motion": {
-    "delivery_at_sec": 82.0,
-    "source_at_sec": 76.0,
-    "source_duration_sec": 1.5,
-    "speed": 0.5,
+    "delivery_at_sec": 86.5,
+    "source_at_sec": 80.5,
+    "source_duration_sec": 1.0,
+    "speed": 0.333333333,
     "delivery_duration_sec": 3.0,
-    "why": "Owner direction, 2026-09-14: a short dramatic slow-motion beat at 01:22. The music and diagnostic residual continue at normal speed."
+    "why": "Frame review: Ana is airborne only from source 01:20.50 through 01:21.50. Owner direction, 2026-09-14: slow this short leap to 33%; the music and diagnostic residual continue at normal speed."
   },
   "plates": [
     {
