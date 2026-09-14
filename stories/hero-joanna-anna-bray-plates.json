@@ -17,6 +17,16 @@
   },
   "plates": [
     {
+      "id": "hidden-liabilities",
+      "at": 22.0,
+      "dur": 3.2,
+      "kind": "caption",
+      "position": "caption",
+      "copy_source": "owner_supplied",
+      "text": "Hidden Liabilities",
+      "why": "Owner-directed label over the ships beneath the ice at 00:22."
+    },
+    {
       "id": "joanna-lee-anna-bray-reveal",
       "at": 35.67,
       "dur": 3.4,
