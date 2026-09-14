@@ -1,0 +1,23 @@
+{
+  "_what": "Joanna Lee's owner-authored Anna Bray hero credit over the Warmind cinematic.",
+  "_source": "https://www.youtube.com/watch?v=wdQBD73mOh4",
+  "_source_title": "Destiny 2: Warmind | Ana Bray Cinematic",
+  "_source_duration_sec": 120.93,
+  "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // GUARDIAN / Troll Slayer / Joanna Lee / Law of the Frontier.",
+  "plates": [
+    {
+      "id": "joanna-lee-anna-bray-reveal",
+      "at": 35.67,
+      "dur": 3.4,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "TRUSTEE // GUARDIAN",
+      "class": "Troll Slayer",
+      "name": "Joanna Lee",
+      "title": "Law of the Frontier",
+      "variant": "leader",
+      "why": "Ana Bray is visibly in the 00:35.67-00:39.07 close-up, leaving the lower-left picture area open for the gold Guardian plate."
+    }
+  ],
+  "unresolved": []
+}
