@@ -108,11 +108,22 @@ def _clip_paths(plan):
 
 def test_the_programme_seats_every_movement(plan, movements):
     paths = _clip_paths(plan)
+    # Movement 2 is embedded in Act II's front section (Prod/02-endlessformsmostbeautiful.mp4)
+    # and must never be seated as a standalone duplicate clip in megacut items.
+    assert "renders/perfume-2.mp4" not in paths, (
+        "perfume-2 is embedded in Act II; standalone placement causes duplicate playback"
+    )
+    # Verify Act II front builder explicitly embeds movement 2 (rebuild_efmb.sh)
+    rebuild_sh = (REPO_ROOT / "scripts" / "rebuild_efmb.sh").read_text(encoding="utf-8")
+    assert 'p2 = Path("renders/perfume-2.mp4")' in rebuild_sh or 'renders/perfume-2.mp4' in rebuild_sh
+    assert 'CLIP = 66.4' in rebuild_sh or '66.4' in rebuild_sh
+
     for movement in movements:
+        if movement["id"] == "perfume-2":
+            continue
         assert movement["out_file"] in paths, (
-            f"{movement['id']} is built but never plays")
-
-
+            f"{movement['id']} is built but never plays"
+        )
 def test_the_movements_sit_where_the_owner_put_them(plan):
     """The seats, by the act each one follows or precedes.
 
@@ -124,19 +135,11 @@ def test_the_movements_sit_where_the_owner_put_them(plan):
     def seat(needle):
         return next(i for i, p in enumerate(paths) if needle in p)
 
-    assert seat("01-intro") < seat("renders/perfume-2.mp4") < seat("02-endless")
+    # Movement 2 is embedded directly inside Act II's front section (scripts/rebuild_efmb.sh)
+    assert seat("01-intro") < seat("02-endless")
     assert seat("03-mrbobbytables") < seat("renders/perfume-3.mp4") < seat("04-kat")
     assert seat("06-7daystothewolves") < seat("renders/perfume-4.mp4") < seat("07-europa")
     assert seat("07-europa") < seat("renders/perfume-5.mp4") < seat("08-credits")
-
-
-def test_movement_two_fades_up_over_the_prologues_fade_down(plan):
-    """6.2 s is not a default -- it is the prologue's own fade, reversed."""
-    item = next(i for i in plan["items"]
-                if i.get("path") == "renders/perfume-2.mp4")
-    assert item["fade_in"] == pytest.approx(PROLOGUE_FADE)
-    assert item["fade_out"] == 0, "the 4:36 join is a hard cut"
-
 
 def test_no_movement_announces_itself(plan, movements):
     """No slide, no chapter marker: the numerals are load-bearing.
