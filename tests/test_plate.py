@@ -2306,6 +2306,17 @@ def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
     for a, b in zip(tail_lines, tail_lines[1:]):
         assert a["at"] + a["dur"] <= b["at"] + 0.001, f"{a['id']} overlaps {b['id']}"
 
+    # No tail pill may overlap an unbonded gold reveal or another card on screen
+    reveal_ids = {"cayde_reveal_castrojo", "gold_kelsey_hightower", "gold_brian_ketelsen", "gold_angie_jones"}
+    reveals = {p["id"]: p for p in plates if p["id"] in reveal_ids}
+    for line in tail_lines:
+        bond = line.get("bond_of")
+        for rid, rev in reveals.items():
+            if bond == rid:
+                continue
+            assert (line["at"] + line["dur"] <= rev["at"] + 0.001
+                    or rev["at"] + rev["dur"] <= line["at"] + 0.001), (
+                f"{line['id']} overlaps {rid}")
 # --- the letterbox banner (owner brief, issue #98) ---------------------------
 
 BANNER = {

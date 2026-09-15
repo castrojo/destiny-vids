@@ -102,6 +102,13 @@ the manifest is an *output*: `tools/plate.py` re-syncs it from the chapter
 file before every burn, so a hand-edit is reverted at the moment it would
 otherwise reach a frame.
 
+**Authored plates preserve chapter order; derived plates interleave by time.**
+When `tools/chapter_md.py` syncs a chapter file into a manifest that carries
+derived plates (such as Act VI's `brief` roster nameplates), the authored plates
+are emitted strictly in the order they appear in the chapter file. Derived plates
+are carried through and interleaved by time order relative to authored rows, so
+reordering dialogue or chapter cues in Markdown cannot be swallowed by the
+manifest's prior ordering.
 **A heading label lets a held frame derive its own duration.** Writing
 `## <heading> <label>` (for example `## 9:52.203 paused`) tags every entry
 under that heading until the next one, and `chapter_md.block_end(act, label)`

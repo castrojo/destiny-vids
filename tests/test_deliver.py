@@ -1661,3 +1661,27 @@ def test_the_segment_rung_does_not_tell_anyone_to_run_publish(tmp_path):
     detail = programme.findings[0].detail
     assert "publish" not in detail, detail
     assert "delivery.json" in detail
+def test_build_scoped_to_act_rebuilds_only_named_act():
+    """`build --act VI` scopes rebuild actions to the named act and schedules megacut."""
+    act_a = deliver.Act(numeral="I", title="Act I", prod_file="01.mp4")
+    act_b = deliver.Act(numeral="VI", title="Act VI", prod_file="06.mp4")
+    masters = {
+        "I": {"rebuild": "echo rebuild_I", "sources": []},
+        "VI": {"rebuild": "echo rebuild_VI", "sources": []},
+    }
+    r_a = deliver.ActReport(act_a)
+    r_a.add("sources", deliver.STALE, "stale A")
+    r_a.add("link", deliver.OK, "ok")
+    r_b = deliver.ActReport(act_b)
+    r_b.add("sources", deliver.STALE, "stale B")
+    r_b.add("link", deliver.OK, "ok")
+    prog = deliver.ActReport(types.SimpleNamespace(numeral="", name="the programme", prod_file=None))
+    prog.add("megacut", deliver.OK, "ok")
+    logged = []
+    deliver.build(
+        [act_a, act_b], masters, {}, Path("/tmp/wolves"), Path("/tmp/megacut.json"),
+        [r_a, r_b], prog, dry_run=True, log=logged.append, only=["VI"]
+    )
+    rebuild_lines = [line for line in logged if "would rebuild" in line]
+    assert rebuild_lines == ["  would rebuild VI: echo rebuild_VI"]
+    assert any("would megacut" in line for line in logged)
