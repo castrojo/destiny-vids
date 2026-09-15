@@ -194,6 +194,14 @@ owner's placement disagree, the constraint yields or the work stops:
 "Fix X" is never authority to re-time Y. A finished section stays finished:
 touching it is a separate request, and it needs a separate yes.
 
+**Do not turn an iteration guess into a test.** During owner-led screening, a
+proposed seat, trim, cadence, or visual fix stays provisional until the owner
+confirms the rendered snippet. Render the smallest review clip, put it on the
+owner's screen, and wait for that confirmation first. Only then update or add
+tests that make the approved behavior permanent. A green assertion around an
+unconfirmed guess is not evidence; it is an unauthorized editorial decision
+made harder to remove.
+
 ### Nothing blocks a release
 
 **A gate may inform. It may never withhold the film.** There is no finding, no
