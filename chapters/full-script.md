@@ -30,9 +30,9 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `5:30.83` **ricardosalveti** — They wanted us to put AI in the glider so we did.
 - `5:34.60` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:35.90` PRESENT DAY
-- `5:55.00` **rochaporto** — The glider can take us around the solar system
-- `5:58.32` **angellk** — Yeah but this isn't Mars
-- `6:00.77` **raravena80** — Make it look like we know what we are doing
+- `5:55.08` **rochaporto** — The glider can take us around the solar system
+- `5:58.40` **angellk** — Yeah but this isn't Mars
+- `6:00.85` **raravena80** — Make it look like we know what we are doing
 - `6:03.88` **jrsapi** — That explains the slop
 - `6:13.83` Your choices are:
 - `6:13.90` Your choices are:

@@ -33,7 +33,7 @@ The builder derives those intervals from the records below.
 
 [chat_ricardo_ai] ricardosalveti @ 5:30.833 +3.4: They wanted us to put AI in the glider so we did.
 
-## 5:55
+## 5:55.083
 
 [rev_glider] rochaporto: The glider can take us around the solar system
 [rev_not_mars] angellk: Yeah but this isn't Mars

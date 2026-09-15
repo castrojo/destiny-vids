@@ -142,6 +142,15 @@ the rule already stated above and the only thing the master's FLAC breaks.
 folder or `/tmp` — never `work/`, which is tracked. A 35 KB cast log and a
 saved-position file were committed that way, and are removed with this change.
 
+### Confirm the picture before pinning it with tests
+
+During an owner-led screening, a proposed seat, trim, cadence, or visual fix is
+provisional until the owner confirms the rendered review clip. Make the
+smallest useful clip, cast it, and get that visual decision first. Only then
+add or update tests that preserve the approved behavior. Tests may protect an
+existing contract while the clip is provisional; they must not turn a new
+editorial guess into one.
+
 ### Keeping a screening alive across a rebuild
 
 The owner watches while work continues, so a new build has to reach the
