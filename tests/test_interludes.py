@@ -113,10 +113,10 @@ def test_the_programme_seats_every_movement(plan, movements):
     assert "renders/perfume-2.mp4" not in paths, (
         "perfume-2 is embedded in Act II; standalone placement causes duplicate playback"
     )
-    # Verify Act II front builder explicitly embeds movement 2 (rebuild_efmb.sh)
+    # Verify Act II front builder explicitly embeds movement 2 (scripts/rebuild_efmb.sh)
     rebuild_sh = (REPO_ROOT / "scripts" / "rebuild_efmb.sh").read_text(encoding="utf-8")
-    assert 'p2 = Path("renders/perfume-2.mp4")' in rebuild_sh or 'renders/perfume-2.mp4' in rebuild_sh
-    assert 'CLIP = 66.4' in rebuild_sh or '66.4' in rebuild_sh
+    assert 'p2 = Path("renders/perfume-2.mp4")' in rebuild_sh
+    assert 'CLIP = 66.4' in rebuild_sh
 
     for movement in movements:
         if movement["id"] == "perfume-2":
