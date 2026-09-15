@@ -369,13 +369,18 @@ those names live. Edit them there.
 
 [robertsirc_go] robertsirc @ 24:19 +2.2: Let's goooooo!
 
-## 24:23
 
-[robertsirc_trash] robertsirc @ 24:23 +2.2: Taking out the trash!
 
-## 24:26.715
 
-[castrojo_line_1] castrojo @ 24:26.715 +2.8: Now you are ready
+# UNRESOLVED / TODO(owner):
+# robertsirc_trash @ 24:23 +2.2 ("Taking out the trash!") collides with
+# owner-authored castrojo_line_1 seated verbatim at 24:23.557 (+2.8).
+# It is omitted from the plate schedule for this degraded render pending
+# owner decision on placement.
+
+## 24:23.557
+
+[castrojo_line_1] castrojo @ 24:23.557 +2.8: Now you are ready
 [castrojo_line_2] castrojo +2.8: In the world of technology there are the sheep
 [castrojo_line_3] castrojo +2.8: And then there are the wolves
 
