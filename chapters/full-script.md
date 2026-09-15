@@ -121,10 +121,8 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:31.90` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
 - `7:34.90` **pastaq** — All your tests passed right?
 - `7:38.90` **LionHeartP** — What tests?
-- `7:41.35` **A1RM4X** — Thank you I never thought I could help!
 - `7:41.35` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
-- `7:43.89` **A1RM4X** — I'm not like you I'm just a lowly user
-- `7:46.38` **GloriousEggroll** — It's your patch, turn the stream on
+- `7:44.90` **A1RM4X** — Thank you I never thought I could help!
 - `7:49.00` **angellk** — Like cardio!
 - `7:53.00` **jrsapi** — This is getting sloppy!
 - `7:55.45` **angellk** — It's getting all over my dress!
