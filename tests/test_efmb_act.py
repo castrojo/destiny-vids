@@ -102,9 +102,10 @@ def test_hallway_interruption_is_compact_and_preserves_authored_boundaries():
     by_id = {p["id"]: p for p in manifest["plates"]}
     assert build_efmb.AMBER_CLIP_IN == pytest.approx(43.000)
     assert build_efmb.AMBER_CLIP_OUT == pytest.approx(53.470)
-    assert by_id["chat_amber_bazaar"]["at"] + by_id["chat_amber_bazaar"]["dur"] <= build_efmb.AMBER_AT
+    assert by_id["chat_amber_bazaar"]["at"] + by_id["chat_amber_bazaar"]["dur"] == pytest.approx(build_efmb.AMBER_AT)
     assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT)
-    assert build_efmb.INTERRUPTION_SEC < 30.0
+    assert by_id["chat_kolunmi_level"]["at"] + by_id["chat_kolunmi_level"]["dur"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT)
+    assert build_efmb.INTERRUPTION_SEC == pytest.approx(26.337)
 
 def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
