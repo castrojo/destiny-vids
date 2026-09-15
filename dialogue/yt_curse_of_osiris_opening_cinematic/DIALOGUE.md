@@ -113,9 +113,9 @@ They've broken out of the sandbox
 
 Hive is the one stuck in the CNCF Sandbox!
 
-## d28 | osiris | 2:18.71 -> 2:21.24
+## d28 | sagira | 2:18.71 -> 2:21.24
 
-You need to apply, check your email, focus!
+But maintainers only open 7% of their emails
 
 ## d22 | osiris | 2:21.25 -> 2:24.08 | pin 2:15.21
 

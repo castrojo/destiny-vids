@@ -38,13 +38,12 @@ CUES = [
     (94.750, 98.500, "We have never had more to lose."),
     (99.000, 105.000, "You are the dream of many ancestors"),
     (105.250, 111.500, "This one is machine and nerve, and has its mind concluded"),
-    (112.000, 114.200, "[ PREPARE FOR TITANFALL ]"),
 ]
 
 PLATFORM_WARS = {
-    "at": 114.200, "dur": 4.000,
+    "at": 112.000, "dur": 4.000,
     "title": "The Platform Wars",
-    "subtitle": "2015-2019",
+    "subtitle": "1993-2019",
     "body": ["Guardians Deliver the Final Blow", "to Legacy Infrastructure"],
 }
 
@@ -106,21 +105,22 @@ def test_orlix_nameplate_uses_the_owner_supplied_github_identity():
     entry = next(e for e in _manifest() if e.get("id") == "orlix")
     assert entry["name"] == "OrliX"
     assert entry["avatar"] == "renders/avatars/orlix.png"
+    assert entry["avatar_url"] == "https://avatars.githubusercontent.com/u/891481?v=4"
 
-def test_warning_card_at_112_with_exact_text():
+def test_warning_card_at_116_with_exact_text():
     entries = _manifest()
     warn = next(e for e in entries if e.get("kind") == "warning")
-    assert warn["at"] == pytest.approx(112.0, abs=0.01)
+    assert warn["at"] == pytest.approx(116.0, abs=0.01)
     assert warn["dur"] == pytest.approx(2.2, abs=0.01)
     assert warn["position"] == "warning"
     assert warn["text"] == "[ PREPARE FOR TITANFALL ]"
     assert warn.get("copy_source") == "owner_supplied"
 
-def test_platform_wars_act_card_follows_the_warning():
+def test_warning_card_follows_platform_wars_slide():
     entries = _manifest()
-    pw = next(e for e in entries if e.get("kind") == "act" and "Platform Wars" in e.get("title", ""))
+    pw = next(e for e in entries if e.get("id") == "platform-wars")
     warn = next(e for e in entries if e.get("kind") == "warning")
-    assert pw["at"] == pytest.approx(warn["at"] + warn["dur"], abs=0.01)
+    assert warn["at"] == pytest.approx(pw["at"] + pw["dur"], abs=0.01)
     assert pw["dur"] == pytest.approx(PLATFORM_WARS["dur"], abs=0.01)
     assert pw["title"] == PLATFORM_WARS["title"]
     assert pw["subtitle"] == PLATFORM_WARS["subtitle"]
@@ -312,7 +312,8 @@ def test_caption_glyph_falls_back_to_plain_letter_when_mark_missing(tmp_path):
 
 def test_platform_wars_body_second_row_has_no_period():
     entries = _manifest()
-    pw = next(e for e in entries if e.get("kind") == "act" and "Platform Wars" in e.get("title", ""))
+    pw = next(e for e in entries if e.get("id") == "platform-wars")
+    assert pw["title"] == PLATFORM_WARS["title"]
     assert pw["body"] == ["Guardians Deliver the Final Blow", "to Legacy Infrastructure"]
 
 # --- Review finding 4: card freshness must not silently reuse stale/missing ---

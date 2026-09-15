@@ -607,7 +607,20 @@ def test_an_unauthored_non_derived_plate_is_dropped_with_a_note():
         before, [{"id": "pill", "text": "new"}])
     assert merged == [before[0], {"id": "pill", "text": "new"}]
     assert notes and "gone" in notes[0] and "dropped" in notes[0]
-
+def test_authored_plates_reorder_around_carried_through_derived_plate():
+    """Reordering authored plates in a chapter must not be swallowed by old manifest order."""
+    before = [
+        {"id": "first", "copy_source": "owner_supplied", "at": 10.0, "dur": 2.0},
+        {"id": "derived", "copy_source": "brief", "at": 15.0, "dur": 3.0},
+        {"id": "second", "copy_source": "owner_supplied", "at": 20.0, "dur": 2.0},
+    ]
+    authored = [
+        {"id": "second", "copy_source": "owner_supplied", "at": 10.0, "dur": 2.0},
+        {"id": "first", "copy_source": "owner_supplied", "at": 20.0, "dur": 2.0},
+    ]
+    merged, notes = chapter_md._merge_plates(before, authored)
+    assert [p["id"] for p in merged] == ["second", "derived", "first"]
+    assert notes == []
 
 # ---------------------------------------------------------------------------
 # The two portrait keys, from act II's migration.
@@ -882,3 +895,18 @@ def test_an_agent_note_can_span_lines_and_does_not_detach_the_rows_below():
 def test_a_note_between_two_pills_does_not_glue_them_together():
     assert _lines("kat: one\n>> a note <<\ntwo\n") == [
         ("kat", "one"), ("kat", "two")]
+
+
+def test_act_vi_opens_with_top_right_infrastructure_popups():
+    entries, _ = chapter_md.entries("VI")
+    popups = [entry for entry in entries if entry["id"].startswith("popup_18_")]
+    assert [entry["title"] for entry in popups] == [
+        "Humanity had conquered infrastructure",
+        "Uniting the entirety of Open Source",
+        "Under in one big white ball of hope in the sky",
+        "The warm white ball of Cloud Native brought many gifts",
+        "Deployment times halved",
+        "You even got some headcount",
+    ]
+    assert all(entry["kind"] == "title" and entry["position"] == "top-right"
+               for entry in popups)

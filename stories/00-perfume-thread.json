@@ -92,10 +92,8 @@
           "source_in": 245.96,
           "source_out": 252.2,
           "art": [
-            "eyes",
-            "lazy-days"
-          ],
-          "turn_sec": 0.5
+            "bluefin-day"
+          ]
         }
       ],
       "_replacements": "Owner 2026-08-15: '13:16 - replace all the ghost renditions of the band in this section with pictures of bluefin from the extra wallpapers', naming seven: bluefin, prey, dusk, huntress, leafcollector, eyes, lazydays. ALL THE GHOSTS, not just the one at the owner's timestamp -- the note says 'all ... in this section', so the section was scanned rather than the stamp taken literally. Programme 13:16 is source 220.767, inside the library sequence. Shot boundaries came from `select='gt(scene,0.10)'` over 210-258 and every candidate was checked on an extracted frame; exactly THREE shots are ghost renditions: 217.680-220.880 the singer, 234.360-240.560 a figure walking the stacks, 245.960-252.200 a seated reader whose face becomes a skull. The other shots in the section are books, specimens and birds and are left alone. SEVEN WALLPAPERS ACROSS THREE SHOTS, in the owner's own order, so all seven appear: 2 + 3 + 2. Night variants where the artwork ships a pair, because the sequence they replace is a dark library. TWO OF THE OWNER'S NAMES ARE NOT THE DIRECTORY NAMES and the mapping is written down rather than guessed: leafcollector -> leaf-collector, lazydays -> lazy-days."

@@ -1418,7 +1418,7 @@ def record_segment_digests(delivery_path, only, log=print):
 
 
 def build(acts, masters, social, wolves, plan_path, reports, programme,
-          dry_run, delivery_path=None, log=print):
+          dry_run, delivery_path=None, log=print, only=None):
     """Rebuild what is stale, in dependency order: Prod links, then the
     megacut, then the social copies. The graph is master -> Prod -> megacut
     -> 10mb, so a conflicted upstream link refuses the megacut rather than
@@ -1427,11 +1427,14 @@ def build(acts, masters, social, wolves, plan_path, reports, programme,
     conflicted = set()
     rebuilt = set()
     prod_mutations = set()
+    scope = {a.upper() for a in only} if only else None
     for r in reports:
         if not r.act.prod_file:
             continue
+        if scope and r.act.numeral.upper() not in scope:
+            continue
         src_f = next((f for f in r.findings if f.node == "sources"), None)
-        if src_f and src_f.state == STALE:
+        if (src_f and src_f.state == STALE) or (scope and r.act.numeral.upper() in scope):
             cmd = (masters.get(r.act.numeral) or {}).get("rebuild")
             if cmd:
                 argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
@@ -1724,10 +1727,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("command", choices=("status", "publish", "build"))
     ap.add_argument("--act", action="append", metavar="NUMERAL",
-                    help="publish: record the input digest for THIS act only "
-                         "(repeatable). Name the acts you actually rebuilt; a "
-                         "blanket publish certifies every act at once, which "
-                         "is how stale programmes shipped")
+                    help="publish/build: scope action to THIS act only "
+                         "(repeatable). For build, forces rebuild of named "
+                         "acts and limits rebuilds to them.")
     ap.add_argument("--segment", action="append", metavar="PATH",
                     help="publish: record the current inputs for this rebuilt "
                          "non-act renders/ segment only")
@@ -1794,7 +1796,8 @@ def main(argv=None):
                      args.dry_run, delivery_path=args.delivery)
     reports = gather(acts, masters, social, wolves, args.plan)
     return build(acts, masters, social, wolves, args.plan, reports,
-                 reports[-1], args.dry_run, delivery_path=args.delivery)
+                 reports[-1], args.dry_run, delivery_path=args.delivery,
+                 only=args.act)
 
 
 if __name__ == "__main__":

@@ -84,6 +84,7 @@ A Guardian nameplate carries **exactly**:
 | `class` | `Voidwalker Warlock` |
 | `name` | `Bob Killen` |
 | `title` | `Reconciler of the Plane` |
+| `tagline` | `"Solves Hard Problems"` — optional fifth owner-authored row |
 | `trustee` | `true` — the burnished-silver chrome |
 
 The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).
@@ -220,8 +221,11 @@ insert, and resolve the hold to its exact `source_at`.
 Owner-authored narration uses `kind: caption` in the top-safe rail while
 Guardian and companion cards keep the lower third. Scene-setting metadata uses
 `kind: context` above that lane; a full-screen deployment beat uses
-`kind: warning`. These are independent chrome rows, not extra nameplate fields,
-and each carries `copy_source: owner_supplied`. A caption's `glyphs` record
+`kind: warning`. A scanner result uses `kind: scan`: one authored `label` in an
+open amber bracket, joined by a hairline leader to a target reticle, with no
+opaque panel and no invented measurements or codes. These are independent
+chrome rows, not extra nameplate fields, and each carries
+`copy_source: owner_supplied`. A caption's `glyphs` record
 replaces a mark without changing its authored `text`; the renderer reserves the
 mark's real width before wrapping or centering, and a missing mark degrades to
 the plain authored letter. See

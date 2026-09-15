@@ -1,0 +1,309 @@
+{
+  "_what": "Joanna Lee's owner-authored Anna Bray hero credit over the Warmind cinematic.",
+  "_source": "https://www.youtube.com/watch?v=wdQBD73mOh4",
+  "_source_title": "Destiny 2: Warmind | Ana Bray Cinematic",
+  "_source_duration_sec": 120.93,
+  "_copy_provenance": "Owner instruction, 2026-09-14: gold Guardian plate reading TRUSTEE // FIRST WARLOCK / Troll Slayer / Joanna Lee / Adjudicator of the Law.",
+  "bed": {
+    "source_url": "https://www.youtube.com/watch?v=tweTY6Y_G5E",
+    "source_title": "Nightwish - Where Were You Last Night (Instrumental)",
+    "start_sec": 0.0,
+    "why": "Owner direction, 2026-09-14: replace Storytime with the supplied instrumental source."
+  },
+  "tail_takeover": {
+    "at_sec": 110.0,
+    "asset": "assets/cta/linux-foundation-training-forest.png",
+    "why": "Owner direction, 2026-09-14: begin the Linux Foundation Training Forest ending splash at the black cut at 01:50."
+  },
+  "sfx_overlay": {
+    "kind": "diagnostic_center_residual_not_sfx_only",
+    "source_window_sec": {
+      "start": 62.594,
+      "end": 107.0
+    },
+    "delivery_window_sec": {
+      "start": 68.594,
+      "end": 113.0
+    },
+    "gain_db": -6.0,
+    "why": "The remote isolation pass could recover only a center-residual diagnostic, not a clean effects stem. Owner authorized a fixed -6 dB mix under the instrumental for the second half after the initial -18 dB audition was inaudible."
+  },
+  "slow_motion": {
+    "delivery_at_sec": 86.5,
+    "source_at_sec": 80.5,
+    "source_duration_sec": 1.0,
+    "speed": 0.333333333,
+    "delivery_duration_sec": 3.0,
+    "why": "Frame review: Ana is airborne only from source 01:20.50 through 01:21.50. Owner direction, 2026-09-14: slow this short leap to 33%; the music and diagnostic residual continue at normal speed."
+  },
+  "plates": [
+    {
+      "id": "joanna-mission-brief",
+      "at": 0.0,
+      "dur": 6.0,
+      "kind": "act",
+      "position": "full",
+      "label": "MISSION BRIEF",
+      "title": "7 Day Old Guardian",
+      "body": [
+        "Lorem ipsum dolor sit amet.",
+        "Lorem ipsum dolor sit amet."
+      ],
+      "copy_source": "placeholder",
+      "why": "Owner requested a Wolves-style mission-brief title slide. The briefing prose remains visibly placeholder text until authored."
+    },
+    {
+      "id": "hidden-liabilities",
+      "at": 24.0,
+      "dur": 7.0,
+      "kind": "scan",
+      "position": "scan",
+      "copy_source": "owner_supplied",
+      "label": "Hidden Liabilities",
+      "why": "Frame review: Ana's red scan scope activates over the ships beneath the ice at 00:24 on the delivered timeline. Held through 00:31 to cover the full multi-ship scan pass; the open amber reticle and leader attach the label to the scan map instead of adding a separate badge."
+    },
+    {
+      "id": "joanna-lee-anna-bray-reveal",
+      "at": 34.0,
+      "dur": 10.0,
+      "position": "left",
+      "copy_source": "owner_supplied",
+      "label": "TRUSTEE // FIRST WARLOCK",
+      "class": "Troll Slayer",
+      "name": "Joanna Lee",
+      "title": "Adjudicator of the Law",
+      "variant": "leader",
+      "why": "Owner-directed seat over Ana Bray's badge shot from 00:28.00 through 00:38.00."
+    },
+    {
+      "id": "chat-01-castrojo",
+      "at": 6.0,
+      "dur": 3.059,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "castrojo",
+      "text": "Welcome to the team ... your first Lone Wolf Mission",
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
+    },
+    {
+      "id": "chat-02-krook",
+      "at": 9.059,
+      "dur": 3.059,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "krook",
+      "text": "The community notices when we fight alongside them.",
+      "avatar": "renders/avatars/krook.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1499840?v=4"
+    },
+    {
+      "id": "chat-03-mrbobbytables",
+      "at": 12.118,
+      "dur": 2.412,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "mrbobbytables",
+      "text": "Some choose not to fight. They're at home",
+      "avatar": "renders/avatars/mrbobbytables.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6500863?v=4"
+    },
+    {
+      "id": "chat-04-cblecker",
+      "at": 14.53,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "cblecker",
+      "text": "I am retired, I am wearing slippers",
+      "avatar": "renders/avatars/cblecker.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1431969?v=4"
+    },
+    {
+      "id": "chat-05-joannalee333-outperform",
+      "at": 16.73,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "Outperforming him should be easy",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-06-joannalee333-right",
+      "at": 18.93,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "You were right it feels",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-07-nimbinatus",
+      "at": 21.13,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "nimbatus",
+      "text": "Weird?",
+      "avatar": "renders/avatars/nimbinatus.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1538692?v=4"
+    },
+    {
+      "id": "chat-08-joannalee333-see",
+      "at": 23.33,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "I can see things",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-09-castrojo-work",
+      "at": 25.53,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "castrojo",
+      "text": "Do they work?",
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
+    },
+    {
+      "id": "chat-10-jeefy",
+      "at": 27.73,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "jeefy",
+      "text": "Do the zoom thing!",
+      "avatar": "renders/avatars/jeefy.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1394552?v=4"
+    },
+    {
+      "id": "chat-11-krook-creepy",
+      "at": 29.93,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "krook",
+      "text": "Creepy if you ask me",
+      "avatar": "renders/avatars/krook.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1499840?v=4"
+    },
+    {
+      "id": "chat-12-joannalee333-question",
+      "at": 44.1,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "I know what to do but one question",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-13-joannalee333-leaving",
+      "at": 46.3,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "Why are you leaving?",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-14-castrojo-budget",
+      "at": 48.5,
+      "dur": 3.824,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "castrojo",
+      "text": "Ultimately this is your budget so we had to make some compromises",
+      "avatar": "renders/avatars/castrojo.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1264109?v=4"
+    },
+    {
+      "id": "chat-15-joannalee333-value",
+      "at": 52.324,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "Oh ok, I'll just show my value then",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    },
+    {
+      "id": "chat-16-nimbinatus-casual",
+      "at": 54.524,
+      "dur": 2.2,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "nimbatus",
+      "text": "Good luck, we'll be back in 24h",
+      "avatar": "renders/avatars/nimbinatus.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1538692?v=4"
+    },
+
+    {
+      "id": "chat-20-joannalee333-clear-comms",
+      "at": 65.712,
+      "dur": 2.882,
+      "kind": "chat",
+      "position": "letterbox",
+      "copy_source": "owner_supplied",
+      "text_source": "owner_supplied",
+      "speaker": "joannalee333",
+      "text": "Clear comms, time to go to work, see you soon ...",
+      "avatar": "renders/avatars/joannalee333.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52938823?v=4"
+    }
+  ],
+  "unresolved": [
+    {
+      "id": "seven-day-old-guardian-title",
+      "reason": "unseated_authored_copy",
+      "automatable": false,
+      "blocked_on": "The recovered Whisp brief supplies the title but no source-time seat or approved title-card treatment."
+    }
+  ]
+}

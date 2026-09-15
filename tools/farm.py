@@ -1382,7 +1382,11 @@ def run_ffmpeg_chain_on_cluster(argvs, *, inputs, out, tmp_prefix=None,
     for local_path, content in (text_files or {}).items():
         dest = text_dests[str(local_path)]
         for local_str, pod_str in staged.items():
-            content = content.replace(local_str, pod_str)
+            resolved = str(Path(local_str).resolve())
+            if resolved != local_str and resolved in content:
+                content = content.replace(resolved, pod_str)
+            else:
+                content = content.replace(local_str, pod_str)
         if prefix:
             content = content.replace(prefix, f"{WORK_DIR}/chain")
         pod_text[dest[len(WORK_DIR) + 1:]] = content

@@ -52,7 +52,9 @@ single ffmpeg overlay rather than an image sequence.
 The cinematic chrome kinds are rendered by the same primitives:
 ``kind: "caption"`` is a top-safe narrative rail; ``kind: "context"`` is a
 restrained lower-left stack; ``kind: "warning"`` is a full-frame deployment
-card. ``caption`` supports structured glyphs that replace individual
+card; and ``kind: "scan"`` is an open amber reticle/readout integrated with
+scanner footage rather than boxed as a generic status badge. ``caption``
+supports structured glyphs that replace individual
 characters with a mark image while reserving the mark's real width during
 layout, so adjacent text stays visible.
 """
@@ -298,6 +300,27 @@ STATUS_INSET = 3.0 * REM
 # .wolves-guardian-plate-raised { bottom: auto; top: 28% }
 RAISED_TOP = 0.28
 
+# --- scanner result readout -------------------------------------------------
+# Ana Bray's Warmind scanner already supplies the visual system: thin amber
+# map rules, open target geometry, and no opaque information panels. This
+# readout follows those primitives instead of recolouring the site's boxed
+# status card. It intentionally occupies a full transparent frame so its
+# leader can connect the authored label to the on-screen scan target.
+SCAN_AMBER = (255, 211, 91, 245)
+SCAN_AMBER_DIM = (255, 211, 91, 128)
+SCAN_AMBER_FAINT = (255, 211, 91, 52)
+SCAN_TEXT_X = 458
+SCAN_TEXT_Y = 438
+SCAN_BRACKET_X = 414
+SCAN_TOP = 420
+SCAN_BOTTOM = 501
+SCAN_RULE_END_X = 760
+SCAN_TARGET_X = 1088
+SCAN_TARGET_Y = 363
+SCAN_TARGET_R = 18
+SCAN_FONT_SIZE = 1.55 * REM
+SCAN_TRACKING = 0.10
+
 # --- letterbox banner (owner brief, issue #98) -------------------------------
 # "a huge callout along the bottom of the letterbox ... Keep it up for the
 # whole song". One tracked line on the bottom bar of a letterboxed frame --
@@ -527,7 +550,9 @@ CARD_KINDS = ("act", "comic", "photo", "ending")
 # `warning` is deliberately NOT here: it renders a full 1920x1080 panel over
 # the picture, so it contends for the whole screen like any full-frame card
 # and gets no coexistence exemption.
-CHROME_ROWS = ("status", "miniboss", "achievement", "banner", "caption", "context")
+CHROME_ROWS = (
+    "status", "scan", "miniboss", "achievement", "banner", "caption", "context",
+)
 
 # --- group rows (the reference deck's roll call, ~/Videos/nameplates.json) ---
 # The deck's gp_* entries are one row of credits, doubly staggered: spatially,
@@ -1315,6 +1340,106 @@ def _render_status(spec, glitch=False):
     return img
 
 
+def _render_scan(spec):
+    """Open amber scanner result: authored label, leader, and target reticle.
+
+    The cue is geometry rather than a panel. A bracket holds the text, a thin
+    segmented rule joins it to the scanner's existing target, and a restrained
+    reticle makes the relationship legible without adding any invented readout
+    copy, numbers, or identity.
+    """
+    label = spec.get("label") or ""
+    frame = Image.new("RGBA", (FRAME_W, FRAME_H), (0, 0, 0, 0))
+
+    glow = Image.new("RGBA", frame.size, (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    path = [
+        (SCAN_BRACKET_X, SCAN_TOP),
+        (SCAN_RULE_END_X, SCAN_TOP),
+        (985, 389),
+        (SCAN_TARGET_X - SCAN_TARGET_R - 8, SCAN_TARGET_Y),
+    ]
+    gd.line(path, fill=SCAN_AMBER_FAINT, width=7, joint="curve")
+    gd.ellipse(
+        [
+            SCAN_TARGET_X - SCAN_TARGET_R - 5,
+            SCAN_TARGET_Y - SCAN_TARGET_R - 5,
+            SCAN_TARGET_X + SCAN_TARGET_R + 5,
+            SCAN_TARGET_Y + SCAN_TARGET_R + 5,
+        ],
+        outline=SCAN_AMBER_FAINT,
+        width=7,
+    )
+    frame.alpha_composite(glow.filter(ImageFilter.GaussianBlur(7)))
+
+    d = ImageDraw.Draw(frame)
+    d.line(path, fill=SCAN_AMBER_DIM, width=1, joint="curve")
+
+    # Open bracket: enough structure to read as a HUD readout, never a box.
+    d.line(
+        [
+            (SCAN_BRACKET_X + 27, SCAN_TOP),
+            (SCAN_BRACKET_X, SCAN_TOP),
+            (SCAN_BRACKET_X, SCAN_BOTTOM),
+            (SCAN_BRACKET_X + 17, SCAN_BOTTOM),
+        ],
+        fill=SCAN_AMBER,
+        width=2,
+        joint="curve",
+    )
+    d.line(
+        [(SCAN_BRACKET_X + 27, SCAN_BOTTOM), (SCAN_BRACKET_X + 155, SCAN_BOTTOM)],
+        fill=SCAN_AMBER_DIM,
+        width=1,
+    )
+
+    # Small calibration ticks borrow the map's node-and-rule rhythm without
+    # turning into textual measurements or codes.
+    for x in (704, 769, 834):
+        d.line([(x, SCAN_TOP - 4), (x, SCAN_TOP + 4)],
+               fill=SCAN_AMBER_DIM, width=1)
+
+    r = SCAN_TARGET_R
+    d.ellipse(
+        [SCAN_TARGET_X - r, SCAN_TARGET_Y - r,
+         SCAN_TARGET_X + r, SCAN_TARGET_Y + r],
+        outline=SCAN_AMBER_DIM,
+        width=1,
+    )
+    d.ellipse(
+        [SCAN_TARGET_X - 3, SCAN_TARGET_Y - 3,
+         SCAN_TARGET_X + 3, SCAN_TARGET_Y + 3],
+        fill=SCAN_AMBER,
+    )
+    for x1, y1, x2, y2 in (
+        (SCAN_TARGET_X - r - 8, SCAN_TARGET_Y,
+         SCAN_TARGET_X - r + 3, SCAN_TARGET_Y),
+        (SCAN_TARGET_X + r - 3, SCAN_TARGET_Y,
+         SCAN_TARGET_X + r + 8, SCAN_TARGET_Y),
+        (SCAN_TARGET_X, SCAN_TARGET_Y - r - 8,
+         SCAN_TARGET_X, SCAN_TARGET_Y - r + 3),
+        (SCAN_TARGET_X, SCAN_TARGET_Y + r - 3,
+         SCAN_TARGET_X, SCAN_TARGET_Y + r + 8),
+    ):
+        d.line([(x1, y1), (x2, y2)], fill=SCAN_AMBER, width=1)
+
+    f_label = _font("bold", SCAN_FONT_SIZE)
+    text = Image.new("RGBA", frame.size, (0, 0, 0, 0))
+    _draw_tracked(
+        ImageDraw.Draw(text),
+        (SCAN_TEXT_X, SCAN_TEXT_Y),
+        label,
+        f_label,
+        SCAN_AMBER,
+        SCAN_TRACKING,
+    )
+    text_glow = text.copy()
+    text_glow.putalpha(text.getchannel("A").point(lambda alpha: int(alpha * 0.25)))
+    frame.alpha_composite(text_glow.filter(ImageFilter.GaussianBlur(4)))
+    frame.alpha_composite(_with_text_shadow(text))
+    return frame
+
+
 def _render_banner(spec):
     """The letterbox callout: one tracked line, sized to the frame's width.
 
@@ -2091,6 +2216,8 @@ def render_plate(spec):
         return _render_achievement(spec)
     if spec.get("kind") == "status":
         return _render_status(spec, glitch=bool(spec.get("glitch")))
+    if spec.get("kind") == "scan":
+        return _render_scan(spec)
     if spec.get("kind") == "banner":
         return _render_banner(spec)
     if spec.get("kind") == "caption":
@@ -2124,7 +2251,7 @@ def render_plate(spec):
     if card:
         # The title card has no eyebrow and no class: its `title` is the display
         # line and `subtitle` sits under it, with `body` beneath both.
-        label, klass = "", ""
+        label, klass, tagline = "", "", ""
         name = spec.get("title") or ""
         title = spec.get("subtitle") or ""
         body = list(spec.get("body") or [])
@@ -2137,6 +2264,7 @@ def render_plate(spec):
         klass = "" if ghost else (spec.get("class") or "")
         name = spec.get("name") or ""
         title = spec.get("title") or ""
+        tagline = spec.get("tagline") or ""
         body = []
 
     widths = [
@@ -2144,6 +2272,7 @@ def render_plate(spec):
         _tracked_width(probe, klass, f_class, LS_CLASS),
         probe.textlength(name, font=f_name),
         _tracked_width(probe, title, f_title, LS_TITLE),
+        _tracked_width(probe, tagline, f_title, LS_TITLE),
         *(probe.textlength(line, font=f_class) for line in body),
         CREST * scale * 3,  # the header never collapses below crest + two rules
     ]
@@ -2154,7 +2283,8 @@ def render_plate(spec):
 
     gap = 0.35 * REM * scale
     crest_h = CREST * scale
-    stack = [(label, f_label), (klass, f_class), (name, f_name), (title, f_title)]
+    stack = [(label, f_label), (klass, f_class), (name, f_name), (title, f_title),
+             (tagline, f_title)]
     stack += [(line, f_class) for line in body]
     text_h = sum(f.size * 1.25 + gap for text, f in stack if text)
     box_h = int(round(PAD_TOP * scale + crest_h + gap + text_h + PAD_BOTTOM * scale))
@@ -2210,6 +2340,11 @@ def render_plate(spec):
     if title:
         w = _tracked_width(draw, title, f_title, LS_TITLE)
         _draw_tracked(draw, (cx - w / 2, y), title, f_title, variant["title"],
+                      LS_TITLE)
+        y += f_title.size * 1.25 + gap
+    if tagline:
+        w = _tracked_width(draw, tagline, f_title, LS_TITLE)
+        _draw_tracked(draw, (cx - w / 2, y), tagline, f_title, variant["title"],
                       LS_TITLE)
         y += f_title.size * 1.25 + gap
 
@@ -2304,6 +2439,10 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
         # letterbox bar.
         frame.alpha_composite(plate, (px + int(STATUS_INSET),
                                       py + int(STATUS_INSET)))
+        return frame
+    if position == "scan":
+        # Scan readouts draw their own frame-relative leader and reticle.
+        frame.alpha_composite(plate, (0, 0))
         return frame
     if position == "status-bottom":
         # The same HUD card, at the bottom. Owner instruction for act II's

@@ -353,7 +353,6 @@ LATE_PASS_REPLACEMENTS = {
     "solo_tulilirockz",
     "timed_krook",
     "timed_bedazzle",
-    "solo_kolunmi",
     "quote_cgwalters",
     "quote_siosm",
     "quote_jberkus",
@@ -506,14 +505,14 @@ SOLO = [
         # THE ARC HUNTER BEFORE KYLE. Owner, 2026-08-14: "the arc hunter
         # before kylegospo is https://github.com/kolunmi/ - add a nameplate."
         #
-        # The shot bounds are MEASURED, not eyeballed: a scene-change pass
-        # over source 320-342 puts cuts at 333.400 and 335.267, and 335.267 is
-        # exactly where Kyle's shot already started -- the two lists agreeing
-        # independently. 1.867 s of picture, the Guardian loosing an Arc bow.
+        # Owner, 2026-09-14: seat this complete plate at programme 10:08
+        # on the held hallway frame. The source window is the frame the
+        # interruption holds, not the later Arc-bow shot this plate replaced.
         "key": "kolunmi",
-        "src": (333.400, 335.267),
-        "seen": 334.300,
-        "why": "the Arc Hunter loosing a bow, one cut before Kyle's Sentinel",
+        "src": (323.933, 325.933),
+        "seen": 323.933,
+        "at_film": 324.2,
+        "why": "owner-seated on the held hallway frame at programme 10:08",
     },
     {
         "key": "KyleGospo",
@@ -1486,7 +1485,8 @@ def build():
                 | MAPPED_TAIL_REPLACEMENTS):
             continue
         src_in, src_out = b["src"]
-        at = (round(film_of(b["at_src"]), 3) if b.get("at_src")
+        at = (round(b["at_film"], 3) if b.get("at_film") is not None
+              else round(film_of(b["at_src"]), 3) if b.get("at_src")
               else _at(src_in, film_of))
         hold = clamp_hold(at, SOLO_HOLD, film_of)
         assert hold, (
