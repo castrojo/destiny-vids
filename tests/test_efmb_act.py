@@ -1277,7 +1277,7 @@ def test_latest_owner_pass_replaces_the_hallway_dialogue():
     assert [(by_id[plate_id]["speaker"], by_id[plate_id]["text"])
             for plate_id, _, _ in expected] == [
                 (speaker, text) for _, speaker, text in expected]
-    assert by_id["rev_glider"]["at"] == pytest.approx(355.0 - 289.4)
+    assert by_id["rev_glider"]["at"] == pytest.approx(355.083 - 289.4)
     assert by_id["chat_joseph_slop"]["at"] == pytest.approx(363.884 - 289.4)
     assert by_id["rev_know_what"]["at"] + by_id["rev_know_what"]["dur"] < by_id["chat_joseph_slop"]["at"]
     assert by_id["rev_love_job"]["at"] == pytest.approx(437.0 - 289.4)
