@@ -2287,13 +2287,13 @@ def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
         "the narration went back to being one stacked card")
 
     lines = [p for p in plates if p.get("kind") == "chat"]
-    # Six until 2026-08-23, when the owner added seven more: the mentor
-    # introductions and the four sayings that close the act.
-    assert len(tail_lines) == 10
+    # 13 lines: 3-line monologue intro ("Now you are ready..."), the mentors/past/present/future
+    # sequence, and the concluding sayings ("You will fail... and rise...").
+    assert len(tail_lines) == 13
     assert {p["speaker"] for p in tail_lines} == {"castrojo"}, (
         "the pills are his own lines; the reveal three cards earlier already "
         "said his name, so they carry his handle")
-    assert tail_lines[0]["text"] == "I follow my mentors"
+    assert tail_lines[0]["text"] == "Now you are ready"
     assert tail_lines[-1]["text"] == "and rise ..."
 
     # One per bar of the song, and the bar is the bed's own (3.157914 s).

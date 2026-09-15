@@ -273,7 +273,9 @@ Edit in `chapters/VI-wolves.md`.
 - `24:12.00` Christoph Blecker
 - `24:15.00` **akgraner** — Thanks for the rez Kyle!
 - `24:19.00` **robertsirc** — Let's goooooo!
-- `24:23.00` **robertsirc** — Taking out the trash!
+- `24:23.56` **castrojo** — Now you are ready
+- `24:26.61` **castrojo** — In the world of technology there are the sheep
+- `24:29.66` **castrojo** — And then there are the wolves
 - `24:45.00` Protector of the Helm / #HIREAWOLF // MAINTAINER / Robert Sirchia
 - `24:48.82` **castrojo** — I follow my mentors
 - `24:57.00` **castrojo** — Of the past
