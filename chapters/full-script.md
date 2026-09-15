@@ -108,12 +108,14 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
-- `6:49.75` **rochaporto** — One reference architecture coming up!
-- `6:58.30` **jrsapi** — I still don't know which Ricardo this is
+- `6:52.00` **rochaporto** — The glider can take us around the solar system
+- `6:55.32` **angellk** — Yeah but this isn't Mars
+- `6:57.77` **raravena80** — Make it look like we know what we are doing
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `7:04.48` **jrsapi** — The gamers would have to impress BOTH Ricardos
 - `7:07.43` **rochaporto** — Look man I am so tired just jump
 - `7:13.80` Do we even know who they are?
+- `7:17.00` **angellk** — I love this job
 - `7:20.47` SATURN
 - `7:23.30` **castrojo** — Time to get this driver upstream
 - `7:26.30` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
@@ -123,12 +125,13 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `7:39.30` **A1RM4X** — Thank you I never thought I could help!
 - `7:41.85` **A1RM4X** — I'm not like you I'm just a lowly user
 - `7:44.33` **GloriousEggroll** — It's your patch, turn the stream on
-- `7:46.78` **LionHeartP** — Let's get these numbers up
-- `7:49.23` **wrkode** — Oh dibs on this one
+- `7:49.00` **angellk** — Like cardio!
 - `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
-- `7:52.18` **GloriousEggroll** — There's nothing glorious about this job
-- `7:59.30` **LionHeartP** — When we work together
-- `8:03.50` **wrkode** — Have I shown you Kairos my friend?
+- `7:53.00` **jrsapi** — This is getting sloppy!
+- `7:55.45` **angellk** — It's getting all over my dress!
+- `7:58.00` **rochaporto** — Weren't we just here?
+- `8:00.45` **jrsapi** — I'm tired man we need new people
+- `8:04.00` **angellk** — Show them how the CNCF rolls
 - `8:09.30` **LionHeartP** — Nice work testing that patch
 - `8:12.00` **LionHeartP** — Usually Blueberries just send me a bunch of crap
 - `8:16.30` **LionHeartP** — You didn't test any of this did you.
@@ -138,40 +141,21 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:25.30` **castrojo** — Unlearning bad habits takes time
 - `8:28.30` **castrojo** — Your options are success
 - `8:31.50` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
-- `8:38.42` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
 - `8:46.20` **castrojo** — Or go blow some shit up
-- `8:59.73` **akgraner** — Hi sugar, I'm looking for Kyle
-- `9:02.18` **HikariKnight** — Ouch man wtf!
-- `9:04.63` **TBD** — Oh sorry my bad
-- `9:07.08` **kolunmi** — Who turned PvP on?
-- `9:09.53` **angellk** — Don't look at me I only turned on PVP
-- `9:12.78` **TBD** — Mom no one plays this game
-- `9:15.23` **HikariKnight** — Hey wait?!
-- `9:17.68` **kolunmi** — Are those ... other linux users?
-- `9:20.53` **akgraner** — "How bazaar?"
-- `9:22.98` **akgraner** — Who writes this crap?
-- `9:25.43` **akgraner** — Oh wow I forgot what the starter dungeon was like! Hi!
-- `9:34.65` **akgraner** — Remember, kindness is doing what's right
-- `9:37.26` **akgraner** — For the ecosystem
-- `9:39.71` **akgraner** — For our users
-- `9:42.16` **akgraner** — And for our maintainers
-- `9:44.61` **akgraner** — Don't be nice
-- `9:47.06` **akgraner** — Be kind
-- `9:49.51` **akgraner** — Extinction is the Rule
-- `9:52.20` **akgraner** — Ok so I'm going to clean out this trash for you
-- `9:55.22` **akgraner** — [Don't let them decide for you]
-- `9:57.67` **akgraner** — You make your own fate.
-- `10:00.12` **akgraner** — I can't save you from this shitty writing though
-- `10:14.94` **nwoods3** — I feel seen
-- `10:17.39` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `10:20.75` **HikariKnight** — Finally, I can play WARFRAME!
-- `10:23.60` Reprehenderit voluptate / HATERS
-- `10:29.20` **KyleGospo** — Sup
-- `10:31.25` **kolunmi** — Cardio!
-- `10:54.17` **castrojo** — Finally, retirement
-- `10:56.62` **castrojo** — The long walk beckons
+- `9:52.00` **castrojo** — There's the spirit
+- `9:54.45` **castrojo** — Never let stop energy tell YOUR story
+- `9:57.17` **castrojo** — Go forth and conquer my gamer children!
+- `10:00.02` **jrsapi** — We can't let The Toilmaster enslave another generation
+- `10:27.00` **angellk** — Don't look at me I only turned on Legendary Mode
+- `10:38.00` **akgraner** — Let me clean out this trash
+- `11:35.00` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `11:39.01` Reprehenderit voluptate / HATERS
+- `11:44.61` **KyleGospo** — Sup
+- `11:46.67` **kolunmi** — Cardio!
+- `12:09.58` **castrojo** — Finally, retirement
+- `12:12.03` **castrojo** — The long walk beckons
 
 ## III
 
@@ -214,20 +198,93 @@ Edit in `chapters/V-nat.md`.
 
 Edit in `chapters/VI-wolves.md`.
 
-- `19:30.03` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
-- `24:23.56` **castrojo** — For five years you've trusted us
-- `24:26.72` **castrojo** — Mastered your tools
-- `24:29.87` **castrojo** — Honed your craft
-- `24:33.03` **castrojo** — Depended on your friends
-- `24:36.19` **castrojo** — Now you're one of us, you are the dream
-- `24:39.35` Protector of the Helm / #HIREAWOLF // MAINTAINER / robertsirc
-- `24:48.82` **castrojo** — I follow my mentors of the past
-- `25:01.45` **castrojo** — Present
-- `25:04.61` **castrojo** — and Future
-- `25:07.77` **castrojo** — The only winning move is not to play
-- `25:10.93` **castrojo** — Think like a dinosaur
-- `25:14.08` **castrojo** — When you fall, rise.
-- `25:17.24` **castrojo** — We've got your back
+- `18:51.00` Humanity had conquered infrastructure
+- `18:53.45` Uniting the entirety of Open Source
+- `18:55.90` Under in one big white ball of hope in the sky
+- `18:58.35` The warm white ball of Cloud Native brought many gifts
+- `19:00.80` Deployment times halved
+- `19:03.25` You even got some headcount
+- `19:12.00` We reached out to the stars
+- `19:14.45` We basked in wonder at what we had built
+- `19:16.90` ... Ok
+- `19:23.00` The light of open source spread through our solar system
+- `19:25.45` Humanity used them together, in peace
+- `19:27.90` Except Europa, we were told to never make an attempt
+- `19:36.00` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
+- `19:45.00` Humanity united around our great cloud native civilization
+- `19:47.45` Our primary purpose had turned to knowledge sharing
+- `19:49.90` A beacon in what remained of our once great empire
+- `20:00.00` Each passing cycle the Toilmaster enboldens his attack
+- `20:02.45` Our noblest Maintainer-Guardians falling to burnout, or worse
+- `20:12.00` **jbryce** — The First Automator | Master Sommelier / DIRECTOR // GUARDIAN / Jonathan Bryce
+- `20:14.00` **jbryce** — We will empower those who come after
+- `20:19.00` **angellk** — Deploy all Guardians! We're under attack!
+- `20:22.05` **rochaporto** — Our infrastructure will suffer the Toilmaster
+- `20:25.10` **alolita** — Deploying our units to the southern perimeter
+- `20:28.35` **chira001** — Western Wall secured
+- `20:30.80` **chadbeaudin** — All fighter wings deployed, good hunting
+- `20:42.00` **akgraner** — Let's roll, interdictor squad on me!
+- `20:46.00` **marcoceppi** — Speeeeed!
+- `20:51.00` TERRIBLE AI MANDATE
+- `20:56.00` University of Michigan | VULTR / BLUEBERRY // MARKETING / Talia S.
+- `21:00.00` TRUSTEE // GUARDIAN / Abbey Bangser
+- `21:06.00` **mfahlandt** — MAINTAINER // GUARDIAN / Mario Fahlandt
+- `21:12.00` **Anita-ihuman** — How many of these things are there!
+- `21:15.00` **akgraner** — To me! Stay together!
+- `21:22.00` LACK OF INHOUSE CNCF EXPERTISE
+- `21:29.00` Same techdebt over and over
+- `21:35.00` **pthomas** — LAUNCH LAUNCH LAUNCH
+- `21:39.00` **mrbobbytables** — All sandboxes breached
+- `21:43.00` Destroyer of Budgets | Sapper of Talent | Tech Debt Conjurer / PLATFORM TORMENTOR
+- `21:43.00` **ingress-nginx** — I've had enough of your smug talk
+- `21:46.00` **akgraner** — Kyle will destroy you
+- `21:50.00` Cloud Native New York City
+- `21:50.00` **abebars** — You picked the wrong town
+- `21:52.05` **justaugustus** — And the wrong day
+- `21:54.00` **juliafmorgado** — Disco!
+- `21:57.00` **kevin-wangzefeng** — CNCF Projects team, plan "Bazzite" approved ... do it
+- `22:00.78` **jeremyrickard** — Full autonomous mode authorized
+- `22:03.23` **thschue** — Mechaphippy Deployment: [ APPROVED ]
+- `22:07.00` **alatiera** — I've brought some new toys Mister Clanker man ...
+- `22:11.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / James Reilly
+- `22:14.00` RISE FROM THE SLOP - OR DROWN IN IT / AI TORMENTOR
+- `22:21.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / Ahmed Adan
+- `22:26.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / Jordan Petridis
+- `22:32.00` **clubanderson** — Introducing our Elite Cloud Native Guardians
+- `22:35.00` WITH LESS / DELIVER MORE
+- `22:39.25` **shuahkh** — They're sending everything, you got this!
+- `22:49.00` **alatiera** — James you and your fucking SLOP!
+- `22:52.05` **hanthor** — That wasn't me!
+- `22:51.00` IS STILL FOUNDER OPS / AI FOUNDER OPS
+- `22:51.00` has force pushed to `main` / castrojo
+- `22:59.00` **hanthor** — Just connect Buildstream to Kubernetes!
+- `23:05.00` **ahmedadan** — Jordan does this mean you like AI?
+- `23:08.00` **alatiera** — No, Greeks can do this naturally. Ciao
+- `23:16.00` Synergy Optimized / CNCF and Apache Foundation
+- `23:26.00` Maintainer-Guardians clawed their way from the abyss
+- `23:28.45` And started to retake what was theirs
+- `23:30.90` To share and protect for for all humanity
+- `23:58.00` **bsherman** — Are we late?
+- `24:00.25` **krook** — What's with the snow gear?
+- `24:02.50` **pthomas** — Long story
+- `24:04.75` **bsherman** — We're new
+- `24:07.00` **p5** — But strong
+- `24:09.25` **fatherlinux** — Team Hummingbird reporting for duty!
+- `24:12.00` Christoph Blecker
+- `24:15.00` **akgraner** — Thanks for the rez Kyle!
+- `24:19.00` **robertsirc** — Let's goooooo!
+- `24:23.00` **robertsirc** — Taking out the trash!
+- `24:45.00` Protector of the Helm / #HIREAWOLF // MAINTAINER / Robert Sirchia
+- `24:48.82` **castrojo** — I follow my mentors
+- `24:57.00` **castrojo** — Of the past
+- `25:02.00` **castrojo** — The Present
+- `25:04.00` **castrojo** — And Future
+- `25:11.00` **castrojo** — You will fail
+- `25:13.45` **castrojo** — Don't let it take you
+- `25:15.90` **castrojo** — The only winning move is not to play
+- `25:18.35` **castrojo** — Think like a dinosaur
+- `25:20.80` **castrojo** — Lift each other
+- `25:23.25` **castrojo** — and rise ...
 
 ## P4
 

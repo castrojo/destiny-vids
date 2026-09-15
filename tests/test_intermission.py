@@ -47,15 +47,14 @@ def test_every_slide_comes_from_the_chapter_file():
     assert committed()["plates"] == deck
 
 
-def test_the_deck_is_all_placeholder_and_credits_nobody():
-    """Lorem under a real name is putting words in a colleague's mouth. The
-    deck names nobody at all, so there is nobody to misquote."""
+def test_the_breakdown_opens_with_the_owner_authored_title():
     plates = committed()["plates"]
-    assert plates
-    for spec in plates:
-        assert placeholder.is_placeholder(spec), spec["id"]
-        assert not spec.get("speaker")
-        assert not spec.get("avatar") and not spec.get("avatar_url")
+    first = plates[0]
+    assert first["copy_source"] == "owner_supplied"
+    assert first["label"] == "MISCOMMUNICATION BREAKDOWN"
+    assert first["title"] == "CLOUD NATIVE MEETS THE LINUX DESKTOP"
+    assert first["subtitle"] == "r/linux goes supernova, no one notices"
+    assert all(placeholder.is_placeholder(spec) for spec in plates[1:])
 
 
 def test_the_unwritten_copy_reaches_the_punch_list():
@@ -63,7 +62,7 @@ def test_the_unwritten_copy_reaches_the_punch_list():
     Markdown would report zero unwritten words -- the one direction that
     tool must never be wrong in."""
     found = {row["id"] for row in placeholder.scan()}
-    assert {p["id"] for p in committed()["plates"]} <= found
+    assert {p["id"] for p in committed()["plates"][1:]} <= found
 
 
 def test_the_missing_bed_is_recorded_rather_than_borrowed():

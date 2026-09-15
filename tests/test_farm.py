@@ -6,6 +6,7 @@ ffmpeg, or a network. The two tests that really encode are gated — one on a
 runnable local ffmpeg, one on a reachable cluster — so CI (neither) skips
 them.
 """
+import base64
 import json
 import os
 import re
@@ -467,3 +468,24 @@ def test_the_chunked_path_stages_a_glob_free_name(monkeypatch):
     assert local == src
     assert rel == "in/Beauty Of The Beast _X3WrCzLIIvk_.webm"
     assert not re.search(r"[\[\]*?]", rel)
+
+
+def test_chain_rewrites_absolute_concat_paths_for_relative_inputs(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    source = Path("input.mp4")
+    source.write_bytes(b"video")
+    concat = Path("inputs.txt")
+    out = Path("out.mp4")
+    captured = {}
+    monkeypatch.setattr(farm, "_execute_on_cluster",
+                        lambda **kwargs: captured.update(kwargs))
+    monkeypatch.setattr(farm, "_verify_fetched", lambda *args, **kwargs: None)
+
+    farm.run_ffmpeg_chain_on_cluster(
+        [["ffmpeg", "-f", "concat", "-i", str(concat), "-i", str(source),
+          "-c:v", "copy", str(out)]],
+        inputs=[source], out=out,
+        text_files={concat: f"file '{source.resolve()}'\n"})
+
+    expected = base64.b64encode(b"file '/work/in/00-input.mp4'\n").decode()
+    assert expected in captured["script"]

@@ -9,7 +9,7 @@
       "at": 0.0,
       "dur": 4.0,
       "position": "full",
-      "label": "The Dawn of Linux",
+      "label": "Linux and Kubernetes",
       "title": "Cloud Native finds the Gamers",
       "subtitle": "Yours to Shape",
       "copy_source": "owner_supplied",
@@ -22,13 +22,13 @@
       "dur": 4.0,
       "position": "full",
       "title": "The Platform Wars",
-      "subtitle": "2015-2019",
+      "subtitle": "1993-2019",
       "body": [
         "Guardians Deliver the Final Blow",
         "to Legacy Infrastructure"
       ],
       "copy_source": "owner_supplied",
-      "note": "Act I's tail card, verbatim (stories/megacut/megacut-hero-plates.json, id platform-wars), replayed here on the owner's instruction. Note the order is HIS: Platform Wars first, Titanfall second -- act I plays them the other way round."
+      "note": "Act I's tail card, replayed here on the owner's instruction: Platform Wars first, Titanfall second."
     },
     {
       "id": "front_titanfall",

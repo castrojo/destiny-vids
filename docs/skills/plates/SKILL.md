@@ -84,6 +84,7 @@ A Guardian nameplate carries **exactly**:
 | `class` | `Voidwalker Warlock` |
 | `name` | `Bob Killen` |
 | `title` | `Reconciler of the Plane` |
+| `tagline` | `"Solves Hard Problems"` — optional fifth owner-authored row |
 | `trustee` | `true` — the burnished-silver chrome |
 
 The deck's other authored shapes are the title card (`title`, `subtitle`, `body[]`) and the **chat card** (`speaker`, `text`) — see [`references/conversation-cards.md`](references/conversation-cards.md).

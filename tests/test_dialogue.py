@@ -372,19 +372,14 @@ def test_act_three_review_copy_and_splits_are_exact():
     assert ids.index("d20a") < ids.index("d20b") < ids.index("d21")
 
 
-def test_act3_bob_barks_at_the_maintainers_before_asking_for_them():
-    """Owner, 2026-08-24: 'add 2 new lines, at 2:13 "mrbobbytables: You need
-    to apply, check your email, focus!" then leave everything else.'
-
-    The later readable-hold pass keeps d28 unpinned and moves the maintainer
-    exchange to 2:15.21, after d28's required 2.53-second hold.
-    """
+def test_act3_clubanderson_explains_maintainer_email_rate():
+    """The owner reassigns the 14:49 programme cue to ClubAnderson."""
     data = dialogue.load_dialogue("yt_curse_of_osiris_opening_cinematic")
     cues = data["cues"]
     by_id = {cue["id"]: cue for cue in cues}
 
-    assert by_id["d28"]["text"] == "You need to apply, check your email, focus!"
-    assert by_id["d28"]["character"] == "osiris", "Bob Killen's character"
+    assert by_id["d28"]["text"] == "But maintainers only open 7% of their emails"
+    assert by_id["d28"]["character"] == "sagira", "ClubAnderson's character"
     assert by_id["d28"]["text_source"] == "owner_supplied"
     assert "pin_sec" not in by_id["d28"], (
         "d28 flows before the separately reseated d22 pin")
@@ -407,8 +402,8 @@ def test_act3_priority_dialogue_reseats_are_readable_and_identity_normalized():
                 "Iteration 7: Students serialize instead of parallelize"),
         "d06": (53.73, 56.79, "clubanderson",
                 "Bluefin's Hive is reprogramming them all as we speak"),
-        "d28": (138.71, 141.24, "mrbobbytables",
-                "You need to apply, check your email, focus!"),
+        "d28": (138.71, 141.24, "clubanderson",
+                "But maintainers only open 7% of their emails"),
         "d22": (141.25, 144.08, "mrbobbytables",
                 "We need to get a message to the CNCF Maintainers"),
     }

@@ -37,13 +37,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "Hey why are they shooting at me!",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 0.6,
    "dur": 2.4,
    "fade_in": 0.6,
    "fade_out_at": 2.75,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p2-bobby",
@@ -51,13 +49,11 @@
    "position": "letterbox",
    "speaker": "mrbobbytables",
    "text": "The gamers don't know you're here to help",
-   "avatar": "renders/avatars/mrbobbytables.png",
    "at": 3.3,
    "dur": 2.4118,
    "fade_in": 0.6,
    "fade_out_at": 5.462,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/6500863?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p2c-kat-nice",
@@ -65,13 +61,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "Nice to meet you too!",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 11.1,
    "dur": 2.2,
    "fade_in": 0.2,
    "fade_out_at": 13.05,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p3-kat-linux1",
@@ -79,13 +73,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "I miss ONE email now I gotta use a Linux desktop?",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 13.55,
    "dur": 2.8824,
    "fade_in": 0.6,
    "fade_out_at": 16.182,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p3b-kat-soundbet",
@@ -93,13 +85,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "How much you want to bet their sound just doesn't work?",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 16.682,
    "dur": 3.2353,
    "fade_in": 0.6,
    "fade_out_at": 19.667,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p3c-hey",
@@ -119,13 +109,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "I have better sh*t to do!",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 22.829,
    "dur": 2.2,
    "fade_in": 0.6,
    "fade_out_at": 24.779,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p4-kat-linux2",
@@ -133,13 +121,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "I miss ingress-nginx sometimes",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 25.279,
    "dur": 2.2,
    "fade_in": 0.6,
    "fade_out_at": 27.229,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p5-kat-linux3",
@@ -147,13 +133,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "Fine I'll fix your sh*t too",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 27.729,
    "dur": 2.2,
    "fade_in": 0.6,
    "fade_out_at": 29.679,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   },
   {
    "id": "p6-kat-cardio",
@@ -161,13 +145,11 @@
    "position": "letterbox",
    "speaker": "katcosgrove",
    "text": "Remember kids, cardio!",
-   "avatar": "renders/avatars/katcosgrove.png",
    "at": 30.179,
    "dur": 2.4,
    "fade_in": 0.6,
    "fade_out_at": 32.329,
-   "fade_out": 0.25,
-   "avatar_url": "https://avatars.githubusercontent.com/u/22032257?v=4"
+   "fade_out": 0.25
   }
  ],
  "cut_list": [

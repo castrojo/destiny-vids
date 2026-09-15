@@ -417,6 +417,13 @@ def test_even_division_remains_the_default(movements, thread):
     assert "xfade=transition=fade:duration=0.500:offset=1.350" in graph
 
 
+
+def test_the_final_perfume_three_ghost_uses_one_day_wallpaper(movements):
+    movement = _movement(movements, "perfume-3")
+    ghost = next(replacement for replacement in movement["replacements"]
+                 if replacement["id"] == "ghost-reader")
+    assert ghost["art"] == ["bluefin-day"]
+
 def test_turn_at_out_of_range_is_a_record_bug_not_a_render(thread):
     movement = _movement(thread["movements"], "perfume-2")
     bad = dict(movement["replacements"][0])

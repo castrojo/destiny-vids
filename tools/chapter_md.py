@@ -782,9 +782,14 @@ def block_end(act, label):
     way ``chapter()`` names what is wired instead of failing silently.
     """
     chap = chapter(act)
-    for block in parse(chap.path.read_text(encoding="utf-8")):
+    blocks = parse(chap.path.read_text(encoding="utf-8"))
+    for index, block in enumerate(blocks):
         if block["label"] != label:
             continue
+        if not block["lines"]:
+            if index + 1 == len(blocks):
+                raise ValueError(f"{act}: empty final block {label!r} has no end")
+            return round(blocks[index + 1]["anchor"] - chap.programme_start, 3)
         at, holds, _ = schedule_block(
             block, chap.programme_start,
             seats=seat_lines(act, block["lines"]))
@@ -1004,10 +1009,16 @@ BOSS_BASE = {
 
 def build_entry(act, b, n, line, start, hold, defaults, order=None):
     """One parsed row -> the plate the manifest carries for it."""
-    base = dict(BOSS_BASE if line["kind"] == "boss" else CHAT_BASE)
-    if line["kind"] == "card":
-        base = {"kind": line["card_kind"]}
+    base = {}
     base.update(defaults or {})
+    if line["kind"] == "boss":
+        base.update(BOSS_BASE)
+    elif line["kind"] == "card":
+        base["kind"] = line["card_kind"]
+        if line["card_kind"] == "-":
+            base.pop("kind", None)
+    elif "kind" not in base:
+        base.update(CHAT_BASE)
     if line["kind"] == "card":
         # A card names its own kind on its own row. The act default -- almost
         # always `chat`, because most rows in a chapter file are dialogue --

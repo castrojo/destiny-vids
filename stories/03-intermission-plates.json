@@ -2,8 +2,9 @@
  "_what": "The intermission slide deck that plays after act III and Perfume's third movement. GENERATED from the deck block in chapters/III-mrbobbytables.md -- edit the chapter file, then run `python3 scripts/build_intermission.py --write`.",
  "act": "III",
  "source": "chapters/III-mrbobbytables.md",
- "film_sec": 27.2,
+ "film_sec": 11.648,
  "unresolved": [
+  "line 2 of the intermission block is pinned 15.002s before the previous line clears; the pin is honoured and the two overlap on screen",
   "no bed is cleared or chosen for the intermission yet. Owner, 2026-08-23: 'I want to put a different song here eventually for now I need the text placeholder.' The deck renders silent and the megacut item carries no audio until one is picked.",
   "every word on these slides is lorem ipsum. `python3 tools/placeholder.py list` names them; replacing the copy is one edit to the chapter file and one `--write`."
  ],
@@ -14,46 +15,45 @@
    "at": 0.0,
    "dur": 6.0,
    "position": "slide",
-   "copy_source": "placeholder",
-   "label": "Lorem ipsum",
-   "label_source": "placeholder",
-   "title": "Dolor sit amet consectetur adipiscing elit",
-   "title_source": "placeholder"
+   "copy_source": "owner_supplied",
+   "label": "MISCOMMUNICATION BREAKDOWN",
+   "title": "CLOUD NATIVE MEETS THE LINUX DESKTOP",
+   "subtitle": "r/linux goes supernova, no one notices"
   },
   {
    "id": "intermission-2",
    "kind": "slide",
-   "at": 6.8,
+   "at": -8.752,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
    "label": "Sed do eiusmod",
-   "label_source": "placeholder",
    "title": "Tempor incididunt ut labore et dolore magna",
+   "label_source": "placeholder",
    "title_source": "placeholder"
   },
   {
    "id": "intermission-3",
    "kind": "slide",
-   "at": 13.6,
+   "at": -1.952,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
    "label": "Ut enim ad minim",
-   "label_source": "placeholder",
    "title": "Veniam quis nostrud exercitation ullamco laboris",
+   "label_source": "placeholder",
    "title_source": "placeholder"
   },
   {
    "id": "intermission-4",
    "kind": "slide",
-   "at": 20.4,
+   "at": 4.848,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
    "label": "Duis aute irure",
-   "label_source": "placeholder",
    "title": "In reprehenderit voluptate velit esse cillum",
+   "label_source": "placeholder",
    "title_source": "placeholder"
   }
  ]

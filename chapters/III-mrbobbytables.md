@@ -13,7 +13,7 @@ owns_plates: true
 # the arrangement is that the deck IS the concluding text of Bob's scene, so
 # it is edited where the rest of his scene is edited.
 deck: intermission
-field_order: id, kind, at, dur, position, copy_source, speaker, text
+field_order: id, kind, at, dur, position, copy_source, label, title, subtitle, speaker, text
 defaults:
   kind: chat
   position: left
@@ -101,15 +101,14 @@ python3 scripts/build_intermission.py --write     # regenerate the manifest
 python3 scripts/build_intermission.py --render    # and the film
 ```
 
-## 16:58.448 intermission
+## 17:14 intermission
 
-* [intermission-1] slide @ 16:58.448 +6.0
+* [intermission-1] slide @ 17:14 +6.0
   - position: slide
-  - copy_source: placeholder
-  - label: Lorem ipsum
-  - label_source: placeholder
-  - title: Dolor sit amet consectetur adipiscing elit
-  - title_source: placeholder
+  - copy_source: owner_supplied
+  - label: MISCOMMUNICATION BREAKDOWN
+  - title: CLOUD NATIVE MEETS THE LINUX DESKTOP
+  - subtitle: r/linux goes supernova, no one notices
 
 * [intermission-2] slide @ 17:05.248 +6.0
   - position: slide

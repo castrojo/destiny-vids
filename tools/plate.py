@@ -2251,7 +2251,7 @@ def render_plate(spec):
     if card:
         # The title card has no eyebrow and no class: its `title` is the display
         # line and `subtitle` sits under it, with `body` beneath both.
-        label, klass = "", ""
+        label, klass, tagline = "", "", ""
         name = spec.get("title") or ""
         title = spec.get("subtitle") or ""
         body = list(spec.get("body") or [])
@@ -2264,6 +2264,7 @@ def render_plate(spec):
         klass = "" if ghost else (spec.get("class") or "")
         name = spec.get("name") or ""
         title = spec.get("title") or ""
+        tagline = spec.get("tagline") or ""
         body = []
 
     widths = [
@@ -2271,6 +2272,7 @@ def render_plate(spec):
         _tracked_width(probe, klass, f_class, LS_CLASS),
         probe.textlength(name, font=f_name),
         _tracked_width(probe, title, f_title, LS_TITLE),
+        _tracked_width(probe, tagline, f_title, LS_TITLE),
         *(probe.textlength(line, font=f_class) for line in body),
         CREST * scale * 3,  # the header never collapses below crest + two rules
     ]
@@ -2281,7 +2283,8 @@ def render_plate(spec):
 
     gap = 0.35 * REM * scale
     crest_h = CREST * scale
-    stack = [(label, f_label), (klass, f_class), (name, f_name), (title, f_title)]
+    stack = [(label, f_label), (klass, f_class), (name, f_name), (title, f_title),
+             (tagline, f_title)]
     stack += [(line, f_class) for line in body]
     text_h = sum(f.size * 1.25 + gap for text, f in stack if text)
     box_h = int(round(PAD_TOP * scale + crest_h + gap + text_h + PAD_BOTTOM * scale))
@@ -2337,6 +2340,11 @@ def render_plate(spec):
     if title:
         w = _tracked_width(draw, title, f_title, LS_TITLE)
         _draw_tracked(draw, (cx - w / 2, y), title, f_title, variant["title"],
+                      LS_TITLE)
+        y += f_title.size * 1.25 + gap
+    if tagline:
+        w = _tracked_width(draw, tagline, f_title, LS_TITLE)
+        _draw_tracked(draw, (cx - w / 2, y), tagline, f_title, variant["title"],
                       LS_TITLE)
         y += f_title.size * 1.25 + gap
 

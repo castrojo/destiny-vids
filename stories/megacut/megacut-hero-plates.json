@@ -208,6 +208,7 @@
       "position": "left",
       "name": "OrliX",
       "avatar": "renders/avatars/orlix.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/891481?v=4",
       "note": "OWNER CORRECTION: Orlin is github.com/orlix. GitHub resolves that account as OrliX (id 891481); the plate uses the account's authored casing and portrait. Source window 70.5 - 77 is unchanged. No Guardian label, class, or title was supplied, so those rows remain omitted rather than inherited from Laura Santamaria."
     },
     {
@@ -335,7 +336,7 @@
     {
       "id": "act-i-warning",
       "kind": "warning",
-      "at": 112.0,
+      "at": 116.0,
       "dur": 2.2,
       "position": "warning",
       "text": "[ PREPARE FOR TITANFALL ]",
@@ -344,11 +345,11 @@
     {
       "id": "platform-wars",
       "kind": "act",
-      "at": 114.2,
+      "at": 112.0,
       "dur": 4.0,
       "position": "full",
       "title": "The Platform Wars",
-      "subtitle": "2015-2019",
+      "subtitle": "1993-2019",
       "body": [
         "Guardians Deliver the Final Blow",
         "to Legacy Infrastructure"

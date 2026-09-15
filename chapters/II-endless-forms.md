@@ -82,17 +82,24 @@ punch-list entry. <<
 
 ! [late_poor_technical_decisions] YOUR POOR TECHNICAL DECISIONS |
 
-[late_rochaporto_cern] rochaporto @ 6:49.750 +2.6: One reference architecture coming up!
-  - seen_at_src: 143.716
+
+## 6:52
+
+[rev_glider] rochaporto: The glider can take us around the solar system
+[rev_not_mars] angellk: Yeah but this isn't Mars
+[rev_know_what] raravena80: Make it look like we know what we are doing
 
 ## 6:58.300
 
-[late_jrsapi_notes] jrsapi @ 6:58.300 +2.6: I still don't know which Ricardo this is
-  - seen_at_src: 152.266
 
 [toc_joseph_worth] jrsapi @ 7:04.477 +2.706: The gamers would have to impress BOTH Ricardos
 
 [toc_ricardo] rochaporto @ 7:07.433 +2.4: Look man I am so tired just jump
+
+## 7:17
+
+[rev_love_job] angellk: I love this job
+  - position: letterbox
 
 ## 7:23.300
 
@@ -115,18 +122,26 @@ punch-list entry. <<
 
 [walk_ge_stream] GloriousEggroll @ 7:44.331 +2.2: It's your patch, turn the stream on
 
-[walk_a1rm4x] LionHeartP @ 7:46.781 +2.2: Let's get these numbers up
 
-[mapped_wrkode_dibs] wrkode @ 7:49.231 +2.7: Oh dibs on this one
+## 7:49
 
-[walk_ge_glorious] GloriousEggroll @ 7:52.181 +2.8: There's nothing glorious about this job
+[rev_like_cardio] angellk: Like cardio!
 
-## 7:59.300
 
-[mapped_lionheartp_together] LionHeartP @ 7:59.300 +3.8: When we work together
-  - seen_at_src: 219.366
+## 7:53
 
-[mapped_wrkode_kairos] wrkode @ 8:03.500 +3.0: Have I shown you Kairos my friend?
+[rev_getting_sloppy] jrsapi: This is getting sloppy!
+[rev_dress] angellk: It's getting all over my dress!
+
+
+## 7:58
+
+[rev_just_here] rochaporto: Weren't we just here?
+[rev_new_people] jrsapi: I'm tired man we need new people
+
+## 8:04
+
+[rev_cncf_rolls] angellk: Show them how the CNCF rolls
 
 ## 8:09.300
 
@@ -155,8 +170,6 @@ punch-list entry. <<
 
 [mapped_redacted_mines] castrojo @ 8:31.500 +3.648: Or a lifetime of servitude in the Toilmaster's Packaging Mines
 
-[owner_convo_joseph] jrsapi @ 8:38.417 +3.6: We can't let The Toilmaster enslave another generation
-  - seen_at_src: 303.117
 
 [mapped_kyle_titanfall] KyleGospo @ 8:43.750 +2.2: FOR TITANFALL!
   - seen_at_src: 308.450
@@ -164,72 +177,29 @@ punch-list entry. <<
 [mapped_redacted_blow] castrojo @ 8:46.200 +2.6: Or go blow some shit up
   - seen_at_src: 310.900
 
-## 8:59.733 paused
+## 9:52
 
-[mapped_akgraner_kyle] akgraner @ 8:59.733 +2.2: Hi sugar, I'm looking for Kyle
+[rev_cayde_spirit] castrojo: There's the spirit
+[rev_cayde_story] castrojo: Never let stop energy tell YOUR story
+[rev_cayde_children] castrojo: Go forth and conquer my gamer children!
+[owner_convo_joseph] jrsapi: We can't let The Toilmaster enslave another generation
 
-[mapped_hikari_ouch] HikariKnight @ 9:02.183 +2.2: Ouch man wtf!
+## 10:27 paused
 
-[mapped_owen_sorry] TBD @ 9:04.633 +2.2: Oh sorry my bad
-  - speaker_pending: Owen
+[rev_legendary] angellk: Don't look at me I only turned on Legendary Mode
 
-[mapped_kolunmi_pvp] kolunmi @ 9:07.083 +2.2: Who turned PvP on?
+## 10:38
 
-[chat_angellk_pvp] angellk @ 9:09.533 +2.2: Don't look at me I only turned on PVP
+[chat_amber_bazaar] akgraner: Let me clean out this trash
 
-[mapped_cam_noone] TBD @ 9:12.783 +2.2: Mom no one plays this game
-  - speaker_pending: cam
+## 10:40.200 amber-action
 
-[mapped_hikari_wait] HikariKnight @ 9:15.233 +2.2: Hey wait?!
+## 11:35 post-amber
 
-[mapped_kolunmi_users] kolunmi @ 9:17.683 +2.6: Are those ... other linux users?
+[chat_kolunmi_level] kolunmi: Hey did you see how we just loaded up in a new level?
 
-[chat_amber_bazaar] akgraner @ 9:20.533 +2.2: "How bazaar?"
 
-[chat_amber_crap] akgraner @ 9:22.983 +2.2: Who writes this crap?
-
-[chat_amber_dungeon] akgraner @ 9:25.433 +3.177: Oh wow I forgot what the starter dungeon was like! Hi!
-
-[mapped_akgraner_kindness_1] akgraner @ 9:34.653 +2.353: Remember, kindness is doing what's right
-  - scale: 1.18
-
-[mapped_akgraner_kindness_2] akgraner @ 9:37.256 +2.2: For the ecosystem
-  - scale: 1.18
-
-[mapped_akgraner_kindness_3] akgraner @ 9:39.706 +2.2: For our users
-  - scale: 1.18
-
-[mapped_akgraner_kindness_4] akgraner @ 9:42.156 +2.2: And for our maintainers
-  - scale: 1.18
-
-[mapped_akgraner_kindness_5] akgraner @ 9:44.606 +2.2: Don't be nice
-  - scale: 1.18
-
-[mapped_akgraner_kindness_6] akgraner @ 9:47.056 +2.2: Be kind
-  - scale: 1.18
-
-[mapped_which_kyle] akgraner @ 9:49.506 +2.2: Extinction is the Rule
-  - scale: 1.0
-
-## 9:52.203 amber-action
-
-[chat_amber_problem] akgraner @ 9:52.203 +2.765: Ok so I'm going to clean out this trash for you
-
-[chat_amber_decide] akgraner @ 9:55.218 +2.2: [Don't let them decide for you]
-
-[chat_amber_fate] akgraner @ 9:57.668 +2.2: You make your own fate.
-
-[chat_amber_shittywriting] akgraner @ 10:00.118 +2.824: I can't save you from this shitty writing though
-
-## 10:14.937 post-amber
-
-[chat_nwoods3_seen] nwoods3 @ 10:14.937 +2.2: I feel seen
-
-[chat_kolunmi_level] kolunmi @ 10:17.387 +3.118: Hey did you see how we just loaded up in a new level?
-
-[chat_hikari_warframe] HikariKnight @ 10:20.755 +2.366: Finally, I can play WARFRAME!
-
-## 10:23.601
+## 11:39.013
 
 ! [mapped_haters] HATERS @ 10:23.601 +5.0 |
   - source_anchor: 326.163
@@ -242,19 +212,19 @@ punch-list entry. <<
     Which reading is right is a judgement about the frame and is the owner's;
     the evidenced seat is kept until then.
 
-## 10:29.201
+## 11:44.613
 
 [mapped_kyle_sup] KyleGospo @ 10:29.201 +2.2: Sup
   - position: right
   - source_anchor: 331.763
 
-## 10:31.255
+## 11:46.667
 
 [mapped_kolunmi_disco] kolunmi @ 10:31.255 +2.2: Cardio!
   - source_anchor: 333.817
   - bond_of: mapped_kyle_sup
 
-## 10:54.168
+## 12:09.583
 
 [retirement-1] castrojo @ 10:54.168 +2.2: Finally, retirement
   - source_anchor: 358.497

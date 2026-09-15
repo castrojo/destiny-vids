@@ -882,3 +882,18 @@ def test_an_agent_note_can_span_lines_and_does_not_detach_the_rows_below():
 def test_a_note_between_two_pills_does_not_glue_them_together():
     assert _lines("kat: one\n>> a note <<\ntwo\n") == [
         ("kat", "one"), ("kat", "two")]
+
+
+def test_act_vi_opens_with_top_right_infrastructure_popups():
+    entries, _ = chapter_md.entries("VI")
+    popups = [entry for entry in entries if entry["id"].startswith("popup_18_")]
+    assert [entry["title"] for entry in popups] == [
+        "Humanity had conquered infrastructure",
+        "Uniting the entirety of Open Source",
+        "Under in one big white ball of hope in the sky",
+        "The warm white ball of Cloud Native brought many gifts",
+        "Deployment times halved",
+        "You even got some headcount",
+    ]
+    assert all(entry["kind"] == "title" and entry["position"] == "top-right"
+               for entry in popups)

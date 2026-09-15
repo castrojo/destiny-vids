@@ -241,10 +241,11 @@
       "id": "d28",
       "start_sec": 138.71,
       "end_sec": 141.24,
-      "character": "osiris",
+      "character": "sagira",
       "evidence": "owner_supplied",
-      "text": "You need to apply, check your email, focus!",
-      "text_source": "owner_supplied"
+      "text": "But maintainers only open 7% of their emails",
+      "text_source": "owner_supplied",
+      "recovered_text": "You need to apply, check your email, focus!"
     },
     {
       "id": "d22",

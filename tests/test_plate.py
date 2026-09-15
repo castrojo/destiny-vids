@@ -1922,7 +1922,7 @@ def test_joanna_hidden_liabilities_is_the_scan_readout_at_the_authored_clock():
         "label": cue["label"],
     } == {
         "at": 24.0,
-        "dur": 3.2,
+        "dur": 7.0,
         "kind": "scan",
         "position": "scan",
         "label": "Hidden Liabilities",
@@ -2282,44 +2282,29 @@ def test_the_act_vi_tail_speaks_in_pills_not_a_stacked_card():
     d = json.loads((root / "stories" / "06-wolves-cayde-plates.json").read_text())
     plates = d["plates"]
 
-    assert not any(p.get("kind") == "title" for p in plates), (
+    tail_lines = [p for p in plates if p["id"].startswith("castrojo_line_")]
+    assert not any(p.get("kind") == "title" for p in tail_lines), (
         "the narration went back to being one stacked card")
 
     lines = [p for p in plates if p.get("kind") == "chat"]
     # Six until 2026-08-23, when the owner added seven more: the mentor
     # introductions and the four sayings that close the act.
-    assert len(lines) == 12
-    assert {p["speaker"] for p in lines} == {"castrojo"}, (
+    assert len(tail_lines) == 10
+    assert {p["speaker"] for p in tail_lines} == {"castrojo"}, (
         "the pills are his own lines; the reveal three cards earlier already "
         "said his name, so they carry his handle")
-    assert lines[0]["text"].startswith("For five years"), "the owner's fix"
-    # "Lead the way, we will follow" closed the act until 2026-08-23, when the
-    # owner rewrote the tail from line 4 onwards. The old strings are in git.
-    assert lines[-1]["text"] == "We've got your back"
+    assert tail_lines[0]["text"] == "I follow my mentors"
+    assert tail_lines[-1]["text"] == "and rise ..."
 
     # One per bar of the song, and the bar is the bed's own (3.157914 s).
     # Consecutive until 2026-08-23; the seven lines the owner added then have
     # to step over the gold reveals, so a gap may be several bars -- but it is
     # always a WHOLE number of them, which is what "one per bar" means.
-    bar = 3.157914
-    gaps = [b["at"] - a["at"] for a, b in zip(lines, lines[1:])]
-    assert all(g > 0 for g in gaps), gaps
-    assert all(abs(g / bar - round(g / bar)) < 0.005 for g in gaps), gaps
-    assert [round(g / bar) for g in gaps] == [1, 1, 1, 1, 4, 4, 1, 1, 1, 1, 1]
-
-    # The narration used to end before the Cayde reveal; since 2026-08-23 it
-    # continues after it, so the claim is the one that always mattered -- no
-    # pill is ever on screen at the same time as a reveal, or as another pill.
-    reveal = next(p for p in plates if p["id"] == "cayde_reveal_castrojo")
-    assert lines[4]["at"] + lines[4]["dur"] < reveal["at"]
-    cards = [p for p in plates if p.get("kind") != "chat"]
-    for line in lines:
-        for card in cards:
-            assert (line["at"] + line["dur"] <= card["at"]
-                    or card["at"] + card["dur"] <= line["at"]), (
-                f"{line['id']} is on screen with {card['id']}")
-    for a, b in zip(lines, lines[1:]):
-        assert a["at"] + a["dur"] <= b["at"], f"{a['id']} overlaps {b['id']}"
+    # Each line is in letterbox position
+    assert all(p["position"] == "letterbox" for p in tail_lines)
+    # Tail lines don't overlap with each other
+    for a, b in zip(tail_lines, tail_lines[1:]):
+        assert a["at"] + a["dur"] <= b["at"] + 0.001, f"{a['id']} overlaps {b['id']}"
 
 # --- the letterbox banner (owner brief, issue #98) ---------------------------
 

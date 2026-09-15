@@ -167,16 +167,6 @@
   },
   {
    "kind": "clip",
-   "path": "renders/excision/excision-plated.mp4",
-   "audio": "source",
-   "fade_in": 0.0,
-   "fade_out": 0.0,
-   "label": "Excision \u2014 first battle: rally, Ward of Dawn, and the Witness unmade",
-   "_what": "NON-ACT connective tissue. No numeral, no chapter marker and no Prod/NN path. The owner asked for the Excision mission before Europa with Saint-14/Kat, a first-battle HUD for John Bazzite, and a plated fireteam. The source rally's subtitle rail is removed from its black matte; gameplay comes from a no-HUD third-person capture so the clean gate remains truthful.",
-   "_seat": "Owner-decision default from epic #371: after act VI and before Perfume movement 4a. This does not break movement 4b's authored hard cut into Europa."
-  },
-  {
-   "kind": "clip",
    "path": "renders/perfume-4.mp4",
    "audio": "source",
    "fade_in": 0.0,
