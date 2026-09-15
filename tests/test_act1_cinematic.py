@@ -107,25 +107,13 @@ def test_orlix_nameplate_uses_the_owner_supplied_github_identity():
     assert entry["avatar"] == "renders/avatars/orlix.png"
     assert entry["avatar_url"] == "https://avatars.githubusercontent.com/u/891481?v=4"
 
-def test_warning_card_at_116_with_exact_text():
+def test_act1_tail_cards_moved_to_act2_front():
+    # Owner instruction (turn 5, 132): Platform Wars and [ PREPARE FOR TITANFALL ]
+    # moved from Act I tail to Act II front, after the first Darwin/evolution clip.
     entries = _manifest()
-    warn = next(e for e in entries if e.get("kind") == "warning")
-    assert warn["at"] == pytest.approx(116.0, abs=0.01)
-    assert warn["dur"] == pytest.approx(2.2, abs=0.01)
-    assert warn["position"] == "warning"
-    assert warn["text"] == "[ PREPARE FOR TITANFALL ]"
-    assert warn.get("copy_source") == "owner_supplied"
-
-def test_warning_card_follows_platform_wars_slide():
-    entries = _manifest()
-    pw = next(e for e in entries if e.get("id") == "platform-wars")
-    warn = next(e for e in entries if e.get("kind") == "warning")
-    assert warn["at"] == pytest.approx(pw["at"] + pw["dur"], abs=0.01)
-    assert pw["dur"] == pytest.approx(PLATFORM_WARS["dur"], abs=0.01)
-    assert pw["title"] == PLATFORM_WARS["title"]
-    assert pw["subtitle"] == PLATFORM_WARS["subtitle"]
-    assert pw["body"] == PLATFORM_WARS["body"]
-
+    ids = {e.get("id") for e in entries}
+    assert "act-i-warning" not in ids, "Titanfall warning moved after Darwin in Act II"
+    assert "platform-wars" not in ids, "Platform Wars slide moved after Darwin in Act II"
 def test_manifest_loads_without_overlapping_errors():
     # Overlaps are intentional and resolved by chrome rows / group.
     plate.load_manifest(MANIFEST)
@@ -310,12 +298,11 @@ def test_caption_glyph_falls_back_to_plain_letter_when_mark_missing(tmp_path):
 
 # --- Review finding 3: Platform Wars body second row has no period -----------
 
-def test_platform_wars_body_second_row_has_no_period():
-    entries = _manifest()
-    pw = next(e for e in entries if e.get("id") == "platform-wars")
-    assert pw["title"] == PLATFORM_WARS["title"]
+def test_platform_wars_body_in_act2_front_has_no_period():
+    front = json.loads((ROOT / "stories" / "02-front-plates.json").read_text())
+    pw = next(e for e in front["plates"] if e.get("id") == "front_platform_wars")
+    assert pw["title"] == "The Platform Wars"
     assert pw["body"] == ["Guardians Deliver the Final Blow", "to Legacy Infrastructure"]
-
 # --- Review finding 4: card freshness must not silently reuse stale/missing ---
 
 def test_render_cards_reuses_fresh_cards_without_playwright(monkeypatch, tmp_path):

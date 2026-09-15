@@ -332,29 +332,6 @@
       "position": "caption",
       "text": "This one is machine and nerve, and has its mind concluded",
       "copy_source": "owner_supplied"
-    },
-    {
-      "id": "act-i-warning",
-      "kind": "warning",
-      "at": 116.0,
-      "dur": 2.2,
-      "position": "warning",
-      "text": "[ PREPARE FOR TITANFALL ]",
-      "copy_source": "owner_supplied"
-    },
-    {
-      "id": "platform-wars",
-      "kind": "act",
-      "at": 112.0,
-      "dur": 4.0,
-      "position": "full",
-      "title": "The Platform Wars",
-      "subtitle": "1993-2019",
-      "body": [
-        "Guardians Deliver the Final Blow",
-        "to Legacy Infrastructure"
-      ],
-      "copy_source": "owner_supplied"
     }
   ],
   "unresolved": [
