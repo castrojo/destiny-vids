@@ -22,140 +22,140 @@ Edit in `chapters/0-prologue.md`.
 
 Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are in chapters/II-endless-forms.md`.
 
-- `4:43.80` Eons later / Maintainer-Guardians hold the line for humanity / Fighting against the Toilmaster and his Legion of Clankers / It all started with Kubernetes.
-- `5:10.23` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
-- `5:14.43` **jrsapi** — No one can tell which Ricardo is which so roll with it
-- `5:18.23` **rochaporto** — It's me the nuke guy how do you think I got here?
-- `5:22.03` **TBD** — Lunar record baby! Hello KubeCon + CloudNativeCon
-- `5:25.23` **ricardosalveti** — They wanted us to put AI in the glider so we did.
-- `5:29.00` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
-- `5:30.30` PRESENT DAY
-- `5:54.23` **jrsapi** — That explains the slop
-- `6:08.23` Your choices are:
-- `6:08.30` Your choices are:
-- `6:08.36` Your choices are:
-- `6:08.42` Your choices are:
-- `6:08.48` Your choices are:
-- `6:08.55` Your choices are:
-- `6:08.61` Your choices are:
-- `6:08.67` Your choices are:
-- `6:08.74` Your choices are:
-- `6:08.80` Your choices are:
-- `6:08.86` Your choices are:
-- `6:08.92` Your choices are:
-- `6:08.99` Your choices are:
-- `6:09.05` Your choices are:
-- `6:09.11` Your choices are:
-- `6:09.17` Your choices are:
-- `6:09.24` Your choices are:
-- `6:09.30` Your choices are:
-- `6:09.36` Your choices are:
-- `6:09.42` Your choices are:
-- `6:09.49` Your choices are:
-- `6:09.55` Your choices are:
-- `6:09.61` Your choices are:
-- `6:09.68` Your choices are:
-- `6:09.74` Your choices are:
-- `6:09.80` Your choices are:
-- `6:09.86` Your choices are:
-- `6:09.93` Your choices are:
-- `6:09.99` Your choices are:
-- `6:10.05` Your choices are:
-- `6:10.11` Your choices are:
-- `6:10.18` Your choices are:
-- `6:10.24` Your choices are:
-- `6:10.30` Your choices are:
-- `6:10.37` Your choices are:
-- `6:10.43` Your choices are:
-- `6:10.49` Your choices are:
-- `6:10.55` Your choices are:
-- `6:10.62` Your choices are:
-- `6:10.68` Your choices are:
-- `6:10.74` Your choices are:
-- `6:10.80` Your choices are:
-- `6:10.87` Your choices are:
-- `6:10.93` Your choices are:
-- `6:10.99` Your choices are:
-- `6:11.06` Your choices are:
-- `6:11.12` Your choices are:
-- `6:11.18` Your choices are:
-- `6:11.24` Your choices are:
-- `6:11.31` Your choices are:
-- `6:11.37` Your choices are:
-- `6:11.43` Your choices are:
-- `6:11.49` Your choices are:
-- `6:11.56` Your choices are:
-- `6:11.62` Your choices are:
-- `6:11.68` Your choices are:
-- `6:11.74` Your choices are:
-- `6:11.81` Your choices are:
-- `6:11.87` Your choices are:
-- `6:11.93` Your choices are:
-- `6:12.00` Your choices are:
-- `6:12.06` Your choices are:
-- `6:12.12` Your choices are:
-- `6:12.18` Your choices are:
-- `6:12.25` Your choices are:
-- `6:12.31` Your choices are:
-- `6:12.37` Your choices are:
-- `6:12.68` **mfahlandt** — K1 Logistics is clean
-- `6:15.38` **kfaseela** — The gamers were here alright
-- `6:18.08` **markmandel** — Agones Cluster - ONLINE
-- `6:20.78` **riaankleinhans** — You're getting close
-- `6:23.30` **jrsapi** — They learn quickly
-- `6:25.75` **rochaporto** — We need to move!
-- `6:28.30` **jrsapi** — Projects Teams Metrics are strong
-- `6:34.00` **jrsapi** — They just need mentoring in the right skills
-- `6:40.30` Mars
-- `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
-- `6:46.40` **rochaporto** — The glider can take us around the solar system
-- `6:49.72` **angellk** — Yeah but this isn't Mars
-- `6:52.17` **raravena80** — Make it look like we know what we are doing
-- `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
-- `7:04.48` **jrsapi** — The gamers would have to impress BOTH Ricardos
-- `7:07.43` **rochaporto** — Look man I am so tired just jump
-- `7:11.40` **angellk** — I love this job
-- `7:13.80` Do we even know who they are?
-- `7:20.47` SATURN
-- `7:23.30` **castrojo** — Time to get this driver upstream
-- `7:26.30` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
-- `7:29.30` **pastaq** — All your tests passed right?
-- `7:33.30` **LionHeartP** — What tests?
-- `7:35.75` **A1RM4X** — Thank you I never thought I could help!
-- `7:35.75` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
-- `7:38.30` **A1RM4X** — I'm not like you I'm just a lowly user
-- `7:40.78` **GloriousEggroll** — It's your patch, turn the stream on
-- `7:43.40` **angellk** — Like cardio!
-- `7:47.40` **jrsapi** — This is getting sloppy!
-- `7:49.85` **angellk** — It's getting all over my dress!
-- `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
-- `7:52.40` **rochaporto** — Weren't we just here?
-- `7:54.85` **jrsapi** — I'm tired man we need new people
-- `7:58.40` **angellk** — Show them how the CNCF rolls
-- `8:09.30` **LionHeartP** — Nice work testing that patch
-- `8:12.00` **LionHeartP** — Usually Blueberries just send me a bunch of crap
-- `8:16.30` **LionHeartP** — You didn't test any of this did you.
-- `8:18.53` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
-- `8:20.30` **pastaq** — Hey man WHAT tests?
-- `8:22.57` **LionHeartP** — Let's go!
-- `8:25.30` **castrojo** — Unlearning bad habits takes time
-- `8:28.30` **castrojo** — Your options are success
-- `8:31.50` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
-- `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
-- `8:43.75` **KyleGospo** — FOR TITANFALL!
-- `8:46.20` **castrojo** — Or go blow some shit up
-- `8:49.05` **castrojo** — There's the spirit
-- `8:51.50` **castrojo** — Never let stop energy tell YOUR story
-- `8:54.22` **castrojo** — Go forth and conquer my gamer children!
-- `8:57.07` **jrsapi** — We can't let The Toilmaster enslave another generation
-- `9:05.92` **angellk** — Don't look at me I only turned on Legendary Mode
-- `9:09.37` **akgraner** — Let me clean out this trash
-- `9:22.29` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `9:26.30` Reprehenderit voluptate / HATERS
-- `9:31.90` **KyleGospo** — Sup
-- `9:33.95` **kolunmi** — Cardio!
-- `9:56.87` **castrojo** — Finally, retirement
-- `9:59.32` **castrojo** — The long walk beckons
+- `4:49.40` Eons later / Maintainer-Guardians hold the line for humanity / Fighting against the Toilmaster and his Legion of Clankers / It all started with Kubernetes.
+- `5:15.83` Does NOT Come in Peace / OG GUARDIAN / Tim Hockin
+- `5:20.03` **jrsapi** — No one can tell which Ricardo is which so roll with it
+- `5:23.83` **rochaporto** — It's me the nuke guy how do you think I got here?
+- `5:27.63` **TBD** — Lunar record baby! Hello KubeCon + CloudNativeCon
+- `5:30.83` **ricardosalveti** — They wanted us to put AI in the glider so we did.
+- `5:34.60` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
+- `5:35.90` PRESENT DAY
+- `5:59.83` **jrsapi** — That explains the slop
+- `6:13.83` Your choices are:
+- `6:13.90` Your choices are:
+- `6:13.96` Your choices are:
+- `6:14.02` Your choices are:
+- `6:14.08` Your choices are:
+- `6:14.15` Your choices are:
+- `6:14.21` Your choices are:
+- `6:14.27` Your choices are:
+- `6:14.33` Your choices are:
+- `6:14.40` Your choices are:
+- `6:14.46` Your choices are:
+- `6:14.52` Your choices are:
+- `6:14.58` Your choices are:
+- `6:14.65` Your choices are:
+- `6:14.71` Your choices are:
+- `6:14.77` Your choices are:
+- `6:14.84` Your choices are:
+- `6:14.90` Your choices are:
+- `6:14.96` Your choices are:
+- `6:15.02` Your choices are:
+- `6:15.09` Your choices are:
+- `6:15.15` Your choices are:
+- `6:15.21` Your choices are:
+- `6:15.27` Your choices are:
+- `6:15.34` Your choices are:
+- `6:15.40` Your choices are:
+- `6:15.46` Your choices are:
+- `6:15.53` Your choices are:
+- `6:15.59` Your choices are:
+- `6:15.65` Your choices are:
+- `6:15.71` Your choices are:
+- `6:15.78` Your choices are:
+- `6:15.84` Your choices are:
+- `6:15.90` Your choices are:
+- `6:15.96` Your choices are:
+- `6:16.03` Your choices are:
+- `6:16.09` Your choices are:
+- `6:16.15` Your choices are:
+- `6:16.22` Your choices are:
+- `6:16.28` Your choices are:
+- `6:16.34` Your choices are:
+- `6:16.40` Your choices are:
+- `6:16.47` Your choices are:
+- `6:16.53` Your choices are:
+- `6:16.59` Your choices are:
+- `6:16.65` Your choices are:
+- `6:16.72` Your choices are:
+- `6:16.78` Your choices are:
+- `6:16.84` Your choices are:
+- `6:16.90` Your choices are:
+- `6:16.97` Your choices are:
+- `6:17.03` Your choices are:
+- `6:17.09` Your choices are:
+- `6:17.16` Your choices are:
+- `6:17.22` Your choices are:
+- `6:17.28` Your choices are:
+- `6:17.34` Your choices are:
+- `6:17.41` Your choices are:
+- `6:17.47` Your choices are:
+- `6:17.53` Your choices are:
+- `6:17.59` Your choices are:
+- `6:17.66` Your choices are:
+- `6:17.72` Your choices are:
+- `6:17.78` Your choices are:
+- `6:17.85` Your choices are:
+- `6:17.91` Your choices are:
+- `6:17.97` Your choices are:
+- `6:18.28` **mfahlandt** — K1 Logistics is clean
+- `6:20.98` **kfaseela** — The gamers were here alright
+- `6:23.68` **markmandel** — Agones Cluster - ONLINE
+- `6:26.38` **riaankleinhans** — You're getting close
+- `6:28.90` **jrsapi** — They learn quickly
+- `6:31.35` **rochaporto** — We need to move!
+- `6:33.90` **jrsapi** — Projects Teams Metrics are strong
+- `6:39.60` **jrsapi** — They just need mentoring in the right skills
+- `6:45.90` Mars
+- `6:50.60` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
+- `6:52.00` **rochaporto** — The glider can take us around the solar system
+- `6:55.32` **angellk** — Yeah but this isn't Mars
+- `6:57.77` **raravena80** — Make it look like we know what we are doing
+- `7:07.90` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
+- `7:10.08` **jrsapi** — The gamers would have to impress BOTH Ricardos
+- `7:13.03` **rochaporto** — Look man I am so tired just jump
+- `7:17.00` **angellk** — I love this job
+- `7:19.40` Do we even know who they are?
+- `7:26.07` SATURN
+- `7:28.90` **castrojo** — Time to get this driver upstream
+- `7:31.90` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
+- `7:34.90` **pastaq** — All your tests passed right?
+- `7:38.90` **LionHeartP** — What tests?
+- `7:41.35` **A1RM4X** — Thank you I never thought I could help!
+- `7:41.35` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
+- `7:43.89` **A1RM4X** — I'm not like you I'm just a lowly user
+- `7:46.38` **GloriousEggroll** — It's your patch, turn the stream on
+- `7:49.00` **angellk** — Like cardio!
+- `7:53.00` **jrsapi** — This is getting sloppy!
+- `7:55.45` **angellk** — It's getting all over my dress!
+- `7:55.73` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
+- `7:58.00` **rochaporto** — Weren't we just here?
+- `8:00.45` **jrsapi** — I'm tired man we need new people
+- `8:04.00` **angellk** — Show them how the CNCF rolls
+- `8:14.90` **LionHeartP** — Nice work testing that patch
+- `8:17.60` **LionHeartP** — Usually Blueberries just send me a bunch of crap
+- `8:21.90` **LionHeartP** — You didn't test any of this did you.
+- `8:24.13` Enslaver of Maintainers | Ruiner of User Experience / KERNEL REGRESSION
+- `8:25.90` **pastaq** — Hey man WHAT tests?
+- `8:28.17` **LionHeartP** — Let's go!
+- `8:30.90` **castrojo** — Unlearning bad habits takes time
+- `8:33.90` **castrojo** — Your options are success
+- `8:37.10` **castrojo** — Or a lifetime of servitude in the Toilmaster's Packaging Mines
+- `8:48.90` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
+- `8:49.35` **KyleGospo** — FOR TITANFALL!
+- `8:51.80` **castrojo** — Or go blow some shit up
+- `8:54.65` **castrojo** — There's the spirit
+- `8:57.10` **castrojo** — Never let stop energy tell YOUR story
+- `8:59.82` **castrojo** — Go forth and conquer my gamer children!
+- `9:02.67` **jrsapi** — We can't let The Toilmaster enslave another generation
+- `9:11.52` **angellk** — Don't look at me I only turned on Legendary Mode
+- `9:14.97` **akgraner** — Let me clean out this trash
+- `9:27.89` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `9:31.90` Reprehenderit voluptate / HATERS
+- `9:37.50` **KyleGospo** — Sup
+- `9:39.55` **kolunmi** — Cardio!
+- `10:02.47` **castrojo** — Finally, retirement
+- `10:04.92` **castrojo** — The long walk beckons
 
 ## III
 

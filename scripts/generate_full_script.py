@@ -37,7 +37,6 @@ OUT = REPO_ROOT / "chapters" / "full-script.md"
 UNMIGRATED = {
     "II": {
         "manifest": "stories/02-endless-forms-plates.json",
-        "programme_start": 283.800,
         "where": ("scripts/build_efmb_plates.py -- except the two red "
                   "splashes, which are in chapters/II-endless-forms.md"),
     },
@@ -104,7 +103,7 @@ def act_lines(act):
     return out
 
 
-def unmigrated_lines(spec):
+def unmigrated_lines(act, spec):
     path = REPO_ROOT / spec["manifest"]
     if not path.exists():
         return []
@@ -114,7 +113,7 @@ def unmigrated_lines(spec):
         words = speech(plate)
         if words is None:
             continue
-        out.append((plate.get("at", 0.0) + spec["programme_start"],
+        out.append((plate.get("at", 0.0) + chapter_md.chapter(act).programme_start,
                     who(plate), words))
     return out
 
@@ -136,9 +135,10 @@ def collect():
     # An untimed chapter has no clock, so it has nothing to sort by. It says
     # where it falls in the running order for reading purposes only.
     for act, spec in UNMIGRATED.items():
-        lines = unmigrated_lines(spec)
+        lines = unmigrated_lines(act, spec)
         if lines:
-            blocks.append((spec["programme_start"], act, spec["where"], lines))
+            blocks.append((chapter_md.chapter(act).programme_start,
+                           act, spec["where"], lines))
     blocks.sort(key=lambda b: (b[0], b[1]))
     return blocks
 
