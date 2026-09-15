@@ -114,17 +114,10 @@ punch-list entry. <<
 [mapped_lionheartp_what_tests] LionHeartP @ 7:38.900 +2.2: What tests?
   - seen_at_src: 193.366
 
-## 7:41.350
+## 7:44.900
 
-[mapped_a1rmax_intro] A1RM4X @ 7:41.350 +2.295: Thank you I never thought I could help!
-  - bond_of: walk_A1RM4X
-  - position: right
+[mapped_a1rmax_intro] A1RM4X @ 7:44.900 +2.295: Thank you I never thought I could help!
 
-[mapped_a1rmax_intro_2] A1RM4X @ 7:43.895 +2.236: I'm not like you I'm just a lowly user
-  - bond_of: walk_A1RM4X
-  - position: right
-
-[walk_ge_stream] GloriousEggroll @ 7:46.381 +2.2: It's your patch, turn the stream on
 
 
 ## 7:49

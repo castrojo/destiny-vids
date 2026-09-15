@@ -1253,8 +1253,6 @@ def space_plates(plates):
     for lane in by_position.values():
         lane.sort(key=lambda p: p["at"])
         for cur, nxt in zip(lane, lane[1:]):
-            if cur.get("bond_of") == nxt.get("id") or nxt.get("bond_of") == cur.get("id"):
-                continue
             room = round(nxt["at"] - cur["at"] - PLATE_GAP, 3)
             if cur["dur"] <= room:
                 continue
@@ -2072,6 +2070,11 @@ def build():
             "no title row is authored for GloriousEggroll or A1RM4X -- their "
             "affiliation rides as chrome and the row is omitted rather than "
             "composed",
+            "A1RM4X's older 'I'm not like you I'm just a lowly user' and "
+            "GloriousEggroll's 'It's your patch, turn the stream on' rows are "
+            "omitted: their established seats collide with the owner's newer "
+            "7:49 'Like cardio!' cue. The older copy remains in git and is not "
+            "retimed around the new authored beat",
             "HikariKnight's Guardian plate remains removed from the Eggroll "
             "scene on the owner's instruction. His later black-screen chat "
             "lines are a separate owner-authored conversation, not a restored "

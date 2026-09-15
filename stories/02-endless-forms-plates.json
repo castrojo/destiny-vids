@@ -1842,20 +1842,6 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/28869010?v=4"
     },
     {
-      "id": "mapped_a1rmax_intro",
-      "at": 171.95,
-      "dur": 2.295,
-      "kind": "chat",
-      "position": "right",
-      "copy_source": "owner_supplied",
-      "speaker": "A1RM4X",
-      "text": "Thank you I never thought I could help!",
-      "text_source": "owner_supplied",
-      "avatar": "renders/avatars/A1RM4X.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4",
-      "bond_of": "walk_A1RM4X"
-    },
-    {
       "id": "walk_A1RM4X",
       "at": 171.95,
       "dur": 3.0,
@@ -1872,31 +1858,17 @@
       "why": "the freed-up ghost seat before GloriousEggroll speaks to him"
     },
     {
-      "id": "mapped_a1rmax_intro_2",
-      "at": 174.495,
-      "dur": 2.236,
-      "kind": "chat",
-      "position": "right",
-      "copy_source": "owner_supplied",
-      "speaker": "A1RM4X",
-      "text": "I'm not like you I'm just a lowly user",
-      "text_source": "owner_supplied",
-      "avatar": "renders/avatars/A1RM4X.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4",
-      "bond_of": "walk_A1RM4X"
-    },
-    {
-      "id": "walk_ge_stream",
-      "at": 176.981,
-      "dur": 2.2,
+      "id": "mapped_a1rmax_intro",
+      "at": 175.5,
+      "dur": 2.295,
       "kind": "chat",
       "position": "left",
       "copy_source": "owner_supplied",
-      "speaker": "GloriousEggroll",
-      "text": "It's your patch, turn the stream on",
+      "speaker": "A1RM4X",
+      "text": "Thank you I never thought I could help!",
       "text_source": "owner_supplied",
-      "avatar": "renders/avatars/GloriousEggroll.png",
-      "avatar_url": "https://avatars.githubusercontent.com/u/11287837?v=4"
+      "avatar": "renders/avatars/A1RM4X.png",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2750931?v=4"
     },
     {
       "id": "rev_like_cardio",
@@ -2371,6 +2343,7 @@
     "William Rizzo and Ahmed Adan lose their act II badges to the same instruction. Rizzo's authored copy stays in vocab/casting.yaml and Ahmed stays in ensemble.placeholders, so only the scheduling went",
     "GloriousEggroll's name row is the handle he was written in as; GitHub records him as Thomas Crider. Which goes on the card is the owner's call",
     "no title row is authored for GloriousEggroll or A1RM4X -- their affiliation rides as chrome and the row is omitted rather than composed",
+    "A1RM4X's older 'I'm not like you I'm just a lowly user' and GloriousEggroll's 'It's your patch, turn the stream on' rows are omitted: their established seats collide with the owner's newer 7:49 'Like cardio!' cue. The older copy remains in git and is not retimed around the new authored beat",
     "HikariKnight's Guardian plate remains removed from the Eggroll scene on the owner's instruction. His later black-screen chat lines are a separate owner-authored conversation, not a restored credit on that shot",
     "the owner's own chat pills still have no pfp: `castrojo` is a lead, his identity lives on the `cayde_6` binding, and no avatar is recorded on it. The drawn crest stands in on the montage's two pills and the 4:51 gaslighting pill",
     "the 2:19 lead-in banner (owner: \"setting up this scene it's important\") has no authored copy, so nothing is emitted for it -- the TOC exchange's first line takes its slot",

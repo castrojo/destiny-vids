@@ -1170,10 +1170,11 @@ def test_hikariknight_is_out_of_the_eggroll_scene():
     casting = build_efmb_plates.load_casting()
     build_efmb_plates.authored_copy("HikariKnight", casting)  # raises if gone
 
-    # The owner-authored line remains after the readability re-time.
+    # The newer 7:49 Like cardio beat supersedes the two older colliding rows.
     by_id = {p["id"]: p for p in manifest["plates"]}
-    assert by_id["walk_ge_stream"]["at"] > by_id["mapped_a1rmax_intro_2"]["at"]
-    assert by_id["walk_ge_stream"]["text"] == "It's your patch, turn the stream on"
+    assert "mapped_a1rmax_intro_2" not in by_id
+    assert "walk_ge_stream" not in by_id
+    assert any("older 'I'm not like you" in gap for gap in manifest["unresolved"])
 
 def test_natewaddington_is_out_of_the_climax():
     """Owner: "get rid of the nate wassington in the endless climax in endless."
