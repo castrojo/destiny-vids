@@ -1015,6 +1015,48 @@
    "fade_out": 0.25
   },
   {
+   "id": "castrojo_line_1",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "Now you are ready",
+   "copy_source": "owner_supplied",
+   "at": 351.348,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 353.548,
+   "fade_out": 0.25
+  },
+  {
+   "id": "castrojo_line_2",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "In the world of technology there are the sheep",
+   "copy_source": "owner_supplied",
+   "at": 354.398,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 356.598,
+   "fade_out": 0.25
+  },
+  {
+   "id": "castrojo_line_3",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "And then there are the wolves",
+   "copy_source": "owner_supplied",
+   "at": 357.448,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 359.648,
+   "fade_out": 0.25
+  },
+  {
    "id": "gold_robertsirc",
    "position": "left",
    "label": "#HIREAWOLF // MAINTAINER",

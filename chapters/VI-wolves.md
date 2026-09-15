@@ -373,6 +373,12 @@ those names live. Edit them there.
 
 [robertsirc_trash] robertsirc @ 24:23 +2.2: Taking out the trash!
 
+## 24:26.715
+
+[castrojo_line_1] castrojo @ 24:26.715 +2.8: Now you are ready
+[castrojo_line_2] castrojo +2.8: In the world of technology there are the sheep
+[castrojo_line_3] castrojo +2.8: And then there are the wolves
+
 ## 24:45
 
 * [gold_robertsirc] - @ 24:45 +2.8
