@@ -400,22 +400,10 @@ def test_act3_priority_now_dialogue_holds_clear_the_audit(monkeypatch):
         assert short.get(cue_id, 0.0) <= ceiling, (cue_id, short.get(cue_id))
 
 
-def test_p4_priority_now_chat_holds_clear_the_audit():
-    """The whale-shot exchange keeps every short pill at the readable floor."""
+def test_p4_has_no_dialogue_to_audit():
     path = readtime.REPO_ROOT / "stories" / "00-perfume-4-plates.json"
-    target_ids = {
-        "chat_loose_end",
-        "chat_escape",
-        "chat_promised",
-        "chat_fine",
-        "chat_minds",
-    }
-    plates = json.loads(path.read_text(encoding="utf-8"))["plates"]
-    target = {plate["id"]: plate for plate in plates if plate["id"] in target_ids}
-    assert set(target) == target_ids
-    assert all(plate["dur"] == pytest.approx(MIN_HOLD)
-               for plate in target.values())
-
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    assert doc["plates"] == []
     rows, _, problems = readtime.audit_manifest(path)
+    assert rows == []
     assert problems == []
-    assert not ({row["id"] for row in rows} & target_ids)

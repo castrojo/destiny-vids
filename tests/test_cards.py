@@ -151,15 +151,15 @@ def test_every_act_slide_carries_an_audience_facing_chapter_title():
             assert item.get("chapter"), item.get("label")
             assert "held long" not in item["chapter"]
 
-def test_act_i_megacut_clip_keeps_the_cinematic_tail():
+def test_act_i_megacut_clip_keeps_clean_cinematic_tail():
     plan = _load("megacut.json")
     act_i = next(
         item for item in plan["items"]
         if item.get("path", "").endswith("01-intro.mp4")
     )
     assert act_i["trim_from"] == pytest.approx(2.0)
-    assert act_i["trim_to"] == pytest.approx(118.2)
-    assert act_i["trim_to"] >= 114.2 + 4.0
+    assert act_i["trim_to"] == pytest.approx(113.60)
+    assert act_i["trim_to"] - act_i["trim_from"] == pytest.approx(111.60)
 
 def test_act_ii_megacut_clip_keeps_its_now_carded_black_head():
     plan = _load("megacut.json")

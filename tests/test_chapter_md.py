@@ -458,7 +458,7 @@ def test_boss_entries_carry_the_miniboss_shape_and_placeholder_seed():
     by_id = {e["id"]: e for e in entries}
     flash = by_id["late_poor_technical_decisions"]
     assert flash["kind"] == "miniboss" and flash["position"] == "boss"
-    assert flash["at"] == pytest.approx(405.0 - OFFSET, abs=1e-3)
+    assert flash["at"] == pytest.approx(410.6 - OFFSET, abs=1e-3)
     assert flash["dur"] == chapter_md.MIN_HOLD
     assert flash["title_source"] == "placeholder"
 

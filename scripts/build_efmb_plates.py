@@ -505,14 +505,14 @@ SOLO = [
         # THE ARC HUNTER BEFORE KYLE. Owner, 2026-08-14: "the arc hunter
         # before kylegospo is https://github.com/kolunmi/ - add a nameplate."
         #
-        # Owner, 2026-09-14: seat this complete plate at programme 10:08
-        # on the held hallway frame. The source window is the frame the
-        # interruption holds, not the later Arc-bow shot this plate replaced.
+        # Owner, 2026-09-14: seat this complete plate on the held hallway
+        # frame after the Cayde/Joseph exchange and before Angelk. The 10:08
+        # mark was on the pre-shortening programme clock; the frame is fixed.
         "key": "kolunmi",
         "src": (323.933, 325.933),
         "seen": 323.933,
-        "at_film": 324.2,
-        "why": "owner-seated on the held hallway frame at programme 10:08",
+        "at_film": 257.367,
+        "why": "owner-seated on the held hallway frame after the Cayde exchange",
     },
     {
         "key": "KyleGospo",
@@ -1253,6 +1253,8 @@ def space_plates(plates):
     for lane in by_position.values():
         lane.sort(key=lambda p: p["at"])
         for cur, nxt in zip(lane, lane[1:]):
+            if cur.get("bond_of") == nxt.get("id") or nxt.get("bond_of") == cur.get("id"):
+                continue
             room = round(nxt["at"] - cur["at"] - PLATE_GAP, 3)
             if cur["dur"] <= room:
                 continue

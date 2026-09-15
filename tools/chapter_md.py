@@ -1389,13 +1389,15 @@ def sync(act, write=False):
         return raw, []
     doc = json.loads(raw)
     plates, unresolved = entries(act)
-    if not plates:
-        return raw, unresolved
     before = doc.get(chap.plates_key) or []
     merged, notes = _merge_plates(before, plates)
     unresolved.extend(notes)
     doc[chap.plates_key] = merged
-    if merged == before:
+    valid_ids = {plate.get("id") for plate in merged if plate.get("id")}
+    for value in doc.values():
+        if isinstance(value, dict) and isinstance(value.get("plate_ids"), list):
+            value["plate_ids"] = [pid for pid in value["plate_ids"] if pid in valid_ids]
+    if doc == json.loads(raw):
         # The manifest already says exactly this. Leaving the file alone --
         # rather than round-tripping it through a serialiser -- keeps the
         # hand-formatting these records were written with, and keeps a

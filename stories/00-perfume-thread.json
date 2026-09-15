@@ -202,12 +202,9 @@
       "ending_derivative": {
         "out_file": "renders/perfume-4-overlays.mp4",
         "overlay_manifest": "stories/00-perfume-4-plates.json",
-        "overlay_section": [
-          "chat_wolf",
-          "chat"
-        ],
+        "overlay_section": [],
         "plates_dir": "renders/perfume-4/plates",
-        "_note": "The clean movement remains renders/perfume-4.mp4. The derivative is rebuilt directly from the same original source and audio window in ONE encode that composes this movement's own replacements AND the chat plates, so the swaps and the words never travel in separate encodes and no generation is added before megacut assembly. scripts/build_ending_overlays.py, generalised from the movement-5 pattern."
+        "_note": "The clean movement remains renders/perfume-4.mp4. The derivative is rebuilt directly from the same original source and audio window in ONE encode that composes this movement's authored visual replacements with no dialogue plates. scripts/build_ending_overlays.py, generalised from the movement-5 pattern."
       }
     },
     {

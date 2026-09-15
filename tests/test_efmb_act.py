@@ -96,14 +96,15 @@ def test_the_hallway_interruption_uses_two_darkened_holds_around_amber():
     assert returned["at"] == pytest.approx(build_efmb.HALLWAY_RETURN_AT, abs=1e-3)
     assert returned["source_in"] == pytest.approx(325.933, abs=1e-3)
 
-def test_hallway_interruption_is_derived_from_the_three_chapter_blocks():
-    """The pause, insert, and returned hold keep distinct authored clocks."""
-    assert build_efmb.AMBER_AT == pytest.approx(
-        chapter_md.block_end("II", "paused"))
-    assert build_efmb.HALLWAY_AFTER_AMBER_AT == pytest.approx(
-        chapter_md.block_end("II", "amber-action"))
-    assert build_efmb.HALLWAY_RETURN_AT == pytest.approx(
-        chapter_md.block_end("II", "post-amber"))
+def test_hallway_interruption_is_compact_and_preserves_authored_boundaries():
+    """No obsolete 8:59→9:52 or 10:40→11:35 gap survives the shortened cut."""
+    manifest = build_efmb_plates.build()
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    assert build_efmb.AMBER_CLIP_IN == pytest.approx(43.000)
+    assert build_efmb.AMBER_CLIP_OUT == pytest.approx(53.470)
+    assert by_id["chat_amber_bazaar"]["at"] + by_id["chat_amber_bazaar"]["dur"] <= build_efmb.AMBER_AT
+    assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(build_efmb.HALLWAY_AFTER_AMBER_AT)
+    assert build_efmb.INTERRUPTION_SEC < 30.0
 
 def test_the_picture_tail_is_black_after_the_last_evidenced_run():
     sequence = build_efmb.picture_sequence()
@@ -1201,7 +1202,7 @@ def test_kolunmi_nameplate_uses_the_owner_seated_hallway_frame():
     manifest = build_efmb_plates.build()
     by_id = {p["id"]: p for p in manifest["plates"]}
     kolunmi = by_id["solo_kolunmi"]
-    assert kolunmi["at"] == pytest.approx(324.2, abs=1e-3)
+    assert kolunmi["at"] == pytest.approx(257.367, abs=1e-3)
     assert kolunmi["seen_at_src"] == pytest.approx(323.933, abs=1e-3)
     assert kolunmi["name"] == "kolunmi"
     assert "mapped_kyle_reveal" not in by_id
@@ -1274,16 +1275,16 @@ def test_latest_owner_pass_replaces_the_hallway_dialogue():
     assert [(by_id[plate_id]["speaker"], by_id[plate_id]["text"])
             for plate_id, _, _ in expected] == [
                 (speaker, text) for _, speaker, text in expected]
-    assert by_id["rev_glider"]["at"] == pytest.approx(412.0 - 283.8)
-    assert by_id["rev_love_job"]["at"] == pytest.approx(437.0 - 283.8)
-    assert by_id["rev_like_cardio"]["at"] == pytest.approx(469.0 - 283.8)
-    assert by_id["rev_getting_sloppy"]["at"] == pytest.approx(473.0 - 283.8)
-    assert by_id["rev_just_here"]["at"] == pytest.approx(478.0 - 283.8)
-    assert by_id["rev_cncf_rolls"]["at"] == pytest.approx(484.0 - 283.8)
-    assert by_id["rev_cayde_spirit"]["at"] == pytest.approx(592.0 - 283.8)
-    assert by_id["rev_legendary"]["at"] == pytest.approx(627.0 - 283.8)
-    assert by_id["chat_amber_bazaar"]["at"] == pytest.approx(638.0 - 283.8)
-    assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(695.0 - 283.8)
+    assert by_id["rev_glider"]["at"] == pytest.approx(412.0 - 289.4)
+    assert by_id["rev_love_job"]["at"] == pytest.approx(437.0 - 289.4)
+    assert by_id["rev_like_cardio"]["at"] == pytest.approx(469.0 - 289.4)
+    assert by_id["rev_getting_sloppy"]["at"] == pytest.approx(473.0 - 289.4)
+    assert by_id["rev_just_here"]["at"] == pytest.approx(478.0 - 289.4)
+    assert by_id["rev_cncf_rolls"]["at"] == pytest.approx(484.0 - 289.4)
+    assert by_id["rev_cayde_spirit"]["at"] == pytest.approx(245.25)
+    assert by_id["rev_legendary"]["at"] == pytest.approx(262.117)
+    assert by_id["chat_amber_bazaar"]["at"] == pytest.approx(265.567)
+    assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(278.487)
     assert not chapter_entries_with_label("amber-action")
     assert chapter_entries_with_label("post-amber") == [
         ("kolunmi", "Hey did you see how we just loaded up in a new level?")]

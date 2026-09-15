@@ -27,7 +27,7 @@
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
-   "note": "scripts/build_act1.py rebuilds the 118.200 s master end to end. Picture is official Destiny 2 upload BKm0TPqeOjY, cut 2.0 -> 113.60 and held on the first black fade frame. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns, decoded from native 48 kHz Opus at the measured +1.978625 s offset (94974 samples); the delivered master correlates 0.99999988 with that aligned source and measures -3.4 dBFS peak. One tools/plate.py burn keeps every existing Guardian/companion plate and adds nine top-safe narrative captions, the lower-left Clankers and Contributors context card, the red deployment warning, and the full-frame Platform Wars card. The title cover remains the Maintainer Summit NA 2025 group-007 photograph credited in ATTRIBUTIONS.md. Representative frames at 9.5, 20, 31.5, 44.5, 61, 70.5, 81.5, 91.5, 99.5, 112.5, and 115.5 were inspected from the rebuilt master; all lanes are readable and the terminal cards play on black. Both encode legs ran on the scheduler-selected farm node.",
+   "note": "scripts/build_act1.py rebuilds the 113.600 s master end to end. Picture is official Destiny 2 upload BKm0TPqeOjY, cut 2.0 -> 113.60 with no card-length tail extension. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns at the measured +1.978625 s offset. One tools/plate.py burn keeps the Guardian/companion plates, narrative captions and context card. Platform Wars and the Titanfall warning moved after Darwin in Act II.",
    "sources": [
     "stories/megacut/megacut-hero-plates.json",
     "stories/summit-photos.json",

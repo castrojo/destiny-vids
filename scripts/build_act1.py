@@ -9,15 +9,15 @@ The chain, established 2026-07-15 from the record (`megacut.json`'s
      (skipped when the jpg already exists — the crop window is a recorded
      taste call, not something a rebuild silently re-makes).
   2. `cards/render-cards.mjs` renders the full-frame title-cover photograph
-     and Platform Wars card into `renders/plates-01-hero/`. Missing or stale
-     cards fail closed when the sibling website checkout cannot run Playwright;
-     an old PNG is never treated as current merely because it exists.
-  3. `tools/plate.py render` renders the Guardian, companion, caption, context,
-     and deployment-warning plates into the same directory.
-  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60, including
-     the first black frame of the source fade, then holds that terminal black
-     frame to make the 118.2 s output. Audio comes from
-     `media/yt_into_the_light_without_dialogue.webm`, beginning at
+     into `renders/plates-01-hero/`. Missing or stale cards fail closed when
+     the sibling website checkout cannot run Playwright; an old PNG is never
+     treated as current merely because it exists.
+  3. `tools/plate.py render` renders the Guardian, companion, caption, and
+     context plates into the same directory.
+  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60. The former
+     terminal-black hold existed only for the Platform Wars and Titanfall cards,
+     which now play after Darwin in Act II, so the master ends at 113.60 s.
+     Audio comes from `media/yt_into_the_light_without_dialogue.webm`, beginning at
      2.0 + 1.978625 = 3.978625 s; that offset was measured against the prior
      instrumental master at 94974 samples / 48 kHz (ncorr 0.999999920). It is
      decoded once to FLAC with no normalization, EQ, compression, or limiter.
@@ -61,15 +61,14 @@ COVER_ART = "renders/title-cover.jpg"
 COVER_SOURCE = "media/summit/group-007.jpg"
 TRIM = "renders/megacut-01-hero-trim.mp4"
 MASTER = "renders/megacut-01-hero.mp4"
-# Picture extends the established window by 0.05s to include the source fade's
-# first black frame; that frame holds the new cards to 118.2. Dialogue-free
-# audio needs the measured offset.
+# End at the source fade. The former terminal-black extension existed only for
+# the Platform Wars and Titanfall cards, which now play in Act II.
 VIDEO_SRC = "media/yt_into_the_light_cinematic.mkv"
 AUDIO_SRC = "media/yt_into_the_light_without_dialogue.webm"
 TRIM_START = 2.0
 TRIM_END = 113.60
 AUDIO_SYNC_OFFSET = 1.978625
-OUTPUT_DURATION = 118.2
+OUTPUT_DURATION = 113.60
 
 
 def trim_command(ffmpeg):

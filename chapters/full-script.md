@@ -108,30 +108,30 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:34.00` **jrsapi** — They just need mentoring in the right skills
 - `6:40.30` Mars
 - `6:45.00` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
-- `6:52.00` **rochaporto** — The glider can take us around the solar system
-- `6:55.32` **angellk** — Yeah but this isn't Mars
-- `6:57.77` **raravena80** — Make it look like we know what we are doing
+- `6:46.40` **rochaporto** — The glider can take us around the solar system
+- `6:49.72` **angellk** — Yeah but this isn't Mars
+- `6:52.17` **raravena80** — Make it look like we know what we are doing
 - `7:02.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `7:04.48` **jrsapi** — The gamers would have to impress BOTH Ricardos
 - `7:07.43` **rochaporto** — Look man I am so tired just jump
+- `7:11.40` **angellk** — I love this job
 - `7:13.80` Do we even know who they are?
-- `7:17.00` **angellk** — I love this job
 - `7:20.47` SATURN
 - `7:23.30` **castrojo** — Time to get this driver upstream
 - `7:26.30` Nessus of Nobara / NOBARA CONTRIBUTOR / LionHeartP
 - `7:29.30` **pastaq** — All your tests passed right?
 - `7:33.30` **LionHeartP** — What tests?
+- `7:35.75` **A1RM4X** — Thank you I never thought I could help!
 - `7:35.75` Useful Youtuber (UNCOMMON) / NEW CONTRIBUTOR / A1RM4X
-- `7:39.30` **A1RM4X** — Thank you I never thought I could help!
-- `7:41.85` **A1RM4X** — I'm not like you I'm just a lowly user
-- `7:44.33` **GloriousEggroll** — It's your patch, turn the stream on
-- `7:49.00` **angellk** — Like cardio!
+- `7:38.30` **A1RM4X** — I'm not like you I'm just a lowly user
+- `7:40.78` **GloriousEggroll** — It's your patch, turn the stream on
+- `7:43.40` **angellk** — Like cardio!
+- `7:47.40` **jrsapi** — This is getting sloppy!
+- `7:49.85` **angellk** — It's getting all over my dress!
 - `7:50.13` KERNEL 6.11-RC / UPSTREAM PATCH QUEUE
-- `7:53.00` **jrsapi** — This is getting sloppy!
-- `7:55.45` **angellk** — It's getting all over my dress!
-- `7:58.00` **rochaporto** — Weren't we just here?
-- `8:00.45` **jrsapi** — I'm tired man we need new people
-- `8:04.00` **angellk** — Show them how the CNCF rolls
+- `7:52.40` **rochaporto** — Weren't we just here?
+- `7:54.85` **jrsapi** — I'm tired man we need new people
+- `7:58.40` **angellk** — Show them how the CNCF rolls
 - `8:09.30` **LionHeartP** — Nice work testing that patch
 - `8:12.00` **LionHeartP** — Usually Blueberries just send me a bunch of crap
 - `8:16.30` **LionHeartP** — You didn't test any of this did you.
@@ -144,18 +144,18 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `8:43.30` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `8:43.75` **KyleGospo** — FOR TITANFALL!
 - `8:46.20` **castrojo** — Or go blow some shit up
-- `9:52.00` **castrojo** — There's the spirit
-- `9:54.45` **castrojo** — Never let stop energy tell YOUR story
-- `9:57.17` **castrojo** — Go forth and conquer my gamer children!
-- `10:00.02` **jrsapi** — We can't let The Toilmaster enslave another generation
-- `10:27.00` **angellk** — Don't look at me I only turned on Legendary Mode
-- `10:38.00` **akgraner** — Let me clean out this trash
-- `11:35.00` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `11:39.01` Reprehenderit voluptate / HATERS
-- `11:44.61` **KyleGospo** — Sup
-- `11:46.67` **kolunmi** — Cardio!
-- `12:09.58` **castrojo** — Finally, retirement
-- `12:12.03` **castrojo** — The long walk beckons
+- `8:49.05` **castrojo** — There's the spirit
+- `8:51.50` **castrojo** — Never let stop energy tell YOUR story
+- `8:54.22` **castrojo** — Go forth and conquer my gamer children!
+- `8:57.07` **jrsapi** — We can't let The Toilmaster enslave another generation
+- `9:05.92` **angellk** — Don't look at me I only turned on Legendary Mode
+- `9:09.37` **akgraner** — Let me clean out this trash
+- `9:22.29` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `9:26.30` Reprehenderit voluptate / HATERS
+- `9:31.90` **KyleGospo** — Sup
+- `9:33.95` **kolunmi** — Cardio!
+- `9:56.87` **castrojo** — Finally, retirement
+- `9:59.32` **castrojo** — The long walk beckons
 
 ## III
 
@@ -287,18 +287,6 @@ Edit in `chapters/VI-wolves.md`.
 - `25:18.35` **castrojo** — Think like a dinosaur
 - `25:20.80` **castrojo** — Lift each other
 - `25:23.25` **castrojo** — and rise ...
-
-## P4
-
-Edit in `chapters/P4-underwater.md`.
-
-- `27:36.75` **JillCastro** — One more loose end
-- `27:39.05` **valerie-tar-gz** — You can't escape yourself
-- `27:41.35` **rafaelcastro10** — You promised
-- `27:43.65` **castrojo** — Fine
-- `27:45.95` **LionHeartP** — Show them the minds
-- `27:48.25` **valerie-tar-gz** — Of the wolves
-- `26:59.96` **rafaelcastro10** — What's a wolf?
 
 ## VII
 
