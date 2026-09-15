@@ -296,7 +296,8 @@ def main(argv=None):
                  f"{args.thread}; pass --manifest and --out explicitly")
 
     manifest = Path(args.manifest or REPO / deriv["overlay_manifest"])
-    section = args.section or (deriv or {}).get("overlay_section", SECTION)
+    section = (args.section if args.section is not None
+               else (deriv or {}).get("overlay_section", SECTION))
     cards_dir = Path(args.cards_dir
                      or (deriv or {}).get("plates_dir") or CARDS)
     if not cards_dir.is_absolute():

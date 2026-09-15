@@ -7,11 +7,8 @@ plates_key: fixed_cards
 timed: false
 # Nothing here is pinned to a second. This is where the chapter falls in the
 # running order, so a read-through of the whole show puts it in the right
-# place -- it is never used to seat a card. Act VIII starts at 1959.685,
-# summed on 2026-08-27 the way tools/megacut.py's item_duration sums it
-# (an authored trim window is trim_to MINUS trim_from): act VII's start
-# 1718.362 (see chapters/VII-europa.md) + act VII 108.400 + the mission
-# pause 23.423 + Perfume 5 3.760 + Perfume 5-ending 105.740.
+# place -- it is never used to seat a card. The final alpha5 plan starts Act
+# VIII at 1755.051; chapters/VIII-cta.md shares the same origin.
 programme_start: 1755.051
 list_keys: names
 owns_plates: true

@@ -14,9 +14,9 @@ The chain, established 2026-07-15 from the record (`megacut.json`'s
      treated as current merely because it exists.
   3. `tools/plate.py render` renders the Guardian, companion, caption, and
      context plates into the same directory.
-  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60 and ends at
-     the source fade; the former terminal hold belonged to the cards now moved
-     into Act II. Audio comes from
+  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60 and retains
+     only the remaining 2.000 s terminal pad. The former 6.600 s card hold is
+     gone; Platform Wars and Titanfall now play after Darwin in Act II. Audio comes from
      `media/yt_into_the_light_without_dialogue.webm`, beginning at
      2.0 + 1.978625 = 3.978625 s; that offset was measured against the prior
      instrumental master at 94974 samples / 48 kHz (ncorr 0.999999920). It is
@@ -61,8 +61,8 @@ COVER_ART = "renders/title-cover.jpg"
 COVER_SOURCE = "media/summit/group-007.jpg"
 TRIM = "renders/megacut-01-hero-trim.mp4"
 MASTER = "renders/megacut-01-hero.mp4"
-# End at the source fade. The former terminal-black extension existed only for
-# the Platform Wars and Titanfall cards, which now play in Act II.
+# Keep only the 2.000 s terminal pad needed with the programme's 2.000 s head
+# trim. The former 6.600 s card hold moved with its cards into Act II.
 VIDEO_SRC = "media/yt_into_the_light_cinematic.mkv"
 AUDIO_SRC = "media/yt_into_the_light_without_dialogue.webm"
 TRIM_START = 2.0

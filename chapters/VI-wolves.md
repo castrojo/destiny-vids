@@ -374,7 +374,7 @@ those names live. Edit them there.
 
 # UNRESOLVED / TODO(owner):
 # robertsirc_trash @ 22:14.268 +2.2 ("Taking out the trash!") collides with
-# owner-authored castrojo_line_1 seated verbatim at 24:23.557 (+2.8).
+# owner-authored castrojo_line_1 seated at 22:14.825 (+2.8).
 # It is omitted from the plate schedule for this degraded render pending
 # owner decision on placement.
 

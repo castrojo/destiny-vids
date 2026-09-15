@@ -1,11 +1,9 @@
 ---
 act: VII
 manifest: stories/07-europa-plates.json
-# WHERE THIS ACT STARTS IN THE PROGRAMME, in seconds. Measured, not guessed:
-# `tools/megacut.py --dry-run` puts Excision at 1450.294, Perfume movement 4
-# at 1602.796, and Europa at 1718.362. The insertion shifts the programme
-# clock only; each plate's act-local seat is unchanged.
-# Restate the derivation when the running order moves.
+# WHERE THIS ACT STARTS IN THE FINAL ALPHA5 PROGRAMME, in seconds.
+# The plan places movement 4 at 1398.162 and Europa at 1513.728; the clock
+# restatement preserves every act-local plate seat.
 programme_start: 1513.728
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.

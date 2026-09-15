@@ -237,5 +237,5 @@
   }
  ],
  "_chapters": "Each act slide carries the audience-facing `chapter` title; `python3 tools/megacut.py <plan> --chapters` derives the timestamps from this plan's own clock, so the markers can never drift from the running order. The numeral is part of the title because the show is told in numbered acts. Which acts publish a marker is derived from which items carry a `chapter` key -- do not count them here. Act VIII carries none deliberately: a scrub-bar entry would spoil the ambush. Act VII carries none because the owner asked for its title slide to go so movement 4 could hard-cut into Europa, and the marker went with the slide. If Europa should keep a scrub-bar entry with no card in front of it, chapters() would need to read a `chapter` off the CLIP -- a change nobody has asked for.",
- "_version": "alpha5 -- integrated overnight recovery (Act I tail cards de-duplicated, Titanfall seated after Darwin in Act II, Act II paused and Amber sequence shortened, Castrojo monologue seated at 24:23.557, delivery metadata certified)"
+ "_version": "alpha5 -- integrated overnight recovery: Act I tail cards moved after Darwin, Act II dialogue and Amber cut compacted, P4 hallucinated dialogue removed, and downstream programme clocks restated."
 }

@@ -1,7 +1,7 @@
 ---
 act: P4
 manifest: stories/00-perfume-4-plates.json
-# Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-27: Excision starts at 1450.294 and movement 4 starts at 1602.796. The programme item-duration rule is authoritative.
+# Final alpha5 programme origin for movement 4: 1398.162 seconds.
 programme_start: 1398.162
 owns_plates: true
 field_order: id, kind, position, speaker, avatar, avatar_url, text, copy_source, at, dur, fade_in, fade_out_at, fade_out
