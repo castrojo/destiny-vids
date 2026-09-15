@@ -14,7 +14,7 @@ timed: false
 # (an authored trim window is trim_to MINUS trim_from): act VII's start
 # 1718.362 (see chapters/VII-europa.md) + act VII 108.400 + the mission
 # pause 23.423 + Perfume 5 3.760 + Perfume 5-ending 105.740.
-programme_start: 1959.685
+programme_start: 1755.051
 # No key in this run is a list: `body` here is one sentence under a name,
 # not the several lines a book page carries.
 list_keys:

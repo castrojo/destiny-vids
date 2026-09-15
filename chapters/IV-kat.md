@@ -2,7 +2,7 @@
 act: IV
 manifest: stories/04-kat-plates.json
 # Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 1005.709
+programme_start: 932.377
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.
 # This act's whole plate list comes from this file, so the manifest is
@@ -51,13 +51,13 @@ python3 tools/chapter_md.py show IV
 python3 tools/chapter_md.py check IV
 ```
 
-## 16:46.309
+## 15:32.977
 
-[p1-kat-shooting] katcosgrove @ 16:46.309 +2.4: Hey why are they shooting at me!
+[p1-kat-shooting] katcosgrove @ 15:32.977 +2.4: Hey why are they shooting at me!
 
-[p2-bobby] mrbobbytables @ 16:49.009 +2.4118: The gamers don't know you're here to help
+[p2-bobby] mrbobbytables @ 15:35.677 +2.4118: The gamers don't know you're here to help
 
-## 16:56.809
+## 15:43.477
 
 [p2c-kat-nice] katcosgrove +2.2: Nice to meet you too!
   - fade_in: 0.2

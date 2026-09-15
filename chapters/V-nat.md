@@ -2,7 +2,7 @@
 act: V
 manifest: stories/05-natali-plates.json
 # Programme start measured from `python3 tools/megacut.py stories/megacut/megacut.json --dry-run` on 2026-08-25. The programme item-duration rule is authoritative.
-programme_start: 1079.642
+programme_start: 966.377
 # The order this act has always written its plates in, kept so the generated
 # manifest reads the way the delivered one did.
 # This act's whole plate list comes from this file, so the manifest is
@@ -54,45 +54,45 @@ python3 tools/chapter_md.py show V
 python3 tools/chapter_md.py check V
 ```
 
-## 18:02.242
+## 16:08.977
 
-[p1-nat-mouthbreathers] Nat @ 18:02.242 +2.6: Hey these mouth breathers are shooting at me!
+[p1-nat-mouthbreathers] Nat @ 16:08.977 +2.6: Hey these mouth breathers are shooting at me!
   - avatar: natali.jpg
   - _note: #118 Nat line 1, marked by the owner at 10:45 on the programme clock of the cut they watched. Seated on the cockpit close-up 2.269-6.073 -- her rule is 'dialogue only when her character is onscreen', and this is her in the ship under fire. Clears 0.87s before the 6.073 cut.
 
-[p2-nat-ceasefire] Nat @ 18:07.442 +2.2: I am a Documentation Expert, cease fire!
+[p2-nat-ceasefire] Nat @ 16:14.177 +2.2: I am a Documentation Expert, cease fire!
   - avatar: natali.jpg
   - _note: #118 Nat line 2. Back in the cockpit after the 7.608 cut; she is onscreen through the boost. Clears at 10.0, before the landing burst.
 
-[p3-nat-goddamn] Nat @ 18:09.942 +1.4: Goddamn it!
+[p3-nat-goddamn] Nat @ 16:16.677 +1.4: Goddamn it!
   - censor: Goddamn -> G{k8s}ddamn
   - avatar: natali.jpg
   - _note: #118's '[Stumble animation]' pair, first half. The landing burst -- the act's own shudder -- peaks ~10.4; the line rides it. She is onscreen from here to the end of the act.
 
-[p4-nat-gitpush] Nat @ 18:11.542 +1.7: No time to `git push`!
+[p4-nat-gitpush] Nat @ 16:18.277 +1.7: No time to `git push`!
   - avatar: natali.jpg
   - _note: #118 stumble pair, second half, as she picks herself up and walks. Backticks are the owner's own and are reproduced.
 
-[p5-nat-stranded] Nat @ 18:13.442 +2.4: I'm stranded, they'll never find the docs in time!
+[p5-nat-stranded] Nat @ 16:20.177 +2.4: I'm stranded, they'll never find the docs in time!
   - avatar: natali.jpg
   - _note: #118, the setup for the docs gag, over the walk as her ship leaves.
 
-[p6-nick-docs1] Nick @ 18:16.042 +1.2: docs.bazzite.gg
+[p6-nick-docs1] Nick @ 16:22.777 +1.2: docs.bazzite.gg
   - avatar: nick.jpg
   - _note: #118, radio answer 1 of 3. Nick has NO avatar in the project and no vocab binding -- plate.py will fall back to the drawn crest and name the missing file, which is the degrade-and-record path; drop render/nick.jpg in and rebuild to fill the slot.
 
-[p7-kat-screams] Kat @ 18:17.442 +1.6: I can hear their screams!
+[p7-kat-screams] Kat @ 16:24.177 +1.6: I can hear their screams!
   - avatar: kat.jpg
   - _note: #118, Kat on the radio; her avatar is the project's own kat.jpg.
 
-[p8-nick-docs2] Nick @ 18:19.242 +1.2: docs.bazzite.gg
+[p8-nick-docs2] Nick @ 16:25.977 +1.2: docs.bazzite.gg
   - avatar: nick.jpg
   - _note: #118, radio answer 2 of 3.
 
-[p9-nat-voices] Nat @ 18:20.642 +2.3: Like one hundred thousand voices cried out in terror
+[p9-nat-voices] Nat @ 16:27.377 +2.3: Like one hundred thousand voices cried out in terror
   - avatar: natali.jpg
   - _note: #118, over the walk; she is onscreen. Runs under her reveal card, which sits ABOVE the matte (reveal.html bottom:336px) while pills sit inside it -- two bands, no collision.
 
-[p10-nick-docs3] Nick @ 18:23.142 +1.4: docs.bazzite.gg
+[p10-nick-docs3] Nick @ 16:29.877 +1.4: docs.bazzite.gg
   - avatar: nick.jpg
   - _note: #118, the button. Clears at 24.9, on the act's own picture fade (fade_out_at 24.95) -- the gag ends the act.

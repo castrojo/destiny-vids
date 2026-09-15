@@ -161,159 +161,159 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 
 Edit in `chapters/III-mrbobbytables.md`.
 
-- `14:45.96` Maintainers Reading Emails / Summer 2027
-- `14:54.80` CNCF Projects to Help Your Agents
+- `12:52.70` Maintainers Reading Emails / Summer 2027
+- `13:01.54` CNCF Projects to Help Your Agents
 
 ## IV
 
 Edit in `chapters/IV-kat.md`.
 
-- `16:46.31` **katcosgrove** — Hey why are they shooting at me!
-- `16:49.01` **mrbobbytables** — The gamers don't know you're here to help
-- `16:56.81` **katcosgrove** — Nice to meet you too!
-- `16:59.26` **katcosgrove** — I miss ONE email now I gotta use a Linux desktop?
-- `17:02.39` **katcosgrove** — How much you want to bet their sound just doesn't work?
-- `17:05.88` **TBD** — HEY! We know when you're not upstreaming!
-- `17:08.54` **katcosgrove** — I have better sh*t to do!
-- `17:10.99` **katcosgrove** — I miss ingress-nginx sometimes
-- `17:13.44` **katcosgrove** — Fine I'll fix your sh*t too
-- `17:15.89` **katcosgrove** — Remember kids, cardio!
+- `15:32.98` **katcosgrove** — Hey why are they shooting at me!
+- `15:35.68` **mrbobbytables** — The gamers don't know you're here to help
+- `15:43.48` **katcosgrove** — Nice to meet you too!
+- `15:45.93` **katcosgrove** — I miss ONE email now I gotta use a Linux desktop?
+- `15:49.06` **katcosgrove** — How much you want to bet their sound just doesn't work?
+- `15:52.54` **TBD** — HEY! We know when you're not upstreaming!
+- `15:55.21` **katcosgrove** — I have better sh*t to do!
+- `15:57.66` **katcosgrove** — I miss ingress-nginx sometimes
+- `16:00.11` **katcosgrove** — Fine I'll fix your sh*t too
+- `16:02.56` **katcosgrove** — Remember kids, cardio!
 
 ## V
 
 Edit in `chapters/V-nat.md`.
 
-- `18:02.24` **Nat** — Hey these mouth breathers are shooting at me!
-- `18:07.44` **Nat** — I am a Documentation Expert, cease fire!
-- `18:09.94` **Nat** — Goddamn it!
-- `18:11.54` **Nat** — No time to `git push`!
-- `18:13.44` **Nat** — I'm stranded, they'll never find the docs in time!
-- `18:16.04` **Nick** — docs.bazzite.gg
-- `18:17.44` **Kat** — I can hear their screams!
-- `18:19.24` **Nick** — docs.bazzite.gg
-- `18:20.64` **Nat** — Like one hundred thousand voices cried out in terror
-- `18:23.14` **Nick** — docs.bazzite.gg
+- `16:08.98` **Nat** — Hey these mouth breathers are shooting at me!
+- `16:14.18` **Nat** — I am a Documentation Expert, cease fire!
+- `16:16.68` **Nat** — Goddamn it!
+- `16:18.28` **Nat** — No time to `git push`!
+- `16:20.18` **Nat** — I'm stranded, they'll never find the docs in time!
+- `16:22.78` **Nick** — docs.bazzite.gg
+- `16:24.18` **Kat** — I can hear their screams!
+- `16:25.98` **Nick** — docs.bazzite.gg
+- `16:27.38` **Nat** — Like one hundred thousand voices cried out in terror
+- `16:29.88` **Nick** — docs.bazzite.gg
 
 ## VI
 
 Edit in `chapters/VI-wolves.md`.
 
-- `18:51.00` Humanity had conquered infrastructure
-- `18:53.45` Uniting the entirety of Open Source
-- `18:55.90` Under in one big white ball of hope in the sky
-- `18:58.35` The warm white ball of Cloud Native brought many gifts
-- `19:00.80` Deployment times halved
-- `19:03.25` You even got some headcount
-- `19:12.00` We reached out to the stars
-- `19:14.45` We basked in wonder at what we had built
-- `19:16.90` ... Ok
-- `19:23.00` The light of open source spread through our solar system
-- `19:25.45` Humanity used them together, in peace
-- `19:27.90` Except Europa, we were told to never make an attempt
-- `19:36.00` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
-- `19:45.00` Humanity united around our great cloud native civilization
-- `19:47.45` Our primary purpose had turned to knowledge sharing
-- `19:49.90` A beacon in what remained of our once great empire
-- `20:00.00` Each passing cycle the Toilmaster enboldens his attack
-- `20:02.45` Our noblest Maintainer-Guardians falling to burnout, or worse
-- `20:12.00` **jbryce** — The First Automator | Master Sommelier / DIRECTOR // GUARDIAN / Jonathan Bryce
-- `20:14.00` **jbryce** — We will empower those who come after
-- `20:19.00` **angellk** — Deploy all Guardians! We're under attack!
-- `20:22.05` **rochaporto** — Our infrastructure will suffer the Toilmaster
-- `20:25.10` **alolita** — Deploying our units to the southern perimeter
-- `20:28.35` **chira001** — Western Wall secured
-- `20:30.80` **chadbeaudin** — All fighter wings deployed, good hunting
-- `20:42.00` **akgraner** — Let's roll, interdictor squad on me!
-- `20:46.00` **marcoceppi** — Speeeeed!
-- `20:51.00` TERRIBLE AI MANDATE
-- `20:56.00` University of Michigan | VULTR / BLUEBERRY // MARKETING / Talia S.
-- `21:00.00` TRUSTEE // GUARDIAN / Abbey Bangser
-- `21:06.00` **mfahlandt** — MAINTAINER // GUARDIAN / Mario Fahlandt
-- `21:12.00` **Anita-ihuman** — How many of these things are there!
-- `21:15.00` **akgraner** — To me! Stay together!
-- `21:22.00` LACK OF INHOUSE CNCF EXPERTISE
-- `21:29.00` Same techdebt over and over
-- `21:35.00` **pthomas** — LAUNCH LAUNCH LAUNCH
-- `21:39.00` **mrbobbytables** — All sandboxes breached
-- `21:43.00` Destroyer of Budgets | Sapper of Talent | Tech Debt Conjurer / PLATFORM TORMENTOR
-- `21:43.00` **ingress-nginx** — I've had enough of your smug talk
-- `21:46.00` **akgraner** — Kyle will destroy you
-- `21:50.00` Cloud Native New York City
-- `21:50.00` **abebars** — You picked the wrong town
-- `21:52.05` **justaugustus** — And the wrong day
-- `21:54.00` **juliafmorgado** — Disco!
-- `21:57.00` **kevin-wangzefeng** — CNCF Projects team, plan "Bazzite" approved ... do it
-- `22:00.78` **jeremyrickard** — Full autonomous mode authorized
-- `22:03.23` **thschue** — Mechaphippy Deployment: [ APPROVED ]
-- `22:07.00` **alatiera** — I've brought some new toys Mister Clanker man ...
-- `22:11.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / James Reilly
-- `22:14.00` RISE FROM THE SLOP - OR DROWN IN IT / AI TORMENTOR
-- `22:21.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / Ahmed Adan
-- `22:26.00` Master Buildstream Architect / MAINTAINER // GUARDIAN / Jordan Petridis
-- `22:32.00` **clubanderson** — Introducing our Elite Cloud Native Guardians
-- `22:35.00` WITH LESS / DELIVER MORE
-- `22:39.25` **shuahkh** — They're sending everything, you got this!
-- `22:49.00` **alatiera** — James you and your fucking SLOP!
-- `22:52.05` **hanthor** — That wasn't me!
-- `22:51.00` IS STILL FOUNDER OPS / AI FOUNDER OPS
-- `22:51.00` has force pushed to `main` / castrojo
-- `22:59.00` **hanthor** — Just connect Buildstream to Kubernetes!
-- `23:05.00` **ahmedadan** — Jordan does this mean you like AI?
-- `23:08.00` **alatiera** — No, Greeks can do this naturally. Ciao
-- `23:16.00` Synergy Optimized / CNCF and Apache Foundation
-- `23:26.00` Maintainer-Guardians clawed their way from the abyss
-- `23:28.45` And started to retake what was theirs
-- `23:30.90` To share and protect for for all humanity
-- `23:58.00` **bsherman** — Are we late?
-- `24:00.25` **krook** — What's with the snow gear?
-- `24:02.50` **pthomas** — Long story
-- `24:04.75` **bsherman** — We're new
-- `24:07.00` **p5** — But strong
-- `24:09.25` **fatherlinux** — Team Hummingbird reporting for duty!
-- `24:12.00` Christoph Blecker
-- `24:15.00` **akgraner** — Thanks for the rez Kyle!
-- `24:19.00` **robertsirc** — Let's goooooo!
-- `24:23.56` **castrojo** — Now you are ready
-- `24:26.61` **castrojo** — In the world of technology there are the sheep
-- `24:29.66` **castrojo** — And then there are the wolves
-- `24:45.00` Protector of the Helm / #HIREAWOLF // MAINTAINER / Robert Sirchia
-- `24:48.82` **castrojo** — I follow my mentors
-- `24:57.00` **castrojo** — Of the past
-- `25:02.00` **castrojo** — The Present
-- `25:04.00` **castrojo** — And Future
-- `25:11.00` **castrojo** — You will fail
-- `25:13.45` **castrojo** — Don't let it take you
-- `25:15.90` **castrojo** — The only winning move is not to play
-- `25:18.35` **castrojo** — Think like a dinosaur
-- `25:20.80` **castrojo** — Lift each other
-- `25:23.25` **castrojo** — and rise ...
+- `16:42.27` Humanity had conquered infrastructure
+- `16:44.72` Uniting the entirety of Open Source
+- `16:47.17` Under in one big white ball of hope in the sky
+- `16:49.62` The warm white ball of Cloud Native brought many gifts
+- `16:52.07` Deployment times halved
+- `16:54.52` You even got some headcount
+- `17:03.27` We reached out to the stars
+- `17:05.72` We basked in wonder at what we had built
+- `17:08.17` ... Ok
+- `17:14.27` The light of open source spread through our solar system
+- `17:16.72` Humanity used them together, in peace
+- `17:19.17` Except Europa, we were told to never make an attempt
+- `17:27.27` Welcome to KubeCon + Cloud Native Con / AN4-CH4K-12
+- `17:36.27` Humanity united around our great cloud native civilization
+- `17:38.72` Our primary purpose had turned to knowledge sharing
+- `17:41.17` A beacon in what remained of our once great empire
+- `17:51.27` Each passing cycle the Toilmaster enboldens his attack
+- `17:53.72` Our noblest Maintainer-Guardians falling to burnout, or worse
+- `18:03.27` **jbryce** — The First Automator | Master Sommelier / DIRECTOR // GUARDIAN / Jonathan Bryce
+- `18:05.27` **jbryce** — We will empower those who come after
+- `18:10.27` **angellk** — Deploy all Guardians! We're under attack!
+- `18:13.32` **rochaporto** — Our infrastructure will suffer the Toilmaster
+- `18:16.37` **alolita** — Deploying our units to the southern perimeter
+- `18:19.62` **chira001** — Western Wall secured
+- `18:22.07` **chadbeaudin** — All fighter wings deployed, good hunting
+- `18:33.27` **akgraner** — Let's roll, interdictor squad on me!
+- `18:37.27` **marcoceppi** — Speeeeed!
+- `18:42.27` TERRIBLE AI MANDATE
+- `18:47.27` University of Michigan | VULTR / BLUEBERRY // MARKETING / Talia S.
+- `18:51.27` TRUSTEE // GUARDIAN / Abbey Bangser
+- `18:57.27` **mfahlandt** — MAINTAINER // GUARDIAN / Mario Fahlandt
+- `19:03.27` **Anita-ihuman** — How many of these things are there!
+- `19:06.27` **akgraner** — To me! Stay together!
+- `19:13.27` LACK OF INHOUSE CNCF EXPERTISE
+- `19:20.27` Same techdebt over and over
+- `19:26.27` **pthomas** — LAUNCH LAUNCH LAUNCH
+- `19:30.27` **mrbobbytables** — All sandboxes breached
+- `19:34.27` Destroyer of Budgets | Sapper of Talent | Tech Debt Conjurer / PLATFORM TORMENTOR
+- `19:34.27` **ingress-nginx** — I've had enough of your smug talk
+- `19:37.27` **akgraner** — Kyle will destroy you
+- `19:41.27` Cloud Native New York City
+- `19:41.27` **abebars** — You picked the wrong town
+- `19:43.32` **justaugustus** — And the wrong day
+- `19:45.27` **juliafmorgado** — Disco!
+- `19:48.27` **kevin-wangzefeng** — CNCF Projects team, plan "Bazzite" approved ... do it
+- `19:52.05` **jeremyrickard** — Full autonomous mode authorized
+- `19:54.50` **thschue** — Mechaphippy Deployment: [ APPROVED ]
+- `19:58.27` **alatiera** — I've brought some new toys Mister Clanker man ...
+- `20:02.27` Master Buildstream Architect / MAINTAINER // GUARDIAN / James Reilly
+- `20:05.27` RISE FROM THE SLOP - OR DROWN IN IT / AI TORMENTOR
+- `20:12.27` Master Buildstream Architect / MAINTAINER // GUARDIAN / Ahmed Adan
+- `20:17.27` Master Buildstream Architect / MAINTAINER // GUARDIAN / Jordan Petridis
+- `20:23.27` **clubanderson** — Introducing our Elite Cloud Native Guardians
+- `20:26.27` WITH LESS / DELIVER MORE
+- `20:30.52` **shuahkh** — They're sending everything, you got this!
+- `20:40.27` **alatiera** — James you and your fucking SLOP!
+- `20:43.32` **hanthor** — That wasn't me!
+- `20:42.27` IS STILL FOUNDER OPS / AI FOUNDER OPS
+- `20:42.27` has force pushed to `main` / castrojo
+- `20:50.27` **hanthor** — Just connect Buildstream to Kubernetes!
+- `20:56.27` **ahmedadan** — Jordan does this mean you like AI?
+- `20:59.27` **alatiera** — No, Greeks can do this naturally. Ciao
+- `21:07.27` Synergy Optimized / CNCF and Apache Foundation
+- `21:17.27` Maintainer-Guardians clawed their way from the abyss
+- `21:19.72` And started to retake what was theirs
+- `21:22.17` To share and protect for for all humanity
+- `21:49.27` **bsherman** — Are we late?
+- `21:51.52` **krook** — What's with the snow gear?
+- `21:53.77` **pthomas** — Long story
+- `21:56.02` **bsherman** — We're new
+- `21:58.27` **p5** — But strong
+- `22:00.52` **fatherlinux** — Team Hummingbird reporting for duty!
+- `22:03.27` Christoph Blecker
+- `22:06.27` **akgraner** — Thanks for the rez Kyle!
+- `22:10.27` **robertsirc** — Let's goooooo!
+- `22:14.83` **castrojo** — Now you are ready
+- `22:17.88` **castrojo** — In the world of technology there are the sheep
+- `22:20.92` **castrojo** — And then there are the wolves
+- `22:36.27` Protector of the Helm / #HIREAWOLF // MAINTAINER / Robert Sirchia
+- `22:40.09` **castrojo** — I follow my mentors
+- `22:48.27` **castrojo** — Of the past
+- `22:53.27` **castrojo** — The Present
+- `22:55.27` **castrojo** — And Future
+- `23:02.27` **castrojo** — You will fail
+- `23:04.72` **castrojo** — Don't let it take you
+- `23:07.17` **castrojo** — The only winning move is not to play
+- `23:09.62` **castrojo** — Think like a dinosaur
+- `23:12.07` **castrojo** — Lift each other
+- `23:14.52` **castrojo** — and rise ...
 
 ## VII
 
 Edit in `chapters/VII-europa.md`.
 
-- `28:38.93` **krook** — Deploy CNCF Projects Team
-- `28:40.93` **preethit** — Stand down, I'm sending my wolf
-- `28:42.93` **alolita** — Are you sure the Kube is on Europa?
-- `28:45.93` **preethit** — I hope she can handle the Kube
-- `28:48.33` **preethit** — I must not fail
-- `28:50.78` **alolita** — We have failed, Guardians are down
-- `28:53.29` **tophee** — I've confirmed it myself, we have no choice
-- `28:56.41` **tophee** — She's the only way to stop the Toilmaster
-- `29:02.93` **castrojo** — They must never know what you did for them
-- `29:05.93` **mrbobbytables** — When all hope is lost
-- `29:08.33` **jeefy** — Standing by for Extraction
-- `29:10.93` **ihor** — G{k8s}dspeed
-- `29:13.53` **preethit** — Our clan
-- `29:15.98` **preethit** — Is the Iron
-- `29:18.43` **preethit** — That forges Wolves
-- `29:20.88` **mrbobbytables** — Wolves gladly sacrifice for their own
-- `29:23.59` **krook** — Initiate Lone Wolf Protocol
-- `29:26.04` **iancoldwater** — Local Security systems trivially pwned
-- `29:28.83` **tabbysable** — Europan Security systems trivially pwned (again)
-- `29:39.93` **nimbatus** — Wilco
-- `29:42.13` **nimbatus** — {k8s}ut
-- `29:49.10` **preethit** — Hummingbird will find the girl
+- `25:14.29` **krook** — Deploy CNCF Projects Team
+- `25:16.29` **preethit** — Stand down, I'm sending my wolf
+- `25:18.29` **alolita** — Are you sure the Kube is on Europa?
+- `25:21.29` **preethit** — I hope she can handle the Kube
+- `25:23.69` **preethit** — I must not fail
+- `25:26.14` **alolita** — We have failed, Guardians are down
+- `25:28.66` **tophee** — I've confirmed it myself, we have no choice
+- `25:31.78` **tophee** — She's the only way to stop the Toilmaster
+- `25:38.29` **castrojo** — They must never know what you did for them
+- `25:41.29` **mrbobbytables** — When all hope is lost
+- `25:43.69` **jeefy** — Standing by for Extraction
+- `25:46.29` **ihor** — G{k8s}dspeed
+- `25:48.89` **preethit** — Our clan
+- `25:51.34` **preethit** — Is the Iron
+- `25:53.79` **preethit** — That forges Wolves
+- `25:56.24` **mrbobbytables** — Wolves gladly sacrifice for their own
+- `25:58.96` **krook** — Initiate Lone Wolf Protocol
+- `26:01.41` **iancoldwater** — Local Security systems trivially pwned
+- `26:04.19` **tabbysable** — Europan Security systems trivially pwned (again)
+- `26:15.29` **nimbatus** — Wilco
+- `26:17.49` **nimbatus** — {k8s}ut
+- `26:24.46` **preethit** — Hummingbird will find the girl
 
 ## VIII-cta
 
