@@ -363,8 +363,7 @@
    "fade_in": 0.6,
    "fade_out_at": 139.033,
    "fade_out": 0.25,
-   "name": "TERRIBLE AI MANDATE",
-   "text_source": "owner_supplied"
+   "name": "TERRIBLE AI MANDATE"
   },
   {
    "id": "talia_marketing",
@@ -447,8 +446,7 @@
    "fade_in": 0.6,
    "fade_out_at": 170.033,
    "fade_out": 0.25,
-   "name": "LACK OF INHOUSE CNCF EXPERTISE",
-   "text_source": "owner_supplied"
+   "name": "LACK OF INHOUSE CNCF EXPERTISE"
   },
   {
    "id": "tank_techdebt",
@@ -502,7 +500,6 @@
    "fade_out_at": 190.033,
    "fade_out": 0.25,
    "name": "PLATFORM TORMENTOR",
-   "text_source": "owner_supplied",
    "tagline": "Thrives on Cloud Native Hubris"
   },
   {
@@ -546,19 +543,6 @@
    "fade_out": 0.25
   },
   {
-   "id": "ch_vi_25_1_juliafmorgado",
-   "kind": "chat",
-   "position": "letterbox",
-   "speaker": "juliafmorgado",
-   "text": "Disco!",
-   "copy_source": "owner_supplied",
-   "at": 198.633,
-   "dur": 2.2,
-   "fade_in": 0.6,
-   "fade_out_at": 200.233,
-   "fade_out": 0.25
-  },
-  {
    "id": "ch_vi_24_2_abebars",
    "kind": "chat",
    "position": "letterbox",
@@ -582,6 +566,19 @@
    "dur": 1.8,
    "fade_in": 0.6,
    "fade_out_at": 197.883,
+   "fade_out": 0.25
+  },
+  {
+   "id": "ch_vi_25_1_juliafmorgado",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "juliafmorgado",
+   "text": "Disco!",
+   "copy_source": "owner_supplied",
+   "at": 198.633,
+   "dur": 2.2,
+   "fade_in": 0.6,
+   "fade_out_at": 200.233,
    "fade_out": 0.25
   },
   {
@@ -662,8 +659,7 @@
    "fade_in": 0.6,
    "fade_out_at": 222.033,
    "fade_out": 0.25,
-   "name": "AI TORMENTOR",
-   "text_source": "owner_supplied"
+   "name": "AI TORMENTOR"
   },
   {
    "id": "ahmed_adan",
@@ -718,8 +714,7 @@
    "fade_in": 0.6,
    "fade_out_at": 243.033,
    "fade_out": 0.25,
-   "name": "DELIVER MORE",
-   "text_source": "owner_supplied"
+   "name": "DELIVER MORE"
   },
   {
    "id": "shuah_khan_guardian",
@@ -733,33 +728,6 @@
    "dur": 2.733,
    "fade_in": 0.6,
    "fade_out_at": 246.016,
-   "fade_out": 0.25
-  },
-  {
-   "id": "ai_founder_ops",
-   "kind": "miniboss",
-   "position": "boss",
-   "title": "IS STILL FOUNDER OPS",
-   "copy_source": "owner_supplied",
-   "at": 255.633,
-   "dur": 4.0,
-   "fade_in": 0.6,
-   "fade_out_at": 259.033,
-   "fade_out": 0.25,
-   "name": "AI FOUNDER OPS",
-   "text_source": "owner_supplied"
-  },
-  {
-   "id": "castrojo_force_push",
-   "kind": "status",
-   "position": "status",
-   "detail": "castrojo",
-   "label": "has force pushed to `main`",
-   "copy_source": "owner_supplied",
-   "at": 255.633,
-   "dur": 4.0,
-   "fade_in": 0.6,
-   "fade_out_at": 259.033,
    "fade_out": 0.25
   },
   {
@@ -777,20 +745,6 @@
    "fade_out": 0.25
   },
   {
-   "id": "hanthor_buildstream",
-   "kind": "chat",
-   "position": "letterbox",
-   "speaker": "hanthor",
-   "avatar": "renders/avatars/hanthor.png",
-   "text": "Just connect Buildstream to Kubernetes!",
-   "copy_source": "owner_supplied",
-   "at": 263.633,
-   "dur": 2.8,
-   "fade_in": 0.6,
-   "fade_out_at": 265.833,
-   "fade_out": 0.25
-  },
-  {
    "id": "hanthor_not_me",
    "kind": "chat",
    "position": "letterbox",
@@ -802,6 +756,46 @@
    "dur": 2.8,
    "fade_in": 0.6,
    "fade_out_at": 258.883,
+   "fade_out": 0.25
+  },
+  {
+   "id": "ai_founder_ops",
+   "kind": "miniboss",
+   "position": "boss",
+   "title": "IS STILL FOUNDER OPS",
+   "copy_source": "owner_supplied",
+   "at": 255.633,
+   "dur": 4.0,
+   "fade_in": 0.6,
+   "fade_out_at": 259.033,
+   "fade_out": 0.25,
+   "name": "AI FOUNDER OPS"
+  },
+  {
+   "id": "castrojo_force_push",
+   "kind": "status",
+   "position": "status",
+   "detail": "castrojo",
+   "label": "has force pushed to `main`",
+   "copy_source": "owner_supplied",
+   "at": 255.633,
+   "dur": 4.0,
+   "fade_in": 0.6,
+   "fade_out_at": 259.033,
+   "fade_out": 0.25
+  },
+  {
+   "id": "hanthor_buildstream",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "hanthor",
+   "avatar": "renders/avatars/hanthor.png",
+   "text": "Just connect Buildstream to Kubernetes!",
+   "copy_source": "owner_supplied",
+   "at": 263.633,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 265.833,
    "fade_out": 0.25
   },
   {
@@ -1036,6 +1030,21 @@
    "variant": "leader"
   },
   {
+   "id": "castrojo_line_6",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "I follow my mentors",
+   "copy_source": "owner_supplied",
+   "at": 373.454,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 375.654,
+   "fade_out": 0.25,
+   "bond_of": "cayde_reveal_castrojo"
+  },
+  {
    "id": "cayde_reveal_castrojo",
    "at": 374.041,
    "dur": 3.4,
@@ -1056,6 +1065,21 @@
     "binding": "cayde_6",
     "decided_by": "https://github.com/castrojo/destiny-vids/issues/111"
    }
+  },
+  {
+   "id": "castrojo_line_7",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "Of the past",
+   "copy_source": "owner_supplied",
+   "at": 381.633,
+   "dur": 2.8,
+   "fade_in": 0.6,
+   "fade_out_at": 383.833,
+   "fade_out": 0.25,
+   "bond_of": "gold_kelsey_hightower"
   },
   {
    "id": "gold_kelsey_hightower",
@@ -1099,6 +1123,21 @@
    "variant": "leader"
   },
   {
+   "id": "castrojo_line_8",
+   "kind": "chat",
+   "position": "letterbox",
+   "speaker": "castrojo",
+   "avatar": "renders/avatars/castrojo.png",
+   "text": "The Present",
+   "copy_source": "owner_supplied",
+   "at": 386.633,
+   "dur": 1.7,
+   "fade_in": 0.6,
+   "fade_out_at": 387.733,
+   "fade_out": 0.25,
+   "bond_of": "gold_brian_ketelsen"
+  },
+  {
    "id": "gold_angie_jones",
    "at": 388.349,
    "dur": 1.85,
@@ -1115,51 +1154,6 @@
    "name": "Angie Jones",
    "title": "Arbiter of the Agentic",
    "variant": "leader"
-  },
-  {
-   "id": "castrojo_line_6",
-   "kind": "chat",
-   "position": "letterbox",
-   "speaker": "castrojo",
-   "avatar": "renders/avatars/castrojo.png",
-   "text": "I follow my mentors",
-   "copy_source": "owner_supplied",
-   "at": 373.454,
-   "dur": 2.8,
-   "fade_in": 0.6,
-   "fade_out_at": 375.654,
-   "fade_out": 0.25,
-   "bond_of": "cayde_reveal_castrojo"
-  },
-  {
-   "id": "castrojo_line_7",
-   "kind": "chat",
-   "position": "letterbox",
-   "speaker": "castrojo",
-   "avatar": "renders/avatars/castrojo.png",
-   "text": "Of the past",
-   "copy_source": "owner_supplied",
-   "at": 381.633,
-   "dur": 2.8,
-   "fade_in": 0.6,
-   "fade_out_at": 383.833,
-   "fade_out": 0.25,
-   "bond_of": "gold_kelsey_hightower"
-  },
-  {
-   "id": "castrojo_line_8",
-   "kind": "chat",
-   "position": "letterbox",
-   "speaker": "castrojo",
-   "avatar": "renders/avatars/castrojo.png",
-   "text": "The Present",
-   "copy_source": "owner_supplied",
-   "at": 386.633,
-   "dur": 1.7,
-   "fade_in": 0.6,
-   "fade_out_at": 387.733,
-   "fade_out": 0.25,
-   "bond_of": "gold_brian_ketelsen"
   },
   {
    "id": "castrojo_line_9",

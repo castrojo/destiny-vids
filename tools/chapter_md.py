@@ -1009,17 +1009,16 @@ BOSS_BASE = {
 
 def build_entry(act, b, n, line, start, hold, defaults, order=None):
     """One parsed row -> the plate the manifest carries for it."""
-    base = {}
+    base = dict(BOSS_BASE if line["kind"] == "boss" else CHAT_BASE)
+    if line["kind"] == "card":
+        base = {"kind": line["card_kind"]}
     base.update(defaults or {})
     if line["kind"] == "boss":
-        base.update(BOSS_BASE)
+        # A boss row (!) must never have its structural kind/position overwritten
+        # by chapter front-matter defaults (e.g. `kind: chat`).
+        base["kind"] = "miniboss"
+        base["position"] = "boss"
     elif line["kind"] == "card":
-        base["kind"] = line["card_kind"]
-        if line["card_kind"] == "-":
-            base.pop("kind", None)
-    elif "kind" not in base:
-        base.update(CHAT_BASE)
-    if line["kind"] == "card":
         # A card names its own kind on its own row. The act default -- almost
         # always `chat`, because most rows in a chapter file are dialogue --
         # must never quietly turn a status card into a pill. A kind of `-` is
@@ -1028,7 +1027,6 @@ def build_entry(act, b, n, line, start, hold, defaults, order=None):
         base["kind"] = line["card_kind"]
         if line["card_kind"] == "-":
             base.pop("kind")
-
     entry = {"id": line["id"] or _generated_id(act, b, n, line),
              "at": start, "dur": hold}
     if start is None:
@@ -1426,10 +1424,9 @@ def _merge_plates(before, authored):
 
     A chapter file owns the plates it authors, NOT the whole array: act VI's
     pills sit in the same list as four ``brief`` nameplates that resolve from
-    the roster. Replacing the array would delete them, so every DERIVED plate
-    the chapter file does not name is carried through in the position it
-    already holds, and a newly written line lands beside the plate it follows
-    in time.
+    the roster. Authored plates follow the chapter file's authored order, while
+    every DERIVED plate the chapter file does not author is carried through
+    and seated in time order.
 
     A NON-derived plate the chapter no longer authors is dropped, with a
     note: carrying it through made deletion inexpressible, which is how
@@ -1441,29 +1438,34 @@ def _merge_plates(before, authored):
         # against, and its order IS its content.
         return authored, []
     by_id = {plate.get("id"): plate for plate in authored}
-    merged, notes = [], []
-    for plate in before:
-        if plate.get("id") in by_id:
-            merged.append(by_id.pop(plate.get("id")))
-        elif plate.get("copy_source") in DERIVED_COPY:
-            merged.append(plate)
-        else:
-            notes.append(f"{plate.get('id')}: dropped -- no longer authored "
-                         "in the chapter file, and not derived copy")
-    for plate in by_id.values():
-        if plate.get("copy_source") in DERIVED_COPY:
-            notes.append(f"{plate.get('id')}: a chapter file cannot author "
-                         f"{plate['copy_source']} copy; it is derived")
+    derived_indices = {}
+    notes = []
+    for idx, plate in enumerate(before):
+        pid = plate.get("id")
+        if pid in by_id:
             continue
-        at = plate.get("at", 0.0)
-        index = len(merged)
-        for position, existing in enumerate(merged):
-            if existing.get("at", 0.0) > at:
-                index = position
-                break
-        merged.insert(index, plate)
-    return merged, notes
+        elif plate.get("copy_source") in DERIVED_COPY:
+            derived_indices[idx] = plate
+        else:
+            notes.append(f"{pid}: dropped -- no longer authored "
+                         "in the chapter file, and not derived copy")
 
+    merged = list(authored)
+    # Insert derived plates at their original index if possible, or time-sorted
+    for idx in sorted(derived_indices):
+        plate = derived_indices[idx]
+        if "at" in plate:
+            at = plate["at"]
+            index = len(merged)
+            for position, existing in enumerate(merged):
+                if existing.get("at", 0.0) > at:
+                    index = position
+                    break
+            merged.insert(index, plate)
+        else:
+            merged.insert(min(idx, len(merged)), plate)
+
+    return merged, notes
 
 def _json_indent(raw):
     """The indent the file already uses, so regenerating it moves no line.
