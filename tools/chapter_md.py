@@ -965,12 +965,20 @@ def _split_entries(act, *, include_block_labels=False):
                 f"{format_tc(at[-1] + holds[-1])} film); it is scheduled "
                 "anyway so the conversation is reviewable")
     if deck:
-        base = deck[0]["at"]
-        for slide in deck:
-            slide["at"] = round(slide["at"] - base, 3)
-            if "fade_out_at" in slide:
-                slide["fade_out_at"] = round(slide["fade_out_at"] - base, 3)
+        _rebase_deck(deck)
     return out, deck, unresolved
+
+
+def _rebase_deck(deck):
+    """Normalize trailing deck relative timestamps against the earliest slide."""
+    if not deck:
+        return deck
+    base = min(slide["at"] for slide in deck)
+    for slide in deck:
+        slide["at"] = round(slide["at"] - base, 3)
+        if "fade_out_at" in slide:
+            slide["fade_out_at"] = round(slide["fade_out_at"] - base, 3)
+    return deck
 
 
 def untimed_entries(act, blocks, defaults, order):

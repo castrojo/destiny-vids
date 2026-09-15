@@ -110,7 +110,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: CLOUD NATIVE MEETS THE LINUX DESKTOP
   - subtitle: r/linux goes supernova, no one notices
 
-* [intermission-2] slide @ 17:05.248 +6.0
+* [intermission-2] slide @ 17:20.800 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Sed do eiusmod
@@ -118,7 +118,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Tempor incididunt ut labore et dolore magna
   - title_source: placeholder
 
-* [intermission-3] slide @ 17:12.048 +6.0
+* [intermission-3] slide @ 17:27.600 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Ut enim ad minim
@@ -126,7 +126,7 @@ python3 scripts/build_intermission.py --render    # and the film
   - title: Veniam quis nostrud exercitation ullamco laboris
   - title_source: placeholder
 
-* [intermission-4] slide @ 17:18.848 +6.0
+* [intermission-4] slide @ 17:34.400 +6.0
   - position: slide
   - copy_source: placeholder
   - label: Duis aute irure

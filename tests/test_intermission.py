@@ -103,3 +103,12 @@ def test_a_slide_with_no_rendered_card_is_named_not_guessed():
             committed()["plates"], 27.0, REPO_ROOT / "no" / "such" / "dir",
             REPO_ROOT / "renders" / "intermission" / "out.mp4",
             ffmpeg=["ffmpeg"])
+
+
+def test_intermission_slides_do_not_overlap_and_total_expected_duration():
+    """Each slide must clear before the next opens; duration is exactly 27.2s."""
+    plates = committed()["plates"]
+    assert len(plates) == 4
+    for a, b in zip(plates, plates[1:]):
+        assert a["at"] + a["dur"] <= b["at"] + 0.001, f"{a['id']} overlaps {b['id']}"
+    assert build_intermission.duration(plates) == pytest.approx(27.2)

@@ -621,7 +621,18 @@ def test_authored_plates_reorder_around_carried_through_derived_plate():
     merged, notes = chapter_md._merge_plates(before, authored)
     assert [p["id"] for p in merged] == ["second", "derived", "first"]
     assert notes == []
-
+def test_rebase_deck_normalizes_to_minimum_slide_timestamp():
+    """A deck with an out-of-order opening pin rebases to min(at) and keeps authored order."""
+    deck = [
+        {"id": "d1", "at": 14.0, "dur": 6.0, "fade_out_at": 20.0},
+        {"id": "d2", "at": 8.0, "dur": 6.0, "fade_out_at": 14.0},
+    ]
+    rebased = chapter_md._rebase_deck(deck)
+    assert [p["id"] for p in rebased] == ["d1", "d2"]
+    assert rebased[0]["at"] == 6.0
+    assert rebased[0]["fade_out_at"] == 12.0
+    assert rebased[1]["at"] == 0.0
+    assert rebased[1]["fade_out_at"] == 6.0
 # ---------------------------------------------------------------------------
 # The two portrait keys, from act II's migration.
 # ---------------------------------------------------------------------------

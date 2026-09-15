@@ -21,9 +21,9 @@
    "footage_rights": {
     "yt_nightwish_perfume_of_the_timeless": "music/bed_perfume_of_the_timeless.json"
    },
-   "source_digest": "8176e640210f6539583d5b1f2573a3d977ccc5da21e1d38757d4f5857d863402",
+   "source_digest": "05d2eb0f41694e65fdcd2eac4719bcc416e1cec4cc3056e70bbc785d01b6d6fc",
    "footage_digest": "fac9a6c7d103836f454d7c1c49181c2983ecbed43ca01f0f2bcc1e9a924a635a",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
@@ -42,11 +42,11 @@
     "yt_into_the_light_cinematic",
     "yt_into_the_light_without_dialogue"
    ],
-   "source_digest": "734e505b65e8e96afeece9b23a9b2e336561145ec71202709bef255840914511",
+   "source_digest": "63d9b0c56b61b88bb6ac2b04389b1042c2c93e09551cdce2fd78dc0063a74f08",
    "footage_digest": "154a0dba529d838b1dd61e0e82b5bfd5c9bb34d57b68243bae60c1d107dd9f1e",
    "rebuild": "python3 scripts/build_act1.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
@@ -70,9 +70,9 @@
     "yt_destiny_all_live_action_trailers",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "f5183b3ada0569ce2781cc100c6a183c8635d3dae93e8e679bb3d8a45ac9c80b",
+   "source_digest": "ed6753123a5836e2d73b764ff1407685d9580223ae60a99789d21322280f99ad",
    "footage_digest": "b233442f1e10ce982ef63bc38ab928dbc79032fd442af300738a8dd8c2a4ddad",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "III": {
    "path": "~/src/destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4",
@@ -99,10 +99,10 @@
    "footage": [
     "yt_curse_of_osiris_opening_cinematic"
    ],
-   "source_digest": "58d7118433142b3b0af2d435254e3b869d1e437527c72dd26afa2faac61c3590",
+   "source_digest": "982158bfa6b8ebc93a376979fa9183574b7af4c332ab4bedca1c11c9c03d6f3d",
    "footage_digest": "45b184f6b60a3640437cc189e2fde807ec58059f47245f52fdc99509cfd0921e",
    "rebuild": "env ACODEC=flac bash scripts/build_uncut_credited.sh yt_curse_of_osiris_opening_cinematic stories/roster-2026-08.json",
-   "built_from_commit": "5da049a860de221bb33f49396528b712df5ee3da"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "IV": {
    "path": "~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4",
@@ -117,11 +117,11 @@
     "chapters/IV-kat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "9d5b883003029a9b1d9a4540bdb24c31a44d34a42328f8b75e6749c1f99c7643",
+   "source_digest": "5a5d0cbd24dc5baf811b50b1d5c022dae32d8442a5d1935bf3f770876c66f62d",
    "rebuild": "python3 scripts/build_kat.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "60f24af4c12ea8a9973aaf76b1602dee7cca177620d58d3c369aa8439b1269f4",
-   "built_from_commit": "eabd74562ef867a92d3340e6be6daa37a653db42"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "V": {
    "path": "~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4",
@@ -136,18 +136,18 @@
     "chapters/V-nat.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "4f69a919b33af19379bc3d833f2048ce7f7f4ad35f10dfa1429f52dbdcfea997",
+   "source_digest": "d8cedb296d1a6ec8886eb94e8f5500f4c1206e5505de19d310f53d8ab72bfc55",
    "rebuild": "python3 scripts/build_natali.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "b18bdaaf50692c0897aba07e91ac31c2c3b67c77b18606450554dc231eec07cf",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "VI": {
    "path": "~/Videos/wolves-musical/wolves-7days-plated-master-v9.mp4",
    "note": "the slide-free interruption-free master (424.074 s), with the Ghost welcome, Jorge's close-up conversation, the Cayde-6 reveal and the three gold credits. v9 is the first master with the Amber interruption actually off screen: the owner ordered it removed in 12f4ebb ('get rid of it lol this moved to the endless song') but every master through v8 still played it. The shotlist was regenerated by scripts/build_wolves.py (31 shots, 423.993 s of film), every plate after the removed block re-seated -19.470 s onto the same shots (the manifest's _shifted records it), and the seats verified frame-by-frame on the rebuilt film. Burned from the clean wolves-7days-master-v9.mp4 kept beside it, because burning is not idempotent. The burn stream-copies the timing pass's FLAC audio, so the act finally has a LOSSLESS master and the #58 caveat is retired.",
    "rebuild": "bash scripts/rebuild_wolves_plated.sh",
    "rebuild_note": "The delivered file is a PLATE BURN over the clean wolves-7days-master-v9.mp4 kept beside it, and burning is not idempotent, so the declared `rebuild` is a wrapper (scripts/rebuild_wolves_plated.sh, the act VI half of #348) that names the two steps explicitly: (1) ./scripts/rebuild-wolves.sh regenerates the timing pass from stories/seven-days-timing-pass.json and runs its gates; (2) plate.py burn targets the FROZEN clean v9 master, never the plated one, and its farm fetch is atomic (burntmp, then replace). That is what makes the route safe to declare: a re-run always burns the same clean picture, so a second set of nameplates about real people can never stack onto the first.",
-   "provenance_note": "Rebuilt on 2026-09-15 against cbca207953f9 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build: rebuild-wolves.sh regenerated the timing pass (31 shots, 423.993 s; its silence and true-peak gates green) and the plates were burned onto the frozen clean v9 master on the farm in one pass with updated chapter ordering and dialogue additions. Earlier: Rebuilt on 2026-09-05 against 82d6c9f24c26 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build. Earlier: Rebuilt on 2026-08-29 against fcbfd52bce90 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build: rebuild-wolves.sh regenerated the timing pass (31 shots, 423.993 s; its silence and true-peak gates green) and the 18 plates were burned onto the frozen clean v9 master on the farm in one pass. Earlier, on 2026-08-23 against 51c0f7ad95de: the four moved inputs were verified NOT to reach a frame (build_wolves.py was +68/-0 reporter-only; the six summit plates and three interruption cards re-rendered to scratch and diffed MAD 0.000 with no difference bbox; chapter_md.py check VI reported no drift).",
+   "provenance_note": "Rebuilt on 2026-09-15 against 1e5c6d106755 through deliver.py build: rebuild-wolves.sh regenerated the timing pass (31 shots, 423.993 s; its silence and true-peak gates green) and the plates were burned onto the frozen clean v9 master on the farm in one pass with updated chapter ordering and dialogue additions. Earlier: Rebuilt on 2026-09-15 against cbca207953f9 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build. Earlier: Rebuilt on 2026-09-05 against 82d6c9f24c26 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build. Earlier: Rebuilt on 2026-08-29 against fcbfd52bce90 through the declared wrapper (scripts/rebuild_wolves_plated.sh) by deliver.py build: rebuild-wolves.sh regenerated the timing pass (31 shots, 423.993 s; its silence and true-peak gates green) and the 18 plates were burned onto the frozen clean v9 master on the farm in one pass. Earlier, on 2026-08-23 against 51c0f7ad95de: the four moved inputs were verified NOT to reach a frame (build_wolves.py was +68/-0 reporter-only; the six summit plates and three interruption cards re-rendered to scratch and diffed MAD 0.000 with no difference bbox; chapter_md.py check VI reported no drift).",
    "sources": [
     "scripts/build_wolves.py",
     "scripts/rebuild-wolves.sh",
@@ -170,9 +170,9 @@
     "yt_destiny_2_lightfall_launch_trailer",
     "yt_destiny_2_the_final_shape_gameplay_trailer"
    ],
-   "source_digest": "3c140c32e72ffe8e47caff17f967e55db7f2d3e9ca1303ea327b64ebd3aa169b",
+   "source_digest": "ef62526166f8be900bca9623aeb9e22ffe2f03adbde72bc06af4688dcdddfb2d",
    "footage_digest": "21c943bcda5ccc2cbae2b3c08cebcf6794763babda3f4304e612e1724bb4220b",
-   "built_from_commit": "cbca207953f9907963fbc9c7208986a036e44d48"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "VII": {
    "path": "~/Videos/wolves-directors-cut/wolves-directors-cut-beauty-of-the-beast-hq-nocover.mp4",
@@ -192,18 +192,18 @@
     "chapters/VII-europa.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "e9b62f373241be240895e2ef5166d972f91d4ffa57b0054ac832a6d168b3d468",
+   "source_digest": "3bbc43797b9eb9e46ce787496b0727367431fa45ef7ff1a6a00f4dc3da279bfc",
    "rebuild": "python3 scripts/build_europa.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
    "footage_digest": "d22c307e1c824644364ab1e2f6fd372be916cce45f89ef8fe51efdc22a01a2bd",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   },
   "VIII": {
    "path": "~/Videos/wolves-credits/08-credits-master.mp4",
    "footage": [],
    "footage_note": "no footage inputs: act VIII carries no filmed picture at all. It is drawn -- contributor walls, placards, the wallpaper cycle and the comic reveal, all rendered from stories/08-credits.json by tools/credits.py. Declared empty rather than left undeclared so the difference between AN ACT WITH NO PICTURE and AN ACT NOBODY HAS DECLARED YET is on the record.",
    "note": "8:52.504. Act VIII, the credits (#51): a call to action before the comic reveal, the credits after it, a second bed pass with vocals, and four upstream projects. Runs on the Bluefin DAY wallpapers over the same white-on-blue deck. Encoded to the DELIVERY SPEC (59.94, high@4.2, bt709) so the megacut joins it by stream copy rather than conforming it at assembly time.",
-   "provenance_note": "Rebuilt on 2026-09-05 at 82d6c9f24c26 by scripts/build_credits.py on the Kubernetes farm. Earlier: Rebuilt on 2026-08-29 at fcbfd52bce90 by deliver.py build (a chapter-clock restatement re-staled the act after the live-concert credits' first farmed encode landed the same night at 332c9740edde). PR #367's Last Ride of the Day had never been encoded before tonight: the 2026-08-24 attempt ran uncapped locally, OOM-killed the workstation at 03:08Z and left the master truncated mid-write, which is why the megacut dry-run found Prod/08-credits.mp4 unprobeable. The cards now reach the pod as staged inputs with the concat list's contents rewritten to pod paths, at a 48Gi limit; the 12G local cap is too small for this graph, so a cluster outage means waiting, not falling back.",
+   "provenance_note": "Rebuilt on 2026-09-15 against 1e5c6d106755 by scripts/build_credits.py through deliver.py build on the Kubernetes farm with all upstream credits and CTA cards. Earlier: Rebuilt on 2026-09-05 at 82d6c9f24c26 by scripts/build_credits.py on the Kubernetes farm. Earlier: Rebuilt on 2026-08-29 at fcbfd52bce90 by deliver.py build (a chapter-clock restatement re-staled the act after the live-concert credits' first farmed encode landed the same night at 332c9740edde). PR #367's Last Ride of the Day had never been encoded before tonight: the 2026-08-24 attempt ran uncapped locally, OOM-killed the workstation at 03:08Z and left the master truncated mid-write, which is why the megacut dry-run found Prod/08-credits.mp4 unprobeable. The cards now reach the pod as staged inputs with the concat list's contents rewritten to pod paths, at a 48Gi limit; the 12G local cap is too small for this graph, so a cluster outage means waiting, not falling back.",
    "sources": [
     "stories/08-credits.json",
     "scripts/build_credits.py",
@@ -214,9 +214,9 @@
     "chapters/VIII-fixed.md",
     "tools/chapter_md.py"
    ],
-   "source_digest": "f3ae36c72559716f7cf47ca331b94f638656c5fc332395e6c20e91f1edba2e62",
+   "source_digest": "a0e48dde4e4bb2202aef531389f33f38b5448d1eb4797aba798ce5a3e8cd6bc1",
    "rebuild": "python3 scripts/build_credits.py --out ~/Videos/wolves-credits/08-credits-master.mp4",
-   "built_from_commit": "82d6c9f24c266a8b9663feb17cc3e6aa7eb90994"
+   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
   }
  },
  "social": {
@@ -248,18 +248,19 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/intermission/03-intermission.mp4": {
-   "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Right now every word is lorem ipsum and the deck credits nobody, so a change here changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
+   "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Opens with the owner-authored MISCOMMUNICATION BREAKDOWN title card followed by three placeholder slides, so changing copy changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
    "sources": [
     "scripts/build_intermission.py",
     "chapters/III-mrbobbytables.md",
     "stories/03-intermission-plates.json",
     "tools/plate.py",
+    "tools/chapter_md.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "267918527b6c5a12ae4f73814c44321ea5d8c35eaaeca29c0f30e94979d4eede"
+   "source_digest": "1a063e5ccb73729a1b6cde8ecae0fec65a057bc03cb4d6dba30c395214f06117"
   },
   "renders/excision/excision-plated.mp4": {
    "note": "The non-act Excision first-battle segment. CARRIES AUTHORED COPY ABOUT REAL PEOPLE and owner-supplied HUD strings. The rally subtitle rail is removed from the black matte; the Ward/finale source is explicitly no-HUD. The plated master is built in one burn from the clean cut.",
@@ -291,7 +292,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/perfume-4-overlays.mp4": {
    "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
@@ -303,7 +304,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "ba94ded66748d935b2b72e40f57e4ec49f29def6bfe94696b747edb569e7737b"
+   "source_digest": "92f99bd30a1c47d417332715c17326d196276cd25406de6554f73b11512f986a"
   },
   "renders/perfume-5.mp4": {
    "note": "Perfume movement 5, clean base: the dark Earth limb before the impact. Stays clean by the thread's own rule.",
@@ -312,7 +313,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/perfume-5-ending.mp4": {
    "note": "Movement 5's overlay derivative: the impact, the underwater passage and its eleven closing lines. CARRIES AUTHORED COPY ABOUT REAL PEOPLE -- the ending cards.",
@@ -324,7 +325,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "7a2e136f94c9143dda1bbd3ca728c44c57853acce3ad6ff7c8f5b9e09260e896"
+   "source_digest": "a9894d251ab1763687c4e6c8da25697e71560b3ba173d4d20ca904cb90659686"
   },
   "renders/ending/mission-pause.mp4": {
    "note": "The Project Bluefin mission, held in silence. Drawn from the ending cards; no footage.",
@@ -333,7 +334,7 @@
     "stories/megacut/ending-cards.json",
     "tools/plate.py"
    ],
-   "source_digest": "304e54faa243a0d5198c11f3a55e058f4326159d23b1ed66614e39bdc9afc3c9"
+   "source_digest": "e5409cd8672fae6be5245c0707c0e82b863d73a9fd0c05b934aab9ec6f4d9728"
   }
  }
 }

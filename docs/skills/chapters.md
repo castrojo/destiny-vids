@@ -109,6 +109,15 @@ are emitted strictly in the order they appear in the chapter file. Derived plate
 are carried through and interleaved by time order relative to authored rows, so
 reordering dialogue or chapter cues in Markdown cannot be swallowed by the
 manifest's prior ordering.
+
+**A trailing deck rebases against its chronologically earliest slide.**
+When an act authors a trailing deck (such as Act III's intermission slide deck),
+the deck's relative timings are normalized against the earliest `at` timestamp
+among all authored slides in the deck (`min(slide['at'] for slide in deck)`),
+rather than assuming the first authored row is chronologically first. This ensures
+that even if the opening slide carries an explicit later pin, relative deck offsets
+remain strictly non-negative.
+
 **A heading label lets a held frame derive its own duration.** Writing
 `## <heading> <label>` (for example `## 9:52.203 paused`) tags every entry
 under that heading until the next one, and `chapter_md.block_end(act, label)`
