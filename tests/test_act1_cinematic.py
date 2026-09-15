@@ -169,7 +169,7 @@ def test_build_contract_describes_the_current_dialogue_free_cut():
     contract = build_act1.__doc__
     assert "yt_into_the_light_without_dialogue.webm" in contract
     assert "1.978625" in contract
-    assert "113.60 s" in contract
+    assert "113.60" in contract
     assert "Ikora" not in contract
     assert "118.2" not in contract
 
@@ -203,14 +203,14 @@ def test_terminal_source_frame_held_by_tpad_is_black(tmp_path):
     image = Image.open(frame).convert("L")
     assert sum(image.getdata()) / (image.width * image.height) < 1.0
 
-def test_trim_command_offsets_audio_and_limits_picture_to_113_6():
+def test_trim_command_offsets_audio_and_limits_picture_to_111_6():
     cmd = build_act1.trim_command(["ffmpeg"])
     ss_positions = [i for i, token in enumerate(cmd) if token == "-ss"]
     assert len(ss_positions) == 2
     audio_ss = float(cmd[ss_positions[1] + 1])
     assert audio_ss == pytest.approx(
         build_act1.TRIM_START + build_act1.AUDIO_SYNC_OFFSET, abs=1e-6)
-    assert build_act1.OUTPUT_DURATION == pytest.approx(113.60)
+    assert build_act1.OUTPUT_DURATION == pytest.approx(111.60)
     assert any(
         float(cmd[i + 1]) == pytest.approx(build_act1.OUTPUT_DURATION, abs=0.01)
         for i, token in enumerate(cmd) if token == "-t")

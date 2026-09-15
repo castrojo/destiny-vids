@@ -14,10 +14,10 @@ The chain, established 2026-07-15 from the record (`megacut.json`'s
      treated as current merely because it exists.
   3. `tools/plate.py render` renders the Guardian, companion, caption, and
      context plates into the same directory.
-  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60. The former
-     terminal-black hold existed only for the Platform Wars and Titanfall cards,
-     which now play after Darwin in Act II, so the master ends at 113.60 s.
-     Audio comes from `media/yt_into_the_light_without_dialogue.webm`, beginning at
+  4. ffmpeg trims the Into the Light picture from 2.0 -> 113.60 and ends at
+     the source fade; the former terminal hold belonged to the cards now moved
+     into Act II. Audio comes from
+     `media/yt_into_the_light_without_dialogue.webm`, beginning at
      2.0 + 1.978625 = 3.978625 s; that offset was measured against the prior
      instrumental master at 94974 samples / 48 kHz (ncorr 0.999999920). It is
      decoded once to FLAC with no normalization, EQ, compression, or limiter.
@@ -68,7 +68,7 @@ AUDIO_SRC = "media/yt_into_the_light_without_dialogue.webm"
 TRIM_START = 2.0
 TRIM_END = 113.60
 AUDIO_SYNC_OFFSET = 1.978625
-OUTPUT_DURATION = 113.60
+OUTPUT_DURATION = TRIM_END - TRIM_START
 
 
 def trim_command(ffmpeg):
