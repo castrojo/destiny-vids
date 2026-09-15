@@ -1380,7 +1380,9 @@ def build():
     # Hunter. That is deliberate and it is the owner's call: holding the names
     # only while all three figures are separate is what made them flash by.
     trio_ats = [round(mc - MEGACUT_OFFSET, 3) for _, _, mc in TRIO]
-    trio_out = round(max(trio_ats) + TRIO_HOLD, 3)
+    glider_at = next(e["at"] for e in chapter_entries if e["id"] == "rev_glider")
+    trio_out = round(min(max(trio_ats) + TRIO_HOLD,
+                         glider_at - PLATE_GAP), 3)
     for order, ((key, where, _), at) in enumerate(zip(TRIO, trio_ats)):
         dur = round(trio_out - at, 3)
         assert dur >= MIN_HOLD, (

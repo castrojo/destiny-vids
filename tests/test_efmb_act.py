@@ -897,15 +897,14 @@ def test_the_owners_marks_are_megacut_time():
     assert by_id["trio_rochaporto"]["at"] == pytest.approx(57.433, abs=1e-3)
 
 def test_the_trio_staggers_and_then_holds_together():
-    """"only show joseph sandoval, we're going to stagger these, keep them up
-    for readability" -- one name, then a pair, then the row, and the row
-    clears together a full TRIO_HOLD after the LAST arrival."""
-    by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    cards = [by_id[f"trio_{k}"] for k, _, _ in build_efmb_plates.TRIO]
-    outs = {round(c["at"] + c["dur"], 3) for c in cards}
+    """The staggered trio clears together before the owner-pinned glider cue."""
+    manifest = build_efmb_plates.build()
+    by_id = {p["id"]: p for p in manifest["plates"]}
+    cards = [by_id[f"trio_{key}"] for key, _, _ in build_efmb_plates.TRIO]
+    outs = {round(card["at"] + card["dur"], 3) for card in cards}
     assert len(outs) == 1, "the row must clear together"
     assert outs.pop() == pytest.approx(
-        max(c["at"] for c in cards) + build_efmb_plates.TRIO_HOLD, abs=1e-3)
+        by_id["rev_glider"]["at"] - build_efmb_plates.PLATE_GAP, abs=1e-3)
     assert cards[0]["dur"] > cards[-1]["dur"], "Joseph is up longest"
 
 def test_the_correct_opening_guardians_are_on_the_owners_marks():
@@ -950,7 +949,7 @@ def test_the_wrong_cncf_community_leadership_card_is_absent():
 
 def test_the_new_dialogue_lands_on_the_owners_seconds():
     by_id = {p["id"]: p for p in build_efmb_plates.build()["plates"]}
-    assert by_id["chat_joseph_slop"]["at"] == pytest.approx(70.433, abs=1e-3)
+    assert by_id["chat_joseph_slop"]["at"] == pytest.approx(74.484, abs=1e-3)
     assert by_id["chat_joseph_slop"]["text"] == "That explains the slop"
     assert all(p["label"] == "Your choices are:" for p in _choice_frames())
 
@@ -1260,6 +1259,7 @@ def test_latest_owner_pass_replaces_the_hallway_dialogue():
         ("rev_glider", "rochaporto", "The glider can take us around the solar system"),
         ("rev_not_mars", "angellk", "Yeah but this isn't Mars"),
         ("rev_know_what", "raravena80", "Make it look like we know what we are doing"),
+        ("chat_joseph_slop", "jrsapi", "That explains the slop"),
         ("rev_love_job", "angellk", "I love this job"),
         ("rev_like_cardio", "angellk", "Like cardio!"),
         ("rev_getting_sloppy", "jrsapi", "This is getting sloppy!"),
@@ -1277,7 +1277,9 @@ def test_latest_owner_pass_replaces_the_hallway_dialogue():
     assert [(by_id[plate_id]["speaker"], by_id[plate_id]["text"])
             for plate_id, _, _ in expected] == [
                 (speaker, text) for _, speaker, text in expected]
-    assert by_id["rev_glider"]["at"] == pytest.approx(412.0 - 289.4)
+    assert by_id["rev_glider"]["at"] == pytest.approx(355.0 - 289.4)
+    assert by_id["chat_joseph_slop"]["at"] == pytest.approx(363.884 - 289.4)
+    assert by_id["rev_know_what"]["at"] + by_id["rev_know_what"]["dur"] < by_id["chat_joseph_slop"]["at"]
     assert by_id["rev_love_job"]["at"] == pytest.approx(437.0 - 289.4)
     assert by_id["rev_like_cardio"]["at"] == pytest.approx(469.0 - 289.4)
     assert by_id["rev_getting_sloppy"]["at"] == pytest.approx(473.0 - 289.4)

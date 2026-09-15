@@ -33,9 +33,15 @@ The builder derives those intervals from the records below.
 
 [chat_ricardo_ai] ricardosalveti @ 5:30.833 +3.4: They wanted us to put AI in the glider so we did.
 
-## 5:59.833
+## 5:55
 
-[chat_joseph_slop] jrsapi @ 5:59.833 +2.6: That explains the slop
+[rev_glider] rochaporto: The glider can take us around the solar system
+[rev_not_mars] angellk: Yeah but this isn't Mars
+[rev_know_what] raravena80: Make it look like we know what we are doing
+
+## 6:03.884
+
+[chat_joseph_slop] jrsapi: That explains the slop
   - position: null
 
 >> KARENA'S FOUR LINES ARE OUT, AND THIS IS THE ONLY RECORD OF THEM.
@@ -83,11 +89,6 @@ punch-list entry. <<
 ! [late_poor_technical_decisions] YOUR POOR TECHNICAL DECISIONS |
 
 
-## 6:52
-
-[rev_glider] rochaporto: The glider can take us around the solar system
-[rev_not_mars] angellk: Yeah but this isn't Mars
-[rev_know_what] raravena80: Make it look like we know what we are doing
 
 ## 7:03.900
 

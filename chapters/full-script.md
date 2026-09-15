@@ -30,7 +30,10 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `5:30.83` **ricardosalveti** — They wanted us to put AI in the glider so we did.
 - `5:34.60` Clankers and Contributors / The Community fights its way / Through the Chaos / To Find the Kube of Destiny
 - `5:35.90` PRESENT DAY
-- `5:59.83` **jrsapi** — That explains the slop
+- `5:55.00` **rochaporto** — The glider can take us around the solar system
+- `5:58.32` **angellk** — Yeah but this isn't Mars
+- `6:00.77` **raravena80** — Make it look like we know what we are doing
+- `6:03.88` **jrsapi** — That explains the slop
 - `6:13.83` Your choices are:
 - `6:13.90` Your choices are:
 - `6:13.96` Your choices are:
@@ -108,9 +111,6 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `6:39.60` **jrsapi** — They just need mentoring in the right skills
 - `6:45.90` Mars
 - `6:50.60` Proident sunt culpa qui / YOUR POOR TECHNICAL DECISIONS
-- `6:52.00` **rochaporto** — The glider can take us around the solar system
-- `6:55.32` **angellk** — Yeah but this isn't Mars
-- `6:57.77` **raravena80** — Make it look like we know what we are doing
 - `7:07.90` #UPSTREAMFIRST | Support the Open Gaming Collective(OGC) | #UPSTREAMFIRST
 - `7:10.08` **jrsapi** — The gamers would have to impress BOTH Ricardos
 - `7:13.03` **rochaporto** — Look man I am so tired just jump
