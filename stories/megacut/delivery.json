@@ -248,7 +248,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/intermission/03-intermission.mp4": {
    "note": "The intermission slide deck that concludes the mrbobbytables section. Silent -- the owner's different song is not chosen yet. CARRIES AUTHORED COPY, which is why the chapter file, the plate manifest, tools/plate.py and vocab/casting.yaml are all declared: every one of them restates what a slide says. Right now every word is lorem ipsum and the deck credits nobody, so a change here changes prose and not a claim about a person -- that stops being true the moment real copy lands.",
@@ -259,7 +259,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "8cc507d1f527b7cb430fcd83d458a24a63edeed868e7072836cb4c74d4b0b146"
+   "source_digest": "fbe13c80d50fbb0d853b8a1773e971eba021d4620197050c698887c74d0f46f3"
   },
   "renders/excision/excision-plated.mp4": {
    "note": "The non-act Excision first-battle segment. CARRIES AUTHORED COPY ABOUT REAL PEOPLE and owner-supplied HUD strings. The rally subtitle rail is removed from the black matte; the Ward/finale source is explicitly no-HUD. The plated master is built in one burn from the clean cut.",
@@ -291,7 +291,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/perfume-4-overlays.mp4": {
    "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
@@ -312,7 +312,7 @@
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json"
    ],
-   "source_digest": "8e93e4b76f780f3f66677eea75604ee30e0abac3db0014bc58d49aa64c5d6f93"
+   "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/perfume-5-ending.mp4": {
    "note": "Movement 5's overlay derivative: the impact, the underwater passage and its eleven closing lines. CARRIES AUTHORED COPY ABOUT REAL PEOPLE -- the ending cards.",

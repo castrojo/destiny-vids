@@ -2,9 +2,8 @@
  "_what": "The intermission slide deck that plays after act III and Perfume's third movement. GENERATED from the deck block in chapters/III-mrbobbytables.md -- edit the chapter file, then run `python3 scripts/build_intermission.py --write`.",
  "act": "III",
  "source": "chapters/III-mrbobbytables.md",
- "film_sec": 11.648,
+ "film_sec": 27.2,
  "unresolved": [
-  "line 2 of the intermission block is pinned 15.002s before the previous line clears; the pin is honoured and the two overlap on screen",
   "no bed is cleared or chosen for the intermission yet. Owner, 2026-08-23: 'I want to put a different song here eventually for now I need the text placeholder.' The deck renders silent and the megacut item carries no audio until one is picked.",
   "every word on these slides is lorem ipsum. `python3 tools/placeholder.py list` names them; replacing the copy is one edit to the chapter file and one `--write`."
  ],
@@ -23,7 +22,7 @@
   {
    "id": "intermission-2",
    "kind": "slide",
-   "at": -8.752,
+   "at": 6.8,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
@@ -35,7 +34,7 @@
   {
    "id": "intermission-3",
    "kind": "slide",
-   "at": -1.952,
+   "at": 13.6,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
@@ -47,7 +46,7 @@
   {
    "id": "intermission-4",
    "kind": "slide",
-   "at": 4.848,
+   "at": 20.4,
    "dur": 6.0,
    "position": "slide",
    "copy_source": "placeholder",
