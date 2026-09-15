@@ -511,7 +511,7 @@ SOLO = [
         "key": "kolunmi",
         "src": (323.933, 325.933),
         "seen": 323.933,
-        "at_film": 257.367,
+        "at_film": build_efmb.KOLUNMI_AT,
         "why": "owner-seated on the held hallway frame after the Cayde exchange",
     },
     {

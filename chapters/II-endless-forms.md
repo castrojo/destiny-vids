@@ -174,14 +174,17 @@ punch-list entry. <<
 [mapped_redacted_blow] castrojo @ 8:51.800 +2.6: Or go blow some shit up
   - seen_at_src: 310.900
 
-## 9:52 paused
+## 8:54.650 cayde
 
-[rev_cayde_spirit] castrojo @ 8:54.650: There's the spirit
+[rev_cayde_spirit] castrojo: There's the spirit
 [rev_cayde_story] castrojo: Never let stop energy tell YOUR story
 [rev_cayde_children] castrojo: Go forth and conquer my gamer children!
 [owner_convo_joseph] jrsapi: We can't let The Toilmaster enslave another generation
-[rev_legendary] angellk @ 9:11.517: Don't look at me I only turned on Legendary Mode
-[chat_amber_bazaar] akgraner @ 9:14.967: Let me clean out this trash
+
+## 9:11.517 paused
+
+[rev_legendary] angellk: Don't look at me I only turned on Legendary Mode
+[chat_amber_bazaar] akgraner: Let me clean out this trash
 
 ## 9:17.167 amber-action
 

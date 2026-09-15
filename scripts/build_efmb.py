@@ -207,12 +207,17 @@ HALLWAY_RESUME_SRC = 325.933
 # The picture reaches the held hallway at film 255.433. The compact chapter
 # block determines exactly how long that frame remains before Amber's action.
 HALLWAY_AT = 255.433
-# The three labels are the clock: `paused` ends after Akgraner clears,
-# `amber-action` spans the exact external clip, and `post-amber` ends after
-# Kolunmi clears. The owner's "go right into" instruction permits no empty gap.
+# The four labels are the clock: `cayde` ends after the preserved exchange,
+# `paused` ends after Akgraner clears, `amber-action` spans the exact external
+# clip, and `post-amber` ends after Kolunmi clears. The owner's "go right into"
+# instruction permits no empty gap at either hard edit boundary.
+CAYDE_BLOCK = "cayde"
 PAUSED_BLOCK = "paused"
 AMBER_ACTION_BLOCK = "amber-action"
 POST_AMBER_BLOCK = "post-amber"
+CAYDE_BLOCK_END = chapter_md.block_end("II", CAYDE_BLOCK)
+KOLUNMI_HOLD = 4.5
+KOLUNMI_AT = round(CAYDE_BLOCK_END + chapter_md.GAP, 3)
 AMBER_AT = round(chapter_md.block_end("II", PAUSED_BLOCK) - chapter_md.GAP, 3)
 HALLWAY_FREEZE_SEC = round(AMBER_AT - HALLWAY_AT, 3)
 AMBER_CLIP_IN = 43.000
