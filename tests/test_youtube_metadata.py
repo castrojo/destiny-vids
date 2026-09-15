@@ -40,10 +40,15 @@ def test_music_videos_have_full_band_credits():
             assert item["music"]["artist"] in desc
 
 
-def test_generated_json_file_validity():
-    p = Path.home() / "Videos" / "bluefin-youtube-metadata.json"
-    assert p.exists()
-    data = json.loads(p.read_text(encoding="utf-8"))
+def test_generated_json_file_validity(tmp_path, monkeypatch):
+    out_dir = tmp_path / "youtube-metadata"
+    json_out = tmp_path / "bluefin-youtube-metadata.json"
+    monkeypatch.setattr(gen, "VIDEOS_DIR", tmp_path)
+    monkeypatch.setattr(gen, "OUT_DIR", out_dir)
+    monkeypatch.setattr(gen, "JSON_OUT", json_out)
+    gen.main()
+    assert json_out.exists()
+    data = json.loads(json_out.read_text(encoding="utf-8"))
     assert len(data) >= 15
     for vid, item in data.items():
         assert "id" in item
