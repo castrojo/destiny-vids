@@ -157,8 +157,9 @@ def test_act_i_megacut_clip_keeps_clean_cinematic_tail():
         item for item in plan["items"]
         if item.get("path", "").endswith("01-intro.mp4")
     )
-    assert "trim_from" not in act_i
-    assert act_i["trim_to"] == pytest.approx(111.60)
+    assert act_i["trim_from"] == pytest.approx(2.0)
+    assert act_i["trim_to"] == pytest.approx(113.60)
+    assert act_i["trim_to"] - act_i["trim_from"] == pytest.approx(111.60)
 
 def test_act_ii_megacut_clip_keeps_its_now_carded_black_head():
     plan = _load("megacut.json")

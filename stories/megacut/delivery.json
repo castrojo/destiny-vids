@@ -27,7 +27,7 @@
   },
   "I": {
    "path": "~/src/destiny-vids/renders/megacut-01-hero.mp4",
-   "note": "scripts/build_act1.py rebuilds the 111.600 s master end to end. Picture is official Destiny 2 upload BKm0TPqeOjY, cut 2.0 -> 113.60 with no terminal extension. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns at the measured +1.978625 s offset. One tools/plate.py burn keeps the Guardian/companion plates, narrative captions and context card. Platform Wars and the Titanfall warning moved after Darwin in Act II.",
+   "note": "scripts/build_act1.py rebuilds the 113.600 s master end to end: 111.600 s of source 2.0 -> 113.60 plus the remaining 2.000 s terminal pad. The programme skips the 2.000 s standalone black head and contributes 111.600 s. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns at the measured +1.978625 s offset. Platform Wars and the Titanfall warning moved after Darwin in Act II.",
    "sources": [
     "stories/megacut/megacut-hero-plates.json",
     "stories/summit-photos.json",

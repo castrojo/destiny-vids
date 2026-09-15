@@ -15,7 +15,7 @@
  "_transitions": "Fade shapes at the act joins. THE NUMBERS ARE NOT RESTATED HERE -- each clip carries its own `fade_in`/`fade_out`, in ACT FILM time (the clip's own clock), so a re-order never moves them and this note can never disagree with them. Read the items; re-measure with `python3 tools/transitions.py --measure` on the built programme rather than believing any paragraph. THE PRINCIPLE (#105): an act that fades itself out carries no `fade_out` -- doubling the taper on a fade the act already performs is the fault, not the fix. Acts II and VI fade themselves; the prologue runs itself down to -58.7 dB RMS across its last three seconds and act I opens at digital silence climbing through -30 to -18 dB, so that join carries no fade on either side. Where music meets music at full level the join is hard, per docs/skills/megacut/references/joins.md. A dip is right only where the incoming act enters QUIET. LEFT TO THE OWNER (automatable: no): levelling the act ENTRIES, which still differ by roughly 20 dB -- a static gain per act is a mix decision, not a derivation.",
  "_sources": {
   "_where": "Every act plays from ~/Videos/Wolves/Prod, which holds the HIGHEST-QUALITY master of each: FLAC audio and the un-re-encoded picture. They are hardlinks to the per-project masters, so Prod costs no extra disk and cannot drift from what its project built.",
-  "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — 111.600 s picture from official Destiny 2 upload BKm0TPqeOjY, source 2.0 -> 113.60. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns at the measured +1.978625 s alignment offset. Platform Wars and Titanfall now play after Darwin in Act II. usage_class: third_party_copyrighted.",
+  "hero": "~/Videos/Wolves/Prod/01-intro.mp4 (hardlink to renders/megacut-01-hero.mp4) — 113.600 s master from official Destiny 2 upload BKm0TPqeOjY, source 2.0 -> 113.60 plus the remaining 2.000 s terminal pad; the programme skips its 2.000 s black head and contributes 111.600 s. Audio is the dialogue-free score from Destiny Music Archive upload BV3BZKbpBns at the measured +1.978625 s alignment offset. Platform Wars and Titanfall now play after Darwin in Act II. usage_class: third_party_copyrighted.",
   "mrbobbytables": "Wolves/Prod/03-mrbobbytables.mp4 -> destiny-vids/renders/yt_curse_of_osiris_opening_cinematic-credited-hq.mp4. The complete owner-authored Andy Anderson / Bob Killen conversation, retirement card and contributor ensemble are burned into the act master; assembly places that verified master as-is.",
   "kat": "Wolves/Prod/04-kat.mp4 -> ~/Videos/wolves-kat/wolves-kat-reveal-hq.mp4. Carries the owner's dialogue change (the Kat/Ian telnet split and 'Remember kids, cardio!'). Its script writes its master in place, so the Prod hardlink survives a rebuild.",
   "natali": "Wolves/Prod/05-nat.mp4 -> ~/Videos/wolves-natali/wolves-natali-arrival-shudder-bed-hq.mp4.",
@@ -59,9 +59,10 @@
    "gain_db": 2.3,
    "_gain": "The dialogue-free score measures -3.4 dBTP on the rebuilt master. +2.3 dB is the most a plain gain can add while holding the act inside the -0.9..-1.1 dBTP band; the audio tenet forbids a limiter, compression or normalisation.",
    "label": "Act I \u2014 Into the Light: six Guardians and companions, cinematic captions, dialogue-free score",
-   "_dur_note": "The shortened master is 111.600 s and ends at the source fade. The old terminal hold belonged to Platform Wars and Titanfall, which now play after Darwin in Act II.",
-   "trim_to": 111.6,
-   "_trim_to": "The programme plays the complete shortened master; no card-length black tail remains."
+   "_dur_note": "The rebuilt master is 113.600 s: 111.600 s of decoded source plus the remaining 2.000 s terminal pad. Platform Wars and Titanfall moved after Darwin in Act II, so the former 6.600 s card hold is gone.",
+   "trim_from": 2.0,
+   "trim_to": 113.6,
+   "_trim_to": "The programme skips the standalone 2.000 s black head and contributes 111.600 s, preserving the established lit opening while shortening the old tail hold."
   },
   {
    "kind": "clip",

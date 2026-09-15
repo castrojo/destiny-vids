@@ -68,7 +68,7 @@ AUDIO_SRC = "media/yt_into_the_light_without_dialogue.webm"
 TRIM_START = 2.0
 TRIM_END = 113.60
 AUDIO_SYNC_OFFSET = 1.978625
-OUTPUT_DURATION = TRIM_END - TRIM_START
+OUTPUT_DURATION = TRIM_END
 
 
 def trim_command(ffmpeg):

@@ -150,12 +150,12 @@ Edit in `scripts/build_efmb_plates.py -- except the two red splashes, which are 
 - `9:02.67` **jrsapi** — We can't let The Toilmaster enslave another generation
 - `9:11.52` **angellk** — Don't look at me I only turned on Legendary Mode
 - `9:14.97` **akgraner** — Let me clean out this trash
-- `9:27.89` **kolunmi** — Hey did you see how we just loaded up in a new level?
-- `9:31.90` Reprehenderit voluptate / HATERS
-- `9:37.50` **KyleGospo** — Sup
-- `9:39.55` **kolunmi** — Cardio!
-- `10:02.47` **castrojo** — Finally, retirement
-- `10:04.92` **castrojo** — The long walk beckons
+- `9:27.64` **kolunmi** — Hey did you see how we just loaded up in a new level?
+- `9:31.40` Reprehenderit voluptate / HATERS
+- `9:37.00` **KyleGospo** — Sup
+- `9:39.05` **kolunmi** — Cardio!
+- `10:01.97` **castrojo** — Finally, retirement
+- `10:04.42` **castrojo** — The long walk beckons
 
 ## III
 

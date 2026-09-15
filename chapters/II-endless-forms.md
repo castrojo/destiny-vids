@@ -190,9 +190,9 @@ punch-list entry. <<
 [rev_legendary] angellk @ 9:11.517: Don't look at me I only turned on Legendary Mode
 [chat_amber_bazaar] akgraner @ 9:14.967: Let me clean out this trash
 
-## 9:17.417 amber-action
+## 9:17.167 amber-action
 
-## 9:27.887 post-amber
+## 9:27.637 post-amber
 
 [chat_kolunmi_level] kolunmi: Hey did you see how we just loaded up in a new level?
 

@@ -1284,7 +1284,7 @@ def test_latest_owner_pass_replaces_the_hallway_dialogue():
     assert by_id["rev_cayde_spirit"]["at"] == pytest.approx(245.25)
     assert by_id["rev_legendary"]["at"] == pytest.approx(262.117)
     assert by_id["chat_amber_bazaar"]["at"] == pytest.approx(265.567)
-    assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(278.487)
+    assert by_id["chat_kolunmi_level"]["at"] == pytest.approx(278.237)
     assert not chapter_entries_with_label("amber-action")
     assert chapter_entries_with_label("post-amber") == [
         ("kolunmi", "Hey did you see how we just loaded up in a new level?")]

@@ -213,19 +213,19 @@ HALLWAY_AT = 255.433
 PAUSED_BLOCK = "paused"
 AMBER_ACTION_BLOCK = "amber-action"
 POST_AMBER_BLOCK = "post-amber"
-HALLWAY_FREEZE_SEC = round(
-    chapter_md.block_end("II", PAUSED_BLOCK) - HALLWAY_AT, 3)
-AMBER_AT = HALLWAY_AT + HALLWAY_FREEZE_SEC
+AMBER_AT = round(chapter_md.block_end("II", PAUSED_BLOCK) - chapter_md.GAP, 3)
+HALLWAY_FREEZE_SEC = round(AMBER_AT - HALLWAY_AT, 3)
 AMBER_CLIP_IN = 43.000
-AMBER_CLIP_SEC = round(
-    chapter_md.block_end("II", AMBER_ACTION_BLOCK) - AMBER_AT, 3)
-AMBER_CLIP_OUT = AMBER_CLIP_IN + AMBER_CLIP_SEC
+AMBER_CLIP_OUT = 53.470
+AMBER_CLIP_SEC = round(AMBER_CLIP_OUT - AMBER_CLIP_IN, 3)
 # Return to the same hallway frame for the post-action conversation before
-# the Destiny picture resumes.
+# the Destiny picture resumes. The last line's readable hold ends the pause;
+# the scheduler's inter-line gap must not extend either hard edit boundary.
 HALLWAY_AFTER_AMBER_AT = AMBER_AT + AMBER_CLIP_SEC
+HALLWAY_RETURN_AT = round(
+    chapter_md.block_end("II", POST_AMBER_BLOCK) - chapter_md.GAP, 3)
 HALLWAY_AFTER_AMBER_SEC = round(
-    chapter_md.block_end("II", POST_AMBER_BLOCK) - HALLWAY_AFTER_AMBER_AT, 3)
-HALLWAY_RETURN_AT = HALLWAY_AFTER_AMBER_AT + HALLWAY_AFTER_AMBER_SEC
+    HALLWAY_RETURN_AT - HALLWAY_AFTER_AMBER_AT, 3)
 
 INTERRUPTION_SEC = (
     HALLWAY_FREEZE_SEC + AMBER_CLIP_SEC + HALLWAY_AFTER_AMBER_SEC)
