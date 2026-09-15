@@ -42,11 +42,11 @@
     "yt_into_the_light_cinematic",
     "yt_into_the_light_without_dialogue"
    ],
-   "source_digest": "63d9b0c56b61b88bb6ac2b04389b1042c2c93e09551cdce2fd78dc0063a74f08",
+   "source_digest": "8508527cfbab961e4a41e028680d452e0b4479281a2c4fafa1c5f50dd4501555",
    "footage_digest": "154a0dba529d838b1dd61e0e82b5bfd5c9bb34d57b68243bae60c1d107dd9f1e",
    "rebuild": "python3 scripts/build_act1.py",
    "_rebuild": "Verified to write THIS master path by default: the builder's own --print-command names it, so `deliver.py build` can close the loop from stale to fresh without a human choosing a command. An act is given a `rebuild` only once that has been checked -- a builder whose default output is some other file (act VIII's is renders/08-credits.mp4, not its master) is left undeclared on purpose, because a wrong rebuild here re-burns nameplates about real people.",
-   "built_from_commit": "1e5c6d106755750610481e258ed326c81f71a49b"
+   "built_from_commit": "f914867d055b86ff00aa4db411e8f598e20a0bdb"
   },
   "II": {
    "path": "~/src/destiny-vids/renders/efmb-plated.mp4",
