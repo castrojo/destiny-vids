@@ -295,14 +295,12 @@
    "source_digest": "ce59ef9746a9889a26e418f91da3239e17260a8098724aa7f535a699368f79de"
   },
   "renders/perfume-4-overlays.mp4": {
-   "note": "Movement 4's overlay derivative: the wallpaper swaps and the chat exchange. CARRIES AUTHORED COPY ABOUT REAL PEOPLE, which is why the plate manifest, tools/plate.py and vocab/casting.yaml are all declared -- a change to any of them restates somebody's words.",
+   "note": "Movement 4's replacement-only derivative: the authored wallpaper and picture swaps, with no dialogue plates.",
    "sources": [
     "scripts/build_ending_overlays.py",
     "stories/00-perfume-thread.json",
     "music/bed_perfume_of_the_timeless.json",
-    "stories/00-perfume-4-plates.json",
-    "tools/plate.py",
-    "vocab/casting.yaml"
+    "stories/00-perfume-4-plates.json"
    ],
    "source_digest": "92f99bd30a1c47d417332715c17326d196276cd25406de6554f73b11512f986a"
   },

@@ -1,18 +1,10 @@
 {
-  "_what": "The chat exchange inside Perfume movement 4, owner copy 2026-08-15, VERBATIM and never edited: six lines in two groups, timed to the song and seated in the letterbox bar over the divers-and-whale-skeleton shot (source 328.080 -> 343.080). Burned into the DERIVATIVE renders/perfume-4-overlays.mp4 by scripts/build_ending_overlays.py; the clean renders/perfume-4.mp4 carries no overlays by the thread's own rule.",
-  "_clock": "All `at` times are MOVEMENT-LOCAL seconds: 0 is source 274.240, the movement's own in point, which is also the derivative's output clock. The owner's original first-group anchor remains local 53.951. The readability pass holds each of the first five pills for 2.200 s and seats them with 0.100 s changes of speaker: 53.951 / 56.251 / 58.551 / 60.851 / 63.151; the later 'Of the wolves' beat follows at 65.451 for its authored 3.000 s hold. The whole exchange ends at 68.451, 0.389 s before the measured whale-shot cut at local 68.840. This preserves every authored word and temporal order without overlapping a pill.",
-  "_letterbox": "position 'letterbox' seats each pill in the bottom bar below the picture rect 0,138,1920,804 -- the same measured letterbox every Perfume movement pads to (source 1920x804 scope, 138 px bars). Render: python3 tools/plate.py render --manifest stories/00-perfume-4-plates.json --out-dir renders/perfume-4/plates --picture 0,138,1920,804",
+  "_what": "Perfume movement 4 carries no dialogue plates. The derivative preserves the authored visual replacements only.",
   "chat": {
-    "source_in": 328.08,
-    "source_out": 343.08,
-    "active_y": 138,
-    "active_height": 804,
-    "plate_ids": [],
-    "_window": "The exchange sits inside one measured shot, the divers approaching the whale skeleton (source 328.080 -> 343.080, local 53.840 -> 68.840), read off the file with select='gt(scene,0.25)'. source_in/source_out are that shot; the pills themselves start on the first downbeat after the owner marks."
+    "plate_ids": []
   },
   "plates": [],
   "chat_wolf": {
     "plate_ids": []
-  },
-  "_chat_wolf": "Owner programme note at 23:30 (movement-local 17.163 from the old 23:12.837 movement start): Rafael, 'What's a wolf?'. Rendered in its own section so the whale-shot chat invariants remain untouched."
+  }
 }

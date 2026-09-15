@@ -197,21 +197,19 @@ BED_TAIL_SEC = None  # derived below, from the remainder
 # These are the owner's recovered source pointers, not inferred timestamps:
 # source 323.933 is the backed-up white hallway with people on the left and dog
 # creatures on the right; source 325.933 is where the Destiny picture resumes.
-# The interruption is intentionally longer than those replaced two seconds so
-# the complete owner conversation can play around Amber's external action.
+# The interruption replaces those two seconds with only the retained authored
+# sequence: the tail of the Cayde/Joseph exchange, Kolunmi's hallway plate,
+# Angelk and Akgraner, Amber's 43.000 -> 53.470 action, then Kolunmi's return
+# line. Removed dialogue contributes no held time.
 HALLWAY_CUT_SRC = 323.933
 HALLWAY_FRAME_SRC = 323.933
 HALLWAY_RESUME_SRC = 325.933
-# Film 255.433 is programme 8:59.233 -- the freeze opens "at 8:59", half a
-# second before akgraner's pinned "Hi sugar, I'm looking for Kyle" (8:59.733).
-# The number itself cannot move: the picture before the hallway plays the
-# source continuously, so this seat is wherever film_for_source(HALLWAY_CUT_SRC)
-# lands (asserted in picture_sequence) -- only cutting frames would move it.
+# The picture reaches the held hallway at film 255.433. The compact chapter
+# block determines exactly how long that frame remains before Amber's action.
 HALLWAY_AT = 255.433
-# The owner moved the external Amber sequence after the complete hallway
-# exchange. The three chapter labels are the clock: `paused` holds the
-# hallway before the insert, `amber-action` is the external sequence, and
-# `post-amber` holds the returned hallway before Destiny picture resumes.
+# The three labels are the clock: `paused` ends after Akgraner clears,
+# `amber-action` spans the exact external clip, and `post-amber` ends after
+# Kolunmi clears. The owner's "go right into" instruction permits no empty gap.
 PAUSED_BLOCK = "paused"
 AMBER_ACTION_BLOCK = "amber-action"
 POST_AMBER_BLOCK = "post-amber"
