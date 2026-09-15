@@ -11,15 +11,14 @@ Movement 5: the eleven closing lines of ``stories/megacut/ending-cards.json``
 (``underwater``) revealed one at a time over the underwater pullback:
 ``renders/perfume-5-ending.mp4``.
 
-Movement 4: Rafael's early ``chat_wolf`` cue followed by the six ``chat``
-lines over the whale-skeleton shot, all from
-``stories/00-perfume-4-plates.json`` into ``renders/perfume-4-overlays.mp4``.
+Movement 4: the authored picture and wallpaper ``replacements`` from
+``stories/00-perfume-thread.json`` into
+``renders/perfume-4-overlays.mp4``. Its dialogue section is deliberately empty:
+the prior conversation was removed by the owner as hallucinated. The derivative
+still exists because the picture replacements are load-bearing.
+
 This is the generalisation the movement-5 pattern predicted: ONE derivative
-per movement, and movement 4's ALSO composes the movement's own
-``replacements`` in the same encode -- the base chain is
-``build_interludes.video_chain`` itself, so a naive copy of the old pattern
-(plates over a bare base) can never ship the chat WITHOUT the wallpapers.
-One source read, one encode: swaps and words together.
+per movement, with the base chain provided by ``build_interludes.video_chain``.
 
 Which movement, which plates
 ----------------------------
