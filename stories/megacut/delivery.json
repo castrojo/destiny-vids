@@ -259,7 +259,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "267918527b6c5a12ae4f73814c44321ea5d8c35eaaeca29c0f30e94979d4eede"
+   "source_digest": "8cc507d1f527b7cb430fcd83d458a24a63edeed868e7072836cb4c74d4b0b146"
   },
   "renders/excision/excision-plated.mp4": {
    "note": "The non-act Excision first-battle segment. CARRIES AUTHORED COPY ABOUT REAL PEOPLE and owner-supplied HUD strings. The rally subtitle rail is removed from the black matte; the Ward/finale source is explicitly no-HUD. The plated master is built in one burn from the clean cut.",
@@ -303,7 +303,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "ba94ded66748d935b2b72e40f57e4ec49f29def6bfe94696b747edb569e7737b"
+   "source_digest": "92f99bd30a1c47d417332715c17326d196276cd25406de6554f73b11512f986a"
   },
   "renders/perfume-5.mp4": {
    "note": "Perfume movement 5, clean base: the dark Earth limb before the impact. Stays clean by the thread's own rule.",
@@ -324,7 +324,7 @@
     "tools/plate.py",
     "vocab/casting.yaml"
    ],
-   "source_digest": "7a2e136f94c9143dda1bbd3ca728c44c57853acce3ad6ff7c8f5b9e09260e896"
+   "source_digest": "a9894d251ab1763687c4e6c8da25697e71560b3ba173d4d20ca904cb90659686"
   },
   "renders/ending/mission-pause.mp4": {
    "note": "The Project Bluefin mission, held in silence. Drawn from the ending cards; no footage.",
@@ -333,7 +333,7 @@
     "stories/megacut/ending-cards.json",
     "tools/plate.py"
    ],
-   "source_digest": "304e54faa243a0d5198c11f3a55e058f4326159d23b1ed66614e39bdc9afc3c9"
+   "source_digest": "e5409cd8672fae6be5245c0707c0e82b863d73a9fd0c05b934aab9ec6f4d9728"
   }
  }
 }
