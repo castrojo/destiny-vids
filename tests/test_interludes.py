@@ -198,11 +198,9 @@ def test_act_six_is_cut_before_its_closing_flash(plan):
 def test_the_trim_keeps_every_tail_credit(plan):
     """A dropped credit is not recoverable by a revert.
 
-    Act VI's tail plates -- the Cayde-6 reveal, the three gold credits, and
-    castrojo's six spoken lines -- all end before the cut. This reads the
-    plate manifest rather than trusting a number copied into a comment. With
-    the interruption removed the margin is 21.3 s: the tail plates all end by
-    390.199, and the trim moved to 411.527 with them.
+    Act VI's tail plates include the Cayde-6 reveal, three gold credits, and
+    thirteen Castrojo lines. The manifest is authoritative: the final line ends
+    at 410.083, leaving 1.444 s before the 411.527 trim.
     """
     plates = json.loads(
         (REPO_ROOT / "stories" / "06-wolves-cayde-plates.json").read_text())
