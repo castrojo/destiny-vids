@@ -41,15 +41,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 DEST = REPO_ROOT / "renders" / "marks"
 OUT = DEST / "bluefin-wordmark.png"
 
-SOURCE_REPO = "ublue-os/universal-blue-org"
-SOURCE_PATH = "content/ocis/bluefin.svg"
+SOURCE_REPO = "projectbluefin/website"
+SOURCE_PATH = "public/brands/bluefin-wordmark.svg"
 SOURCE_URL = (f"https://raw.githubusercontent.com/{SOURCE_REPO}/main/{SOURCE_PATH}")
 
-# The published fill for the wordmark's type. Recoloured for a dark background;
-# the fin's #4285f4 is NOT in this list and is never touched.
-TYPE_FILL = "#000000"
+# The published mark in projectbluefin/website is white with #4285f4 fin for dark backgrounds.
+TYPE_FILL = "#fff"
 REVERSED_FILL = "#ffffff"
-
 RENDER_WIDTH = 1600
 
 
@@ -107,13 +105,7 @@ def main(argv=None):
               file=sys.stderr)
         return 1
 
-    if TYPE_FILL not in svg:
-        print(f"warning: {TYPE_FILL} not found in the published SVG -- the mark "
-              f"may have been redrawn upstream. Not recolouring blind.",
-              file=sys.stderr)
-        return 1
-
-    rasterise(svg.replace(TYPE_FILL, REVERSED_FILL), OUT)
+    rasterise(svg, OUT)
     size = trim(OUT)
     print(f"wrote {OUT} ({size[0]}x{size[1]}) from {SOURCE_REPO}/{SOURCE_PATH}")
     return 0

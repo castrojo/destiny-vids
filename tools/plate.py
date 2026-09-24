@@ -3696,11 +3696,14 @@ def seat_for(entry):
     scale = float(entry.get("scale", 1.0))
     raised = bool(entry.get("raised"))
     if kind == "chat":
+        if entry.get("bond_of"):
+            # A dialogue pill bonded to another plate keeps its authored position
+            return pos, scale, raised
         return "dialogue", scale, False
-    if kind in NAMEPLATE_KINDS and pos != "group":
+    if kind in NAMEPLATE_KINDS and not entry.get("group") and not entry.get("bond_of") and pos != "group":
         # Predictable nameplates: one fixed reading seat across the board.
-        # Group roll-calls retain their horizontal spread, while solo
-        # nameplates no longer jump between left, right, center, or raised.
+        # Group roll-calls (entry.group or pos=='group') retain their authored
+        # spread/scale, and bonded companions sit beside their partner.
         return "nameplate", 1.0, False
     return pos, scale, raised
 

@@ -101,8 +101,19 @@ fields map to the canonical Bluefin status plate. Reuse
 rule, tracking, and type ramp are the design system. Do not replace it with a
 generic title box.
 
-Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
+**The Bluefin wordmark is the modern SVG from `projectbluefin/website`**
+(`public/brands/bluefin-wordmark.svg`), never the legacy/outdated rounded
+`project Bluefin` ligature lockup from `universal-blue-org:content/ocis/bluefin.svg`.
+The canonical modern mark uses Audiowide-based lowercase `blue` in `#ffffff`
+with the integrated blue `#4285f4` `fin` ligature.
 
+Keep background treatments professional and subdued: muted, dark slate/navy
+gradients with gentle ambient lighting and natural depth shadows. Avoid loud
+neon outer glows, sci-fi slash stripes, or high-contrast chromatic clutter.
+Leave subject anatomy (jaws, teeth, weapons, claws) completely unobstructed by
+corner furniture.
+
+Deliver a 1920x1080 JPEG below 2 MB and inspect it at 336x189.
 ## What you must not get wrong
 
 - **Report deliverables from the `Hero/` root.** A rough cut or final
