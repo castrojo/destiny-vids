@@ -29,7 +29,7 @@ from PIL import Image
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
-from tools.plate import FRAME_H, FRAME_W, place, render_plate  # noqa: E402
+from tools.plate import FRAME_H, FRAME_W, place, render_plate, seat_for  # noqa: E402
 
 MANIFEST = REPO / "stories" / "06-wolves-interruption-cards.json"
 OUT_DIR = REPO / "renders" / "interruption"
@@ -58,8 +58,9 @@ def render_card(entry):
         # nameplate below it is unmistakably the thing being introduced.
         frame.alpha_composite(place(intro, "toast", scale=0.6))
         plate = dict(entry["plate"])
+        pos, scale, raised = seat_for(plate)
         frame.alpha_composite(
-            place(render_plate(plate), plate.get("position", "left")))
+            place(render_plate(plate), pos, scale=scale, raised=raised))
         return frame
     raise ValueError(f"{entry.get('id')!r}: unknown interruption card shape "
                      f"{shape!r}")

@@ -300,6 +300,28 @@ STATUS_INSET = 3.0 * REM
 # .wolves-guardian-plate-raised { bottom: auto; top: 28% }
 RAISED_TOP = 0.28
 
+# --- the two fixed reading seats (owner, 2026-09-24) -------------------------
+# "put the dialogue center bottom in the letterbox area so it's consistent
+# across the board, also make it so the name plate never jumps around, people
+# need to read this so the dialogue must be predictably placed."
+#
+# Both seats are FRAME constants: they ignore the probed picture rect, the
+# plate's own height and every per-entry override, because each of those is
+# a way for the same kind of card to land somewhere else. A 2.39:1 picture in
+# a 1080 frame leaves a 138 px bottom bar starting at y=942; the 62 px chat
+# pill centred in it tops out at y=980. Full-frame stretches (act II's
+# opening) keep the same seat, so a reader's eye never has to move.
+DIALOGUE_TOP = 980
+# The Guardian lower third: left margin of the frame, bottom edge on the
+# 2.39:1 picture's 90% line (138 + 0.9 * 804), clear of the dialogue bar.
+NAMEPLATE_LEFT = int(1920 * 0.05)
+NAMEPLATE_BOTTOM = 861
+# The cards that carry a single person's identity and take the fixed seat.
+# `None` is the Guardian plate's default kind. Group roll-call rows keep their
+# own row -- several cards shown together cannot share one seat -- and so do
+# bonded companions, which sit beside their Guardian by construction.
+NAMEPLATE_KINDS = (None, "guardian", "plate", "nameplate", "ghost")
+
 # --- scanner result readout -------------------------------------------------
 # Ana Bray's Warmind scanner already supplies the visual system: thin amber
 # map rules, open target geometry, and no opaque information panels. This
@@ -2454,6 +2476,20 @@ def place(plate, position="left", picture=None, x=None, scale=1.0, raised=False)
             plate, (px + pw - int(STATUS_INSET) - plate.width,
                     py + ph - int(STATUS_INSET) - plate.height))
         return frame
+    if position == "dialogue":
+        # Fixed dialogue seat: center bottom in the letterbox area.
+        # Using DIALOGUE_TOP ensures a constant vertical read-line across all cuts.
+        x = (FRAME_W - plate.width) // 2
+        y = DIALOGUE_TOP
+        frame.alpha_composite(plate, (x, y))
+        return frame
+    if position == "nameplate":
+        # Predictable solo nameplate seat across the board: ignores picture
+        # aspect-ratio jitter so readers' eyes do not hunt across cuts.
+        x = NAMEPLATE_LEFT
+        y = NAMEPLATE_BOTTOM - plate.height
+        frame.alpha_composite(plate, (x, y))
+        return frame
     if position == "letterbox":
         # The banner's strip is the bottom BAR of a letterboxed frame: below
         # the picture entirely, so it can hold for a whole film and never
@@ -3653,6 +3689,22 @@ def load_manifest_entries(entries):
     return entries
 
 
+def seat_for(entry):
+    """Determine the predictable seat (position, scale, raised) for an entry."""
+    kind = entry.get("kind")
+    pos = entry.get("position", "left")
+    scale = float(entry.get("scale", 1.0))
+    raised = bool(entry.get("raised"))
+    if kind == "chat":
+        return "dialogue", scale, False
+    if kind in NAMEPLATE_KINDS and pos != "group":
+        # Predictable nameplates: one fixed reading seat across the board.
+        # Group roll-calls retain their horizontal spread, while solo
+        # nameplates no longer jump between left, right, center, or raised.
+        return "nameplate", 1.0, False
+    return pos, scale, raised
+
+
 def render_all(entries, out_dir, picture=None):
     """Render every plate in a manifest -- except the full-frame cards.
 
@@ -3681,16 +3733,15 @@ def render_all(entries, out_dir, picture=None):
             skipped.append(e["id"])
             continue
         dest = out_dir / f"plate_{e['id']}.png"
-        place(render_plate(e), e.get("position", "left"), picture,
-              x=e.get("x"), scale=float(e.get("scale", 1.0)),
-              raised=bool(e.get("raised"))).save(dest)
+        pos, scale, raised = seat_for(e)
+        place(render_plate(e), pos, picture,
+              x=e.get("x"), scale=scale,
+              raised=raised).save(dest)
         written.append(dest)
     if skipped:
         print(f"skipped {len(skipped)} full-frame card(s) -- render them with "
               f"cards/render-cards.mjs: {', '.join(skipped)}")
     return written
-
-
 def _probe_duration(path, ffmpeg=None):
     """Seconds of ``path``, for bounding the looped plate inputs.
 
