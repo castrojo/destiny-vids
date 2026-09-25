@@ -4,6 +4,25 @@
   "act": "II",
   "plates": [
     {
+      "id": "wob_prologue",
+      "kind": "prologue_card",
+      "panels": [
+        [
+          "A once promising line of Linux",
+          "Edges closer to extinction",
+          "Millions of years of predation and infighting"
+        ],
+        [
+          "Until the cloud native came to their world",
+          "New rules in play, new species evolved",
+          "To unmake all those that had come before"
+        ]
+      ],
+      "copy_source": "owner_supplied",
+      "generator": "scripts/build_world_of_bluefin_plate.mjs",
+      "note": "Owner, 2026-09-25: 'ONe intro slide, fade these lines in before the rest of the video, make it awesome like a cinematic movie', six lines with a blank line after the third -- that break is the card split; then 'stick the 2nd slide at the dark transition 02:25' and 'I want 2 split cards': panel 0 opens the film, panel 1 sits in the black before the monolith. The owner then edited both panels here directly. Set in Jost Light, tracked capitals; timing in scripts/build_world_of_bluefin.py (PROLOGUE_*, CARD_BEFORE)."
+    },
+    {
       "id": "wob_title_swap",
       "kind": "redaction_card",
       "source_at": 91.0,
@@ -20,7 +39,7 @@
       "label": "[Bluefin wordmark] Presents",
       "label_source": "owner_supplied",
       "title": "The World of Bluefin",
-      "subtitle": "The Kube of Destiny shapes this alternate Earth",
+      "subtitle": "A new beginning on a new world",
       "copy_source": "owner_supplied",
       "generator": "scripts/build_world_of_bluefin_thumbnail.mjs",
       "note": "Owner, 2026-09-25: 'make the eyebrow \"project bluefin presents\" with the new wordmark and the subtitle \"The Kube of Destiny shapes this alternate Earth\"', then 'remove the \"project bluefin\" text so it just reads [wordmark] presents'. Art: the standing terror-bird skeleton in the museum, efmb-front.mkv 62.2 s, owner-approved."

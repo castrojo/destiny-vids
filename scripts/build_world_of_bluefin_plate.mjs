@@ -3,7 +3,7 @@
 // though the film shipped that way. Owner: "overlay with a black box but be
 // exact", then "needs another quality pass".
 //
-// The WORDS layer (3840x2160 RGBA). The box under them is drawn from the
+// The WORDS layer (3840x2160 RGBA), and the prologue card's line layers. The box under them is drawn from the
 // frame itself by scripts/build_world_of_bluefin.py, and each layer fades on
 // its own envelope there.
 //
@@ -24,12 +24,16 @@ const outDir = process.argv[2];
 if (!outDir) { console.error('usage: build_world_of_bluefin_plate.mjs <out-dir>'); process.exit(2); }
 fs.mkdirSync(outDir, { recursive: true });
 
+// Every word comes from the record; nothing on screen is typed here.
+const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const record = JSON.parse(fs.readFileSync(path.join(REPO, 'stories/world-of-bluefin-plates.json'), 'utf8'));
+const TEXT = record.plates.find(p => p.id === 'wob_title_swap').text.toUpperCase();  // the card is set in capitals
+
 const S = 2;                          // 1080p measurements -> 4K
 const CARD = { x0: 516, x1: 1396, y0: 670, y1: 736 };   // original ink, 1080p
 const CAP = (CARD.y1 - CARD.y0) * S;                     // 132 px
 const CENTRE_X = (CARD.x0 + CARD.x1) / 2 * S;            // 1912 px
 const INK_TOP = CARD.y0 * S;                             // 1340 px
-const TEXT = 'A WORLD BEFORE KUBERNETES';
 const COLOUR = 'rgb(150, 174, 176)';
 const STROKE = 2.8 * S;               // weight match against the card's stems
 const WORD_GAP = 12 * S;              // the card's word spaces are wide
@@ -37,10 +41,10 @@ const BLUR = 1.1;                     // the print's softness, 4K px
 
 const page = await (await chromium.launch()).newPage({ viewport: { width: 3840, height: 2160 } });
 await page.setContent(`<!DOCTYPE html><html><head>
-<link href="https://fonts.googleapis.com/css2?family=Marcellus&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300&display=block" rel="stylesheet">
 <style>html,body{margin:0;width:3840px;height:2160px;background:transparent;overflow:hidden}</style>
 </head><body></body></html>`, { waitUntil: 'networkidle' });
-await page.evaluate(() => document.fonts.load('200px Marcellus'));
+await page.evaluate(() => Promise.all([document.fonts.load('200px Marcellus'), document.fonts.load('300 72px Jost')]));
 
 // Layer 2: the words, placed by their measured ink box, not by CSS metrics.
 const fit = await page.evaluate(({ TEXT, CAP, CENTRE_X, INK_TOP, COLOUR, STROKE, WORD_GAP, BLUR }) => {
@@ -95,5 +99,34 @@ for (let pass = 0; pass < 3; pass++) {
   fit[`pass${pass}`] = ink;
 }
 await page.screenshot({ path: path.join(outDir, 'text.png'), omitBackground: true });
-await page.context().browser().close();
 console.log(`wrote ${outDir}/text.png`, JSON.stringify(fit));
+
+// The prologue card: one transparent layer per line, each at its final seat,
+// so the builder can fade and drift every line on its own clock. Copy is read
+// verbatim from the record; case and wording are the owner's.
+const prologue = record.plates.find(p => p.id === 'wob_prologue');
+// Jost Light in tracked capitals: Futura lineage, the family of 2001's own
+// on-screen type. Capitals are styling; the words are the owner's.
+const LINE_PX = 72, LEADING = 170;
+for (const [pi, lines] of prologue.panels.entries()) {
+  const top = 1080 - (lines.length - 1) * LEADING / 2;
+  for (const [li, line] of lines.entries()) {
+    await page.evaluate(({ line, y, LINE_PX }) => {
+      document.body.innerHTML = '';
+      const s = document.createElement('div');
+      s.textContent = line;
+      Object.assign(s.style, {
+        position: 'absolute', left: '0', width: '3840px', top: (y - LINE_PX * 0.6) + 'px',
+        textAlign: 'center', whiteSpace: 'nowrap', lineHeight: '1',
+        fontFamily: 'Jost', fontWeight: '300', fontSize: LINE_PX + 'px', letterSpacing: '0.3em',
+        textTransform: 'uppercase', paddingLeft: '0.3em',
+        color: 'rgb(238, 234, 226)',
+        textShadow: '0 0 14px rgba(255, 230, 200, 0.18)',
+      });
+      document.body.appendChild(s);
+    }, { line, y: top + li * LEADING, LINE_PX });
+    await page.screenshot({ path: path.join(outDir, `prologue_${pi}_${li}.png`), omitBackground: true });
+  }
+}
+console.log(`wrote ${outDir}/prologue_*.png`);
+await page.context().browser().close();

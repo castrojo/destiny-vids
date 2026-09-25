@@ -39,7 +39,14 @@ from tools import farm  # noqa: E402
 SOURCE_2001 = Path.home() / "Videos" / (
     "2001： A Space Odyssey ｜ Dawn of Man： Opening Monolith Scene ｜ "
     "Warner Classics [5NShEY1ScSY].webm")
-SOURCE_DARWIN = REPO_ROOT / "renders/efmb-front.mkv"
+SOURCE_DARWIN = REPO_ROOT / "renders/efmb-front.mkv"       # the Darwin SOUND (its mix)
+# The Darwin PICTURE comes from the on-disk 4K master efmb-front was cut from
+# (perfume-2 = source 93.0 -> 159.4, seated at efmb 4.0), at native 3840x1608,
+# so the clip is 4K rather than a 1080 conform scaled back up. The 2001 upload
+# has no rung above 1080p.
+PERFUME_4K = REPO_ROOT / "media/yt_nightwish_perfume_of_the_timeless.mkv"
+DARWIN_PICTURE_IN, DARWIN_PICTURE_S = 93.0, 66.4   # then black, as efmb-front
+CONFORM_4K = "pad=3840:2160:0:(oh-ih)/2:color=black,format=yuv420p"
 WORK = REPO_ROOT / "renders/world-of-bluefin-chunks"
 PLATE_SCRIPT = REPO_ROOT / "scripts/build_world_of_bluefin_plate.mjs"
 PLATE_DIR = REPO_ROOT / "renders/plates-world-of-bluefin"
@@ -82,8 +89,15 @@ EDIT_2001 = [
     (381.0, 391.5),      #   the tribe gives the water up
     (416.791, 425.5),    # night: the leopard on its kill
     (479.0, 504.295),    # terror in the cave: the growl, then Moon-Watcher
-    (504.295, 679.2333), # dawn, the monolith, the sun over it: FINISHED, untouched
+    (504.295, 510.495),  # dawn, fading to black (black 507.63 -> 514.18)
+    (510.495, 679.2333), # out of the black: Ligeti, the monolith, the sun over it
 ]
+# The two prologue panels are cards IN the programme: panel 0 opens the film,
+# panel 1 sits in the black before the monolith (owner: "stick the 2nd slide
+# at the dark transition"), cut in at 510.495 -- mid-black, 2.5 s before the
+# Requiem's first breath at ~513, so the cue plays whole after the card.
+# {index into EDIT_2001: panel}
+CARD_BEFORE = {0: 0, len(EDIT_2001) - 1: 1}
 SPAN_DARWIN = (SOURCE_DARWIN, 4.0, 70.4667)
 # Title swap, in 2001-span time. The source card is up 92.4 -> 93.8, held,
 # down 97.6 -> 100.2, and the shot cuts at 100.768 (select=gt(scene,0.2)).
@@ -96,6 +110,17 @@ SWAP_IN, SWAP_IN_D = 5.0, 1.4
 SHOT_CUT = 14.75            # last card-shot frame is t=14.7333 on the 30 fps grid
 TEXT_OUT_D = 2.0
 LAYER_SECONDS = 16
+
+# The prologue cards (copy: wob_prologue in stories/world-of-bluefin-plates.json,
+# two panels split where the owner left a blank line). Each line fades up and
+# settles a few pixels as it resolves; the panel holds, then fades to black,
+# and the film carries on out of black. Silent.
+PROLOGUE_PANELS = [   # (first line in, line step, fade-out start, fade-out length, card seconds)
+    (1.0, 2.2, 9.4, 1.2, 11.2),
+    (1.0, 2.2, 9.6, 1.4, 11.5),
+]
+PROLOGUE_LINE_FADE = 1.6
+PROLOGUE_DRIFT_PX = 14
 # The card's ink on the 4K conform (1080p x=516..1396, y=670..736), padded
 # for the print's softness; the box covers exactly this.
 BOX = (1016, 1324, 2808, 1488)
@@ -125,19 +150,19 @@ def span_frames(a, b):
 def spans():
     """[(source, in, n_frames)] in programme order."""
     out = [(SOURCE_2001_LINK, a, span_frames(a, b)) for a, b in EDIT_2001]
-    src, a, b = SPAN_DARWIN
-    return out + [(src, a, span_frames(a, b))]
+    _src, a, b = SPAN_DARWIN
+    return out + [(PERFUME_4K, DARWIN_PICTURE_IN, span_frames(a, b))]
 
 
 def plan_chunks():
-    """[(source, src_start, n_frames, has_plate)]: every span is its own chunk,
+    """[(source, src_start, n_frames, has_plate, span_index)]: every span is its own chunk,
     split further when it is longer than MAX_CHUNK_S. Only the first chunk of
     the first span carries the title swap."""
     chunks = []
     for k, (src, a, n) in enumerate(spans()):
         parts = max(1, -(-n // (MAX_CHUNK_S * FPS)))
         bounds = [round(i * n / parts) for i in range(parts + 1)]
-        chunks += [(src, a + lo / FPS, hi - lo, k == 0 and lo == 0)
+        chunks += [(src, a + lo / FPS, hi - lo, k == 0 and lo == 0, k)
                    for lo, hi in zip(bounds, bounds[1:])]
     return chunks
 
@@ -161,10 +186,48 @@ def chunk_argv(ffmpeg, src, start, n_frames, has_plate, out):
                  + layer(1, "bx") + ";" + layer(2, "tx", text_out) + ";"
                  f"[b][bx]overlay=0:0:{on}:eof_action=pass:format=auto[b1];"
                  f"[b1][tx]overlay=0:0:{on}:eof_action=pass:format=auto[v]")
+    elif src == PERFUME_4K:
+        keep = span_frames(0, DARWIN_PICTURE_S)
+        graph = (f"[0:v]fps={FPS},trim=end_frame={keep},{CONFORM_4K},"
+                 f"tpad=stop_mode=add:stop={n_frames - keep}:color=black[v]")
     else:
         graph = f"[0:v]fps={FPS},{CONFORM}[v]"
     return argv + ["-filter_complex", graph, "-map", "[v]", "-an",
                    "-frames:v", str(n_frames), *VIDEO_ARGS, str(out)]
+
+
+def prologue_layers():
+    return sorted(PLATE_DIR.glob("prologue_*_*.png"))
+
+
+def card_frames(pi):
+    return span_frames(0, PROLOGUE_PANELS[pi][4])
+
+
+def prologue_argv(ffmpeg, out, pi):
+    """Panel ``pi``: black 3840x2160, one faded, settling overlay per line."""
+    t0, step, out_st, out_d, seconds = PROLOGUE_PANELS[pi]
+    n = card_frames(pi)
+    argv = [ffmpeg, "-y", "-f", "lavfi", "-i",
+            f"color=c=black:s=3840x2160:r={FPS}:d={seconds}"]
+    graph, last = [], "0:v"
+    for li in range(3):
+        k = li + 1
+        argv += ["-loop", "1", "-t", str(seconds), "-i",
+                 str(PLATE_DIR / f"prologue_{pi}_{li}.png")]
+        t_in = t0 + li * step
+        graph.append(
+            f"[{k}:v]format=rgba,fade=t=in:st={t_in}:d={PROLOGUE_LINE_FADE}:alpha=1,"
+            f"fade=t=out:st={out_st}:d={out_d}:alpha=1[l{k}]")
+        e = f"clip((t-{t_in})/{PROLOGUE_LINE_FADE},0,1)"
+        graph.append(
+            f"[{last}][l{k}]overlay=x=0:y='{PROLOGUE_DRIFT_PX}*pow(1-{e},2)'"
+            f":eval=frame:enable='between(t,{t_in},{out_st + out_d})'"
+            f":format=auto[o{k}]")
+        last = f"o{k}"
+    graph.append(f"[{last}]format=yuv420p[v]")
+    return argv + ["-filter_complex", ";".join(graph), "-map", "[v]", "-an",
+                   "-frames:v", str(n), *VIDEO_ARGS, str(out)], n
 
 
 def audio_argv(ffmpeg, out):
@@ -181,13 +244,27 @@ def audio_argv(ffmpeg, out):
                      f"aformat=sample_fmts=fltp:channel_layouts=stereo,"
                      f"afade=t=in:d=0.012,afade=t=out:st={d - 0.012:.6f}:d=0.012"
                      f"[a{i}]")
-    _src, a, n = edit[-1]
+    _src, _a, n = edit[-1]
+    a = SPAN_DARWIN[1]
     parts.append(f"[1:a]atrim=start={a:.6f}:duration={n / FPS:.6f},"
                  f"asetpts=PTS-STARTPTS,aresample=48000,"
                  f"aformat=sample_fmts=fltp:channel_layouts=stereo[a{n2001}]")
-    graph = ";".join(parts) + ";" + "".join(
-        f"[a{i}]" for i in range(len(edit))) + f"concat=n={len(edit)}:v=0:a=1[a]"
+    order, silences = [], []
+    for i in range(len(edit)):
+        if i in CARD_BEFORE:
+            pi = CARD_BEFORE[i]
+            silences.append(card_frames(pi) / FPS)
+            parts.append(f"[{1 + len(silences)}:a]aformat=sample_fmts=fltp:"
+                         f"channel_layouts=stereo[c{pi}]")
+            order.append(f"[c{pi}]")
+        order.append(f"[a{i}]")
+    graph = ";".join(parts) + ";" + "".join(order) + \
+        f"concat=n={len(order)}:v=0:a=1[a]"
+    silent_inputs = []
+    for d in silences:
+        silent_inputs += ["-f", "lavfi", "-t", f"{d:.6f}", "-i", "anullsrc=r=48000:cl=stereo"]
     return [ffmpeg, "-y", "-i", str(SOURCE_2001_LINK), "-i", str(SOURCE_DARWIN),
+            *silent_inputs,
             "-filter_complex", graph, "-map", "[a]", "-vn",
             "-c:a", "aac", "-b:a", "320k", str(out)]
 
@@ -263,7 +340,7 @@ def render_plate(ffmpeg, mode):
     than the code that draws it -- but replace a layer only when its pixels
     changed, so an unchanged card does not re-encode its chunk."""
     old = {p: (p.read_bytes(), p.stat().st_mtime)
-           for p in (PLATE_BOX, PLATE_TEXT) if p.is_file()}
+           for p in (PLATE_BOX, PLATE_TEXT, *prologue_layers()) if p.is_file()}
     grab_plateau_frame(ffmpeg)
     build_box(mode)
     env = dict(os.environ, NODE_PATH=str(Path.home() /
@@ -284,31 +361,37 @@ def encode_chunks(ffmpeg, chunks, *, local):
     if not ok:
         print(f"farm unavailable ({why}); encoding chunks locally, capped",
               file=sys.stderr)
-    outs = []
-
-    def one(i, chunk):
-        src, start, n, has_plate = chunk
+    jobs, seated = [], set()
+    for i, (src, start, n, has_plate, k) in enumerate(chunks):
+        if k in CARD_BEFORE and k not in seated:
+            seated.add(k)
+            pi = CARD_BEFORE[k]
+            jobs.append((f"card{pi}", *prologue_argv(ffmpeg, WORK / f"chunk_card{pi}.mp4", pi),
+                         [PLATE_DIR / f"prologue_{pi}_{li}.png" for li in range(3)]))
         out = WORK / f"chunk_{i:02d}.mp4"
+        jobs.append((f"{i:02d}", chunk_argv(ffmpeg, src, start, n, has_plate, out),
+                     n, [src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])))
+
+    def one(job):
+        key, argv, n, inputs = job
+        out = Path(argv[-1])
         # Reused only when the SAME argv already produced a chunk of the right
         # length from inputs no newer than it: a card tweak re-encodes the one
         # chunk that carries the card, not the film.
         stamp = out.with_suffix(".argv")
-        argv = chunk_argv(ffmpeg, src, start, n, has_plate, out)
-        deps = [src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])
         if (out.is_file() and stamp.is_file()
                 and stamp.read_text() == "\0".join(argv)
                 and _frame_count(out) == n
-                and out.stat().st_mtime > max(d.stat().st_mtime for d in deps)):
-            print(f"chunk {i:02d}: unchanged ({n} frames), reused")
+                and out.stat().st_mtime > max(d.stat().st_mtime for d in inputs)):
+            print(f"chunk {key}: unchanged ({n} frames), reused")
             return out
         stamp.unlink(missing_ok=True)
-        inputs = [src, PLATE_BOX, PLATE_TEXT] if has_plate else [src]
         if ok:
             farm.run_ffmpeg_on_cluster(
                 argv, inputs=inputs, out=out,
-                name=farm.farm_name(f"wob-chunk-{i:02d}"),
+                name=farm.farm_name(f"wob-chunk-{key}"),
                 limit_cpu="8", memory="2Gi", expected_duration=n / FPS,
-                label=f"farm[wob chunk {i:02d}]")
+                label=f"farm[wob chunk {key}]")
         else:
             farm.run_capped_local(argv, reason=why)
         stamp.write_text("\0".join(argv))
@@ -317,9 +400,8 @@ def encode_chunks(ffmpeg, chunks, *, local):
     # 8 x 8 cpu fills both nodes; submitting every chunk at once asks for more
     # memory than the cluster can schedule, and the farm fails an
     # unschedulable pod rather than queueing it.
-    with ThreadPoolExecutor(max_workers=min(8, len(chunks))) as pool:
-        outs = list(pool.map(lambda ic: one(*ic), enumerate(chunks)))
-    return outs
+    with ThreadPoolExecutor(max_workers=min(8, len(jobs))) as pool:
+        return list(pool.map(one, jobs))
 
 
 def main(argv=None):
@@ -345,7 +427,7 @@ def main(argv=None):
     render_plate(ffmpeg, args.box)
 
     chunks = plan_chunks()
-    total = sum(c[2] for c in chunks)
+    total = sum(c[2] for c in chunks) + sum(card_frames(pi) for pi in CARD_BEFORE.values())
     print(f"{len(chunks)} chunks, {total} frames, {total / FPS:.3f} s")
     outs = encode_chunks(ffmpeg, chunks, local=args.local)
 

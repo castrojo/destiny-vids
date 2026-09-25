@@ -8,16 +8,21 @@ import os from 'os';
 import path from 'path';
 
 // Thumbnail for "The World of Bluefin": the standing terror-bird skeleton in
-// the museum, from the Darwin clip (renders/efmb-front.mkv at 62.2 s), the
+// the museum, from the on-disk 4K Perfume master (source 151.7 s, 3840x1608),
+// framed as a true 16:9 window with the skull left of centre, the
 // modern Bluefin wordmark + "Presents", and the act-card frame on the right so
 // the art stays clear. Owner-approved composition, 2026-09-25.
 const REPO = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const FFMPEG = process.env.DESTINY_FFMPEG || '/home/linuxbrew/.linuxbrew/bin/ffmpeg';
 const bgPath = path.join(REPO, 'renders/plates-world-of-bluefin/thumb-terror-bird-4k.png');
 fs.mkdirSync(path.dirname(bgPath), { recursive: true });
-execFileSync(FFMPEG, ['-v', 'error', '-y', '-ss', '62.2',
-  '-i', path.join(REPO, 'renders/efmb-front.mkv'), '-frames:v', '1',
-  '-vf', 'crop=1920:804:0:138,scale=3840:2160:flags=lanczos', '-update', '1', bgPath]);
+// 2859x1608 is 16:9 at the master's full height: cover-crop, never stretch.
+execFileSync(FFMPEG, ['-v', 'error', '-y', '-ss', '151.7',
+  '-i', path.join(REPO, 'media/yt_nightwish_perfume_of_the_timeless.mkv'), '-frames:v', '1',
+  '-vf', 'crop=2859:1608:632:0,scale=3840:2160:flags=lanczos', '-update', '1', bgPath]);
+const record = JSON.parse(fs.readFileSync(path.join(REPO, 'stories/world-of-bluefin-plates.json'), 'utf8'));
+const thumb = record.plates.find(p => p.id === 'wob_thumbnail');
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const wordmarkPath = path.join(REPO, 'renders/marks/modern-bluefin-wordmark.png');
 const outPath = path.join(os.homedir(), 'Videos/Wolves/world-of-bluefin-thumbnail.jpg');
 
@@ -161,8 +166,8 @@ const html = `<!DOCTYPE html>
 
     <div class="frame">
       <span class="label">// CHAPTER II</span>
-      <h1 class="title">The World of Bluefin</h1>
-      <p class="subtitle">The Kube of Destiny shapes this alternate Earth</p>
+      <h1 class="title">${esc(thumb.title)}</h1>
+      <p class="subtitle">${esc(thumb.subtitle)}</p>
     </div>
   </div>
 </body>
