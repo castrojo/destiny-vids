@@ -23,6 +23,7 @@ span re-encodes that span only.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import subprocess
@@ -139,6 +140,8 @@ def frames(seconds):
 
 
 MAX_CHUNK_S = 90
+BT709_TAGS = ("-color_primaries", "bt709", "-color_trc", "bt709",
+              "-colorspace", "bt709", "-color_range", "tv")
 
 
 def span_frames(a, b):
@@ -167,6 +170,33 @@ def plan_chunks():
     return chunks
 
 
+def darwin_chain():
+    """Perfume movement 2 as the interludes render it -- its authored Bluefin
+    art replacements (the dusk wallpaper turning, the roar jump scare) and
+    all -- but on a 3840x2160 frame from the 4K master. It IS
+    scripts/build_interludes.py's own chain, with the delivery frame swapped,
+    so the two can never disagree about where the art sits or when the
+    raptor cuts in. Returns (graph ending in [dv], the art inputs)."""
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
+    import build_interludes as bi
+    thread = json.loads((REPO_ROOT / "stories/00-perfume-thread.json").read_text())
+    movement = next(m for m in thread["movements"] if m["id"] == "perfume-2")
+    bi.W, bi.H, bi.FPS = 3840, 2160, FPS
+    bi.FIT = f"scale={bi.W}:{bi.H}:force_original_aspect_ratio=decrease:flags=lanczos"
+    bi.PAD = f"pad={bi.W}:{bi.H}:(ow-iw)/2:(oh-ih)/2:color=black"
+    bi._SCOPE_CACHE.clear()
+    spec = {"source": str(PERFUME_4K.relative_to(REPO_ROOT)), "source_height": 1608}
+    repls = bi.usable_replacements(movement)
+    return (bi.video_chain(spec, movement, repls, out_label="dv"),
+            bi._replacement_inputs(repls))
+
+
+def darwin_art():
+    """The artwork files the Darwin chunk reads, for staging onto the farm."""
+    args = darwin_chain()[1]
+    return [Path(args[i + 1]) for i, a in enumerate(args) if a == "-i"]
+
+
 def chunk_argv(ffmpeg, src, start, n_frames, has_plate, out):
     dur = n_frames / FPS
     argv = [ffmpeg, "-y", "-ss", f"{start:.6f}", "-t", f"{dur + 1.0:.6f}",
@@ -187,8 +217,10 @@ def chunk_argv(ffmpeg, src, start, n_frames, has_plate, out):
                  f"[b][bx]overlay=0:0:{on}:eof_action=pass:format=auto[b1];"
                  f"[b1][tx]overlay=0:0:{on}:eof_action=pass:format=auto[v]")
     elif src == PERFUME_4K:
+        chain, art_args = darwin_chain()
+        argv += art_args
         keep = span_frames(0, DARWIN_PICTURE_S)
-        graph = (f"[0:v]fps={FPS},trim=end_frame={keep},{CONFORM_4K},"
+        graph = (f"{chain};[dv]trim=end_frame={keep},"
                  f"tpad=stop_mode=add:stop={n_frames - keep}:color=black[v]")
     else:
         graph = f"[0:v]fps={FPS},{CONFORM}[v]"
@@ -225,9 +257,14 @@ def prologue_argv(ffmpeg, out, pi):
             f":eval=frame:enable='between(t,{t_in},{out_st + out_d})'"
             f":format=auto[o{k}]")
         last = f"o{k}"
-    graph.append(f"[{last}]format=yuv420p[v]")
+    graph.append(f"[{last}]setparams=range=tv:colorspace=bt709:color_primaries=bt709:"
+                 f"color_trc=bt709,format=yuv420p[v]")
+    # Tagged bt709 like every film chunk: the join stream-copies, so every
+    # chunk must emit the SAME SPS, and an untagged card's SPS differs from a
+    # tagged one's (47- vs 51-byte avcC) -- the film then decodes against the
+    # card's parameter sets and breaks up.
     return argv + ["-filter_complex", ";".join(graph), "-map", "[v]", "-an",
-                   "-frames:v", str(n), *VIDEO_ARGS, str(out)], n
+                   "-frames:v", str(n), *VIDEO_ARGS, *BT709_TAGS, str(out)], n
 
 
 def audio_argv(ffmpeg, out):
@@ -274,6 +311,14 @@ def join_argv(ffmpeg, listing, audio, out):
             "-i", str(audio), "-map", "0:v", "-map", "1:a",
             "-c:v", "copy", "-c:a", "copy", "-movflags", "+faststart",
             str(out)]
+
+
+def _extradata_size(path):
+    probe = subprocess.run(
+        [*farm.native_ffprobe(), "-v", "error", "-select_streams", "v:0",
+         "-show_entries", "stream=extradata_size", "-of", "csv=p=0", str(path)],
+        capture_output=True, text=True)
+    return probe.stdout.strip()
 
 
 def _frame_count(path):
@@ -335,6 +380,15 @@ def build_box(mode):
     layer.save(PLATE_BOX)
 
 
+def decode_errors(ffmpeg, path):
+    """Every decoder complaint from a full decode of ``path``: a stream-copy
+    join of chunks with mismatched parameter sets has the right length and
+    frame count and is still garbage, so the length checks cannot see it."""
+    run = subprocess.run([ffmpeg, "-v", "error", "-i", str(path), "-f", "null", "-"],
+                         capture_output=True, text=True)
+    return [l for l in run.stderr.splitlines() if l.strip()]
+
+
 def render_plate(ffmpeg, mode):
     """Redraw both title-swap layers every run, so nothing burned can be older
     than the code that draws it -- but replace a layer only when its pixels
@@ -370,7 +424,8 @@ def encode_chunks(ffmpeg, chunks, *, local):
                          [PLATE_DIR / f"prologue_{pi}_{li}.png" for li in range(3)]))
         out = WORK / f"chunk_{i:02d}.mp4"
         jobs.append((f"{i:02d}", chunk_argv(ffmpeg, src, start, n, has_plate, out),
-                     n, [src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])))
+                     n, [src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])
+                     + (darwin_art() if src == PERFUME_4K else [])))
 
     def one(job):
         key, argv, n, inputs = job
@@ -442,6 +497,14 @@ def main(argv=None):
                           reason="stream-copy join; nothing is encoded")
 
     print(f"built {OUTPUT}")
+    extradata = {_extradata_size(p) for p in outs}
+    errors = decode_errors(ffmpeg, OUTPUT)
+    if len(extradata) != 1 or errors:
+        print(f"NOT DELIVERED: {OUTPUT} does not decode cleanly "
+              f"(avcC sizes {sorted(extradata)}, {len(errors)} decode errors; "
+              f"first: {errors[:1]})", file=sys.stderr)
+        return 1
+    print(f"decoded clean: 0 errors, one parameter set ({extradata.pop()}-byte avcC)")
     if not args.deliver:
         return 0
     for dest in DELIVER:
