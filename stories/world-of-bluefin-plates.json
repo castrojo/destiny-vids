@@ -1,6 +1,6 @@
 {
-  "_what": "THE WORLD OF BLUEFIN -- the chapter that replaces act II's front in the YouTube release: 2001: A Space Odyssey's Dawn of Man sequence (Warner Classics upload 5NShEY1ScSY) from the fade up at 86.0 s to the last frame of the sun-over-the-monolith shot at 679.2333 s, then the Nightwish Darwin clip (renders/efmb-front.mkv 4.0 -> 70.4667, clean), hard cut, each part keeping its own audio, no mix. The rest of Endless Forms Most Beautiful becomes a standalone. Builder: scripts/build_world_of_bluefin.py (frame-exact chunks, one farm Workflow each, stream-copy join).",
-  "_version": "1 -- 2026-09-25: no in-video title slide (owner: 'don't make it in the video make it a thumbnail'); the source's THE DAWN OF MAN card is covered by a black box carrying A World before Kubernetes",
+  "_what": "THE WORLD OF BLUEFIN -- the chapter that replaces act II's front in the YouTube release: 2001: A Space Odyssey's Dawn of Man sequence (Warner Classics upload 5NShEY1ScSY) cut down to its story beats, then the Nightwish Darwin clip (renders/efmb-front.mkv 4.0 -> 70.4667, clean), hard cut, each part keeping its own audio. The cut list is EDIT_2001 in scripts/build_world_of_bluefin.py: source 86.0 -> 504.295 compressed from 6:43 to 2:05 (silent vistas and repeated foraging dropped, one shot or sound event kept per beat), then 504.295 -> 679.2333 untouched (owner: '7m-11m is finished'). The rest of Endless Forms Most Beautiful becomes a standalone.",
+  "_version": "2 -- 2026-09-25: first segment compressed to the story beats (owner: 'compress the first segment ... cut out the monotonous ones for modern audiences, ensure we are capturing 2001 story beats as outlined by the book'); title swap as v1",
   "act": "II",
   "plates": [
     {

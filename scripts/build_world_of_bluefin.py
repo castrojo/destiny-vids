@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
 """'The World of Bluefin' as a map-reduce farm encode.
 
-The 2001 Dawn of Man
-sequence from the fade up (86.0 s) to the last frame of the sun-over-the-monolith shot (679.2333 s)
-with the title card swapped for "A World before Kubernetes", then the Darwin
-evolution clip (``renders/efmb-front.mkv`` 4.0 -> 70.4667) -- but encoded the
-way ``tools/farm.py`` was designed to be used: the output timeline is cut into
-frame-exact chunks, every chunk is its OWN Workflow (so the scheduler spreads
-them over exo-0 and ghost instead of one 24-thread x264 on one node), and the
-pieces are joined with ``-c copy``. This is the Argo fan-out/reduce pattern
-(``withItems`` map, single join) expressed through the farm's per-job API.
+2001's Dawn of Man, cut down to its story beats (``EDIT_2001``: the fade up
+with "THE DAWN OF MAN" swapped for "A WORLD BEFORE KUBERNETES", one shot or
+one sound event per beat of Clarke's "Primeval Night", then the dawn, the
+monolith and the sun over it untouched), hard cut to the Darwin evolution clip
+(``renders/efmb-front.mkv`` 4.0 -> 70.4667).
 
-  map     N video-only chunks, each ``-ss``-seeked into its own source span,
-          conformed to 3840x2160 letterboxed 30 fps, ``-frames:v`` exact.
-  audio   one pass over both spans' audio, concatenated in order, no mixing.
+  map     every span is its own chunk (long spans split at MAX_CHUNK_S), each
+          its own farm Workflow, ``-ss``-seeked into the source, conformed to
+          3840x2160 letterboxed 30 fps, ``-frames:v`` exact; 8 at a time so
+          both nodes are full and every pod schedules.
+  audio   each span's own sound, concatenated in order, 12 ms de-click fades
+          at the 2001 edits, nothing mixed across an edit.
   reduce  concat demuxer, picture and sound stream-copied, never re-encoded.
 
-The 2001 span and the Darwin span never share a chunk, so the cut between the
-two films is a chunk seam by construction.
+A chunk is reused when the same argv already produced it, so a change to one
+span re-encodes that span only.
 
-    python3 scripts/build_world_of_bluefin.py [--chunks 7] [--local] [--deliver]
+    python3 scripts/build_world_of_bluefin.py [--box black|matched] [--local] [--deliver]
 """
 from __future__ import annotations
 
@@ -58,9 +57,33 @@ FPS = 30
 # temp name -- and parallel chunks are threads of one process, so they race on
 # that one link. The chunks read a bracket-free hardlink made once, up front.
 SOURCE_2001_LINK = WORK / "src-2001-dawn-of-man.webm"
-# Out on the last frame of the sun-over-the-monolith shot: the next shot
-# (a desert dawn) cuts in at 679.262, measured with select=gt(scene,0.3).
-SPAN_2001 = (SOURCE_2001_LINK, 86.0, 679.2333)
+
+# THE CUT. Owner: "compress the first segment to capture the best of the
+# first parts of the film and cut out the monotonous ones ... ensure we are
+# capturing 2001 story beats as outlined by the book", "we want to preserve
+# the music so anything without sound is on the table", and "7m-11m is
+# finished". Source seconds on the Warner upload; every in/out is a measured
+# shot cut (ffprobe select=gt(scene,0.25)) or a point picked from per-second
+# RMS inside a long take. The beats are Clarke's "Primeval Night".
+EDIT_2001 = [
+    (86.0, 100.768),     # the fade up; carries the title swap
+    (110.611, 115.490),  # the world before: one sunrise
+    (169.961, 174.091),  # the road to extinction: the tusked skull
+    (197.5, 203.578),    # beside the tapirs: an ape grunts at a tapir
+    (214.756, 219.0),    #   foraging, the tribe's calls
+    (237.5, 242.534),    #   an ape shoves a tapir off the scrub
+    (242.534, 249.249),  #   ...and the tapirs keep feeding
+    (259.0, 274.8),      # the leopard takes one of them (out before the fade)
+    (291.5, 299.8),      # the water hole: drinking
+    (324.5, 326.660),    #   the Others arrive
+    (326.660, 338.171),  #   the screaming stand-off
+    (338.171, 348.2),    #   display, no blow struck
+    (360.402, 362.613),  #   face to face
+    (381.0, 391.5),      #   the tribe gives the water up
+    (416.791, 425.5),    # night: the leopard on its kill
+    (479.0, 504.295),    # terror in the cave: the growl, then Moon-Watcher
+    (504.295, 679.2333), # dawn, the monolith, the sun over it: FINISHED, untouched
+]
 SPAN_DARWIN = (SOURCE_DARWIN, 4.0, 70.4667)
 # Title swap, in 2001-span time. The source card is up 92.4 -> 93.8, held,
 # down 97.6 -> 100.2, and the shot cuts at 100.768 (select=gt(scene,0.2)).
@@ -90,15 +113,32 @@ def frames(seconds):
     return round(seconds * FPS)
 
 
-def plan_chunks(n_2001):
-    """[(source, src_start, n_frames, has_plate)] in programme order."""
-    src, a, b = SPAN_2001
-    total = frames(b - a)
-    bounds = [round(i * total / n_2001) for i in range(n_2001 + 1)]
-    chunks = [(src, a + lo / FPS, hi - lo, lo == 0)
-              for lo, hi in zip(bounds, bounds[1:])]
+MAX_CHUNK_S = 90
+
+
+def span_frames(a, b):
+    """Frames a span keeps on the 30 fps grid. Floored, so a span that ends ON
+    a shot cut never samples the incoming shot's first frame."""
+    return int((b - a) * FPS + 1e-6)
+
+
+def spans():
+    """[(source, in, n_frames)] in programme order."""
+    out = [(SOURCE_2001_LINK, a, span_frames(a, b)) for a, b in EDIT_2001]
     src, a, b = SPAN_DARWIN
-    chunks.append((src, a, frames(b - a), False))
+    return out + [(src, a, span_frames(a, b))]
+
+
+def plan_chunks():
+    """[(source, src_start, n_frames, has_plate)]: every span is its own chunk,
+    split further when it is longer than MAX_CHUNK_S. Only the first chunk of
+    the first span carries the title swap."""
+    chunks = []
+    for k, (src, a, n) in enumerate(spans()):
+        parts = max(1, -(-n // (MAX_CHUNK_S * FPS)))
+        bounds = [round(i * n / parts) for i in range(parts + 1)]
+        chunks += [(src, a + lo / FPS, hi - lo, k == 0 and lo == 0)
+                   for lo, hi in zip(bounds, bounds[1:])]
     return chunks
 
 
@@ -128,12 +168,25 @@ def chunk_argv(ffmpeg, src, start, n_frames, has_plate, out):
 
 
 def audio_argv(ffmpeg, out):
-    parts = []
-    for i, (_src, a, b) in enumerate((SPAN_2001, SPAN_DARWIN)):
-        parts.append(f"[{i}:a]atrim=start={a}:end={b},asetpts=PTS-STARTPTS,"
-                     f"aresample=48000,aformat=sample_fmts=fltp:"
-                     f"channel_layouts=stereo[a{i}]")
-    graph = ";".join(parts) + ";[a0][a1]concat=n=2:v=0:a=1[a]"
+    """Every span's own sound, trimmed to its frames and concatenated in
+    order. A 12 ms fade at each 2001 edit keeps the hard cuts click-free;
+    nothing is mixed across an edit."""
+    edit = spans()
+    n2001 = len(edit) - 1
+    parts = [f"[0:a]asplit={n2001}" + "".join(f"[s{i}]" for i in range(n2001))]
+    for i, (_src, a, n) in enumerate(edit[:-1]):
+        d = n / FPS
+        parts.append(f"[s{i}]atrim=start={a:.6f}:duration={d:.6f},"
+                     f"asetpts=PTS-STARTPTS,aresample=48000,"
+                     f"aformat=sample_fmts=fltp:channel_layouts=stereo,"
+                     f"afade=t=in:d=0.012,afade=t=out:st={d - 0.012:.6f}:d=0.012"
+                     f"[a{i}]")
+    _src, a, n = edit[-1]
+    parts.append(f"[1:a]atrim=start={a:.6f}:duration={n / FPS:.6f},"
+                 f"asetpts=PTS-STARTPTS,aresample=48000,"
+                 f"aformat=sample_fmts=fltp:channel_layouts=stereo[a{n2001}]")
+    graph = ";".join(parts) + ";" + "".join(
+        f"[a{i}]" for i in range(len(edit))) + f"concat=n={len(edit)}:v=0:a=1[a]"
     return [ffmpeg, "-y", "-i", str(SOURCE_2001_LINK), "-i", str(SOURCE_DARWIN),
             "-filter_complex", graph, "-map", "[a]", "-vn",
             "-c:a", "aac", "-b:a", "320k", str(out)]
@@ -254,22 +307,23 @@ def encode_chunks(ffmpeg, chunks, *, local):
             farm.run_ffmpeg_on_cluster(
                 argv, inputs=inputs, out=out,
                 name=farm.farm_name(f"wob-chunk-{i:02d}"),
-                limit_cpu="8", expected_duration=n / FPS,
+                limit_cpu="8", memory="2Gi", expected_duration=n / FPS,
                 label=f"farm[wob chunk {i:02d}]")
         else:
             farm.run_capped_local(argv, reason=why)
         stamp.write_text("\0".join(argv))
         return out
 
-    with ThreadPoolExecutor(max_workers=len(chunks)) as pool:
+    # 8 x 8 cpu fills both nodes; submitting every chunk at once asks for more
+    # memory than the cluster can schedule, and the farm fails an
+    # unschedulable pod rather than queueing it.
+    with ThreadPoolExecutor(max_workers=min(8, len(chunks))) as pool:
         outs = list(pool.map(lambda ic: one(*ic), enumerate(chunks)))
     return outs
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--chunks", type=int, default=7,
-                    help="chunks for the 2001 span (Darwin is one more)")
     ap.add_argument("--local", action="store_true")
     ap.add_argument("--box", choices=("black", "matched"), default="black",
                     help="the box over THE DAWN OF MAN: black, or the sky's tone")
@@ -290,7 +344,7 @@ def main(argv=None):
         SOURCE_2001_LINK.hardlink_to(SOURCE_2001)
     render_plate(ffmpeg, args.box)
 
-    chunks = plan_chunks(args.chunks)
+    chunks = plan_chunks()
     total = sum(c[2] for c in chunks)
     print(f"{len(chunks)} chunks, {total} frames, {total / FPS:.3f} s")
     outs = encode_chunks(ffmpeg, chunks, local=args.local)
