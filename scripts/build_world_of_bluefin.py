@@ -62,12 +62,17 @@ SOURCE_2001_LINK = WORK / "src-2001-dawn-of-man.webm"
 # (a desert dawn) cuts in at 679.262, measured with select=gt(scene,0.3).
 SPAN_2001 = (SOURCE_2001_LINK, 86.0, 679.2333)
 SPAN_DARWIN = (SOURCE_DARWIN, 4.0, 70.4667)
-# Title swap, in 2001-span time. The source card's measured envelope: up
-# 92.4 -> 93.8, held, down 97.6 -> 100.2. The new words ride that envelope; the
-# box is fully up BEFORE the old words start to show and down only AFTER they
-# are gone, so no fraction of THE DAWN OF MAN ever shows through a fade.
-TEXT_IN, TEXT_IN_D, TEXT_OUT, TEXT_OUT_D = 6.4, 1.4, 11.6, 2.6
-BOX_IN, BOX_IN_D, BOX_OUT, BOX_OUT_D = 5.4, 1.0, 14.2, 1.0
+# Title swap, in 2001-span time. The source card is up 92.4 -> 93.8, held,
+# down 97.6 -> 100.2, and the shot cuts at 100.768 (select=gt(scene,0.2)).
+# Owner: "render the world before kubernetes longer than the original so you
+# hide it entirely". Box and words are fully up before the old words begin to
+# show; the box holds until the frame before the cut and leaves WITH the cut
+# (it carries the old shot's tone, so it must never outlive the shot); the
+# words fade over the last 2 s of the shot -- on screen longer than the card.
+SWAP_IN, SWAP_IN_D = 5.0, 1.4
+SHOT_CUT = 14.75            # last card-shot frame is t=14.7333 on the 30 fps grid
+TEXT_OUT_D = 2.0
+LAYER_SECONDS = 16
 # The card's ink on the 4K conform (1080p x=516..1396, y=670..736), padded
 # for the print's softness; the box covers exactly this.
 BOX = (1016, 1324, 2808, 1488)
@@ -103,19 +108,19 @@ def chunk_argv(ffmpeg, src, start, n_frames, has_plate, out):
             "-i", str(src)]
     if has_plate:
         for layer in (PLATE_BOX, PLATE_TEXT):
-            argv += ["-loop", "1", "-t", "16", "-i", str(layer)]
+            argv += ["-loop", "1", "-t", str(LAYER_SECONDS), "-i", str(layer)]
 
-        def layer(i, t_in, d_in, t_out, d_out, name):
-            return (f"[{i}:v]trim=duration=16,setpts=PTS-STARTPTS,format=rgba,"
-                    f"fade=t=in:st={t_in}:d={d_in}:alpha=1,"
-                    f"fade=t=out:st={t_out}:d={d_out}:alpha=1[{name}]")
+        def layer(i, name, fade_out=""):
+            return (f"[{i}:v]trim=duration={LAYER_SECONDS},setpts=PTS-STARTPTS,"
+                    f"format=rgba,fade=t=in:st={SWAP_IN}:d={SWAP_IN_D}:alpha=1"
+                    f"{fade_out}[{name}]")
+        on = f"enable='between(t,{SWAP_IN},{SHOT_CUT})'"
+        text_out = (f",fade=t=out:st={SHOT_CUT - TEXT_OUT_D:.2f}"
+                    f":d={TEXT_OUT_D}:alpha=1")
         graph = (f"[0:v]fps={FPS},{CONFORM}[b];"
-                 + layer(1, BOX_IN, BOX_IN_D, BOX_OUT, BOX_OUT_D, "bx") + ";"
-                 + layer(2, TEXT_IN, TEXT_IN_D, TEXT_OUT, TEXT_OUT_D, "tx") + ";"
-                 f"[b][bx]overlay=0:0:enable='between(t,{BOX_IN},"
-                 f"{BOX_OUT + BOX_OUT_D})':eof_action=pass:format=auto[b1];"
-                 f"[b1][tx]overlay=0:0:enable='between(t,{TEXT_IN},"
-                 f"{TEXT_OUT + TEXT_OUT_D})':eof_action=pass:format=auto[v]")
+                 + layer(1, "bx") + ";" + layer(2, "tx", text_out) + ";"
+                 f"[b][bx]overlay=0:0:{on}:eof_action=pass:format=auto[b1];"
+                 f"[b1][tx]overlay=0:0:{on}:eof_action=pass:format=auto[v]")
     else:
         graph = f"[0:v]fps={FPS},{CONFORM}[v]"
     return argv + ["-filter_complex", graph, "-map", "[v]", "-an",
@@ -202,13 +207,19 @@ def build_box(mode):
 
 def render_plate(ffmpeg, mode):
     """Redraw both title-swap layers every run, so nothing burned can be older
-    than the code that draws it."""
+    than the code that draws it -- but replace a layer only when its pixels
+    changed, so an unchanged card does not re-encode its chunk."""
+    old = {p: (p.read_bytes(), p.stat().st_mtime)
+           for p in (PLATE_BOX, PLATE_TEXT) if p.is_file()}
     grab_plateau_frame(ffmpeg)
     build_box(mode)
     env = dict(os.environ, NODE_PATH=str(Path.home() /
                                          "src/website/node_modules"))
     subprocess.run(["node", str(PLATE_SCRIPT), str(PLATE_DIR)], check=True,
                    env=env)
+    for p, (before, mtime) in old.items():
+        if p.read_bytes() == before:
+            os.utime(p, (p.stat().st_atime, mtime))
 
 
 def encode_chunks(ffmpeg, chunks, *, local):
@@ -225,20 +236,29 @@ def encode_chunks(ffmpeg, chunks, *, local):
     def one(i, chunk):
         src, start, n, has_plate = chunk
         out = WORK / f"chunk_{i:02d}.mp4"
-        deps = [Path(__file__), src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])
-        if out.is_file() and _frame_count(out) == n and (
-                out.stat().st_mtime > max(d.stat().st_mtime for d in deps)):
-            print(f"chunk {i:02d}: already built ({n} frames), reused")
-            return out
+        # Reused only when the SAME argv already produced a chunk of the right
+        # length from inputs no newer than it: a card tweak re-encodes the one
+        # chunk that carries the card, not the film.
+        stamp = out.with_suffix(".argv")
         argv = chunk_argv(ffmpeg, src, start, n, has_plate, out)
+        deps = [src] + ([PLATE_BOX, PLATE_TEXT] if has_plate else [])
+        if (out.is_file() and stamp.is_file()
+                and stamp.read_text() == "\0".join(argv)
+                and _frame_count(out) == n
+                and out.stat().st_mtime > max(d.stat().st_mtime for d in deps)):
+            print(f"chunk {i:02d}: unchanged ({n} frames), reused")
+            return out
+        stamp.unlink(missing_ok=True)
         inputs = [src, PLATE_BOX, PLATE_TEXT] if has_plate else [src]
         if ok:
             farm.run_ffmpeg_on_cluster(
-                argv, inputs=inputs, out=out, name=f"wob-chunk-{i:02d}",
+                argv, inputs=inputs, out=out,
+                name=farm.farm_name(f"wob-chunk-{i:02d}"),
                 limit_cpu="8", expected_duration=n / FPS,
                 label=f"farm[wob chunk {i:02d}]")
         else:
             farm.run_capped_local(argv, reason=why)
+        stamp.write_text("\0".join(argv))
         return out
 
     with ThreadPoolExecutor(max_workers=len(chunks)) as pool:

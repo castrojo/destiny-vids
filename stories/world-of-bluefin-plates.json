@@ -1,17 +1,18 @@
 {
-  "_what": "THE WORLD OF BLUEFIN -- the chapter that replaces act II's front in the YouTube release: 2001: A Space Odyssey's Dawn of Man sequence (Warner Classics upload 5NShEY1ScSY) from the fade up at 86.0 s to the last frame of the sun-over-the-monolith shot at 679.2333 s, then the Nightwish Darwin clip (renders/efmb-front.mkv 4.0 -> 70.4667, clean), hard cut, each part keeping its own audio, no mix. The rest of Endless Forms Most Beautiful becomes a standalone. Builders: scripts/build_world_of_bluefin_chunked.py (farm map-reduce) and scripts/build_world_of_bluefin.py (single pod).",
+  "_what": "THE WORLD OF BLUEFIN -- the chapter that replaces act II's front in the YouTube release: 2001: A Space Odyssey's Dawn of Man sequence (Warner Classics upload 5NShEY1ScSY) from the fade up at 86.0 s to the last frame of the sun-over-the-monolith shot at 679.2333 s, then the Nightwish Darwin clip (renders/efmb-front.mkv 4.0 -> 70.4667, clean), hard cut, each part keeping its own audio, no mix. The rest of Endless Forms Most Beautiful becomes a standalone. Builder: scripts/build_world_of_bluefin.py (frame-exact chunks, one farm Workflow each, stream-copy join).",
   "_version": "1 -- 2026-09-25: no in-video title slide (owner: 'don't make it in the video make it a thumbnail'); the source's THE DAWN OF MAN card is covered by a black box carrying A World before Kubernetes",
   "act": "II",
   "plates": [
     {
       "id": "wob_title_swap",
       "kind": "redaction_card",
-      "source_at": 92.2,
-      "dur": 8.0,
+      "source_at": 91.0,
+      "dur": 9.75,
       "text": "A World before Kubernetes",
       "copy_source": "owner_supplied",
       "generator": "scripts/build_world_of_bluefin_plate.mjs",
-      "note": "Owner, 2026-09-25, verbatim: 'reaplce \"the dawn of man\" slide in the movie with \"A World before Kubernetes\" so that it looks like the movie came that way, make it subtle and perfect', then 'rescue the image though, overlay with a black box but be exact'. The card measures 1080p x=516..1396, y=670..736, colour ~rgb(155,175,178), fading 92.2 -> 94.0 up and 97.6 -> 100.2 down in the source; the box rides that envelope."
+      "note": "Owner, 2026-09-25, verbatim: 'reaplce \"the dawn of man\" slide in the movie with \"A World before Kubernetes\" so that it looks like the movie came that way, make it subtle and perfect', 'rescue the image though, overlay with a black box but be exact', 'render the world before kubernetes longer than the original so you hide it entirely if needbe', and 'ship whatever looks best'. The source card's ink is 1080p x=516..1396, y=670..736, colour ~rgb(155,175,178), up 92.4 -> 93.8 and down 97.6 -> 100.2; the shot cuts at 100.768. Box and words are fully up 91.0 -> 92.4, before the old words show; the box covers exactly the old ink, filled with the shot's own sky tone (the black box read as a sticker on review), and leaves with the cut; the words fade over the shot's last 2 s. Typeface: Marcellus, fitted to the card's measured ink box.",
+      "box": "matched"
     },
     {
       "id": "wob_thumbnail",
