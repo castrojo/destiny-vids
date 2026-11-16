@@ -5,7 +5,7 @@
     {
       "id": "runtime--container-runtime--lima",
       "name": "Lima",
-      "homepage_url": "https://github.com/lima-vm/lima",
+      "homepage_url": "https://lima-vm.io/",
       "logo_svg_url": "https://landscape.cncf.io/logos/f5c2adc9a6645771cdbf17782a45fb4a97db3d007de6523c7682b27f7c35ae2d.svg",
       "logo_png": "assets/cncf-logos/runtime--container-runtime--lima.png"
     },
